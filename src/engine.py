@@ -1,3 +1,4 @@
+from src.camera import Camera
 from src.event_handler import EventHandler
 from src.map_manager import MapManager
 from src.renderer import Renderer
@@ -7,7 +8,7 @@ import pygame
 class Engine:
     """Classe principale qui regroupe tous les composants du programme (Renderer, MapManager, EventHandler, etc ...)"""
     def __init__(self):
-        # L'initialisation de Pygame est nécéssaire pour tous les modules
+        # L'initialisation de Pygame est nécessaire pour tous les modules
         pygame.init()
         self.clock = pygame.time.Clock()
 
@@ -16,8 +17,9 @@ class Engine:
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
+        self.camera = Camera()
 
-        self.map_manager.load_new("maps/map0.tmj")
+        self.map_manager.load_new("maps/map1.tmj")
 
         self.renderer.load_tile_set("assets/tiles.png", 16)
 
@@ -36,6 +38,6 @@ class Engine:
         self.event_handler.update()
 
     def stop(self):
-        """Arrete le programme."""
+        """Arrête le programme."""
         self.running = False
         pygame.quit()
