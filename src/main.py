@@ -1,4 +1,4 @@
-from engine import Engine
+from src.engine import Engine
 
 engine = Engine()
 engine.loop()
