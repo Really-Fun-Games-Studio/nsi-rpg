@@ -23,7 +23,6 @@ class Renderer:
             for x in range(tile_set.get_width()//tile_size):
                 tile = tile_set.subsurface((x*tile_size, y*tile_size, tile_size, tile_size))
                 self.tiles.append(tile)
-        #print(self.tiles)
 
     def update(self):
         """Fait le rendu du jeu."""
@@ -68,5 +67,5 @@ class Renderer:
                                            (y*self.tile_size-self.engine.camera.y+y_middle_offset)))
 
         # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
-        self.window.blit(transform.scale(rendered_surface, (rendered_surface_size[0]*self.engine.camera.zoom, rendered_surface_size[1]*self.engine.camera.zoom)), (0, 0))
-
+        self.window.blit(transform.scale(rendered_surface, (rendered_surface_size[0]*self.engine.camera.zoom,
+                                                            rendered_surface_size[1]*self.engine.camera.zoom)), (0, 0))

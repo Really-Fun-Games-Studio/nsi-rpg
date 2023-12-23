@@ -27,7 +27,7 @@ class MapManager:
         # On récupère la couche demandée
         layer = self.map_layers[layer_id]
 
-        # On calcule les coordonées du chunk
+        # On calcule les coordonnées du chunk
         coordinates = (x//self.chunk_width, y//self.chunk_height)
 
         # On transforme les coordonnées globales en coordonnées dans le chunk
