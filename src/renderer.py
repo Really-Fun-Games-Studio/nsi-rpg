@@ -34,14 +34,20 @@ class Renderer:
         display.update()
 
     def render_map(self):
+        # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
         x_map_range = int(display.get_window_size()[0] / 16 / self.engine.camera.zoom) + 2
         y_map_range = int(display.get_window_size()[1] / 16 / self.engine.camera.zoom) + 2
-        x_map_offset = int(self.engine.camera.x / self.tile_size)
-        y_map_offset = int(self.engine.camera.y / self.tile_size)
 
-        rendered_surface_size = (x_map_range*self.tile_size, y_map_range*self.tile_size)
+        # On calcule le décalage pour centrer la caméra
+        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+
+        # On calcule le décalage du début de rendu des tiles
+        x_map_offset = int((self.engine.camera.x - x_middle_offset) / self.tile_size)
+        y_map_offset = int((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
         # On crée une surface temporaire qui nous permettra de la redimensionner
+        rendered_surface_size = (x_map_range * self.tile_size, y_map_range * self.tile_size)
         rendered_surface = surface.Surface(rendered_surface_size)
 
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
@@ -58,8 +64,8 @@ class Renderer:
 
                     # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
                     rendered_surface.blit(self.tiles[tile_id-1],
-                                          ((x*self.tile_size-self.engine.camera.x),
-                                           (y*self.tile_size-self.engine.camera.y)))
+                                          ((x*self.tile_size-self.engine.camera.x+x_middle_offset),
+                                           (y*self.tile_size-self.engine.camera.y+y_middle_offset)))
 
         # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
         self.window.blit(transform.scale(rendered_surface, (rendered_surface_size[0]*self.engine.camera.zoom, rendered_surface_size[1]*self.engine.camera.zoom)), (0, 0))
