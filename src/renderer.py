@@ -30,6 +30,7 @@ class Renderer:
 
         self.render_map()
 
+        # Apres avoir tout rendu, on met à jour l'écran
         display.update()
 
     def render_map(self):
