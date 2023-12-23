@@ -1,7 +1,10 @@
+import math
+
 from pygame import display, image, surface, transform
 from pygame.locals import RESIZABLE
 
 import src.engine as engine
+from src.animation import Anim
 
 
 class Renderer:
@@ -11,6 +14,7 @@ class Renderer:
         self.window = display.set_mode((600, 600), RESIZABLE)
         self.tiles = []
         self.tile_size = 0
+        self.animations: dict[str: Anim] = {}
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -28,12 +32,40 @@ class Renderer:
         """Fait le rendu du jeu."""
         self.window.fill((255, 255, 255))
 
-        self.render_map()
+        # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
+        rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom, display.get_window_size()[1] / self.engine.camera.zoom)
+        rendered_surface = surface.Surface(rendered_surface_size)
+
+        self.renderer_layer(0, rendered_surface)
+        self.render_entities(rendered_surface)
+        self.renderer_layer(1, rendered_surface)
+        self.renderer_layer(2, rendered_surface)
+
+        # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
+        self.window.blit(transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
+                                                            math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
+                         (0, 0))
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
 
-    def render_map(self):
+    def register_animation(self, animation: Anim, name: str):
+        """Enregistre une animation."""
+        self.animations[name] = animation
+
+    def render_entities(self, rendered_surface: surface.Surface):
+        """Rend toutes les entités."""
+        # On calcule le décalage pour centrer la caméra
+        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+
+        for entity in self.engine.entity_manager.get_all_entities():
+            anim: Anim = self.animations[entity.animation_name]
+            frame = anim.get_frame(0.01666667)
+            rendered_surface.blit(frame, (entity.x-self.engine.camera.x+x_middle_offset, entity.y-self.engine.camera.y+y_middle_offset))
+
+    def renderer_layer(self, layer_id: int, rendered_surface: surface.Surface):
+        """Rend la map."""
         # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
         x_map_range = int(display.get_window_size()[0] / 16 / self.engine.camera.zoom) + 2
         y_map_range = int(display.get_window_size()[1] / 16 / self.engine.camera.zoom) + 2
@@ -46,27 +78,19 @@ class Renderer:
         x_map_offset = int((self.engine.camera.x - x_middle_offset) / self.tile_size)
         y_map_offset = int((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
-        # On crée une surface temporaire qui nous permettra de la redimensionner
-        rendered_surface_size = (x_map_range * self.tile_size, y_map_range * self.tile_size)
-        rendered_surface = surface.Surface(rendered_surface_size)
-
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
-        for i in range(len(self.engine.map_manager.map_layers)):
-            for x in range(x_map_offset, x_map_offset + x_map_range):
-                for y in range(y_map_offset, y_map_offset + y_map_range):
+        for x in range(x_map_offset, x_map_offset + x_map_range):
+            for y in range(y_map_offset, y_map_offset + y_map_range):
 
-                    # On récupère l'id de la tile à la position donnée
-                    tile_id = self.engine.map_manager.get_tile_at(x, y, i)
+                # On récupère l'id de la tile à la position donnée
+                tile_id = self.engine.map_manager.get_tile_at(x, y, layer_id)
 
-                    # Si l'id est 0, il s'agit de vide donc on saute le rendu
-                    if tile_id == 0:
-                        continue
+                # Si l'id est 0, il s'agit de vide donc on saute le rendu
+                if tile_id == 0:
+                    continue
 
-                    # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
-                    rendered_surface.blit(self.tiles[tile_id-1],
-                                          ((x*self.tile_size-self.engine.camera.x+x_middle_offset),
-                                           (y*self.tile_size-self.engine.camera.y+y_middle_offset)))
+                # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
+                rendered_surface.blit(self.tiles[tile_id-1],
+                                      ((x*self.tile_size-self.engine.camera.x+x_middle_offset),
+                                       (y*self.tile_size-self.engine.camera.y+y_middle_offset)))
 
-        # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
-        self.window.blit(transform.scale(rendered_surface, (rendered_surface_size[0]*self.engine.camera.zoom,
-                                                            rendered_surface_size[1]*self.engine.camera.zoom)), (0, 0))
