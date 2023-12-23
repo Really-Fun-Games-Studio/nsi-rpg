@@ -40,7 +40,7 @@ class Renderer:
 
         # On calcule le décalage pour centrer la caméra
         x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
         # On calcule le décalage du début de rendu des tiles
         x_map_offset = int((self.engine.camera.x - x_middle_offset) / self.tile_size)
