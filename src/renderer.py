@@ -34,10 +34,10 @@ class Renderer:
         display.update()
 
     def render_map(self):
-        x_map_range = int(display.get_window_size()[0] // 16 // self.engine.camera.zoom) + 2
-        y_map_range = int(display.get_window_size()[1] // 16 // self.engine.camera.zoom) + 2
-        x_map_offset = int(self.engine.camera.x)
-        y_map_offset = int(self.engine.camera.y)
+        x_map_range = int(display.get_window_size()[0] / 16 / self.engine.camera.zoom) + 2
+        y_map_range = int(display.get_window_size()[1] / 16 / self.engine.camera.zoom) + 2
+        x_map_offset = int(self.engine.camera.x / self.tile_size)
+        y_map_offset = int(self.engine.camera.y / self.tile_size)
 
         rendered_surface_size = (x_map_range*self.tile_size, y_map_range*self.tile_size)
 
@@ -58,8 +58,8 @@ class Renderer:
 
                     # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
                     rendered_surface.blit(self.tiles[tile_id-1],
-                                          ((x-self.engine.camera.x/self.engine.camera.zoom)*self.tile_size,
-                                           (y-self.engine.camera.y/self.engine.camera.zoom)*self.tile_size))
+                                          ((x*self.tile_size-self.engine.camera.x),
+                                           (y*self.tile_size-self.engine.camera.y)))
 
         # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
         self.window.blit(transform.scale(rendered_surface, (rendered_surface_size[0]*self.engine.camera.zoom, rendered_surface_size[1]*self.engine.camera.zoom)), (0, 0))
