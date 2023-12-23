@@ -1,6 +1,6 @@
 import math
 
-from pygame import display, image, surface, transform
+from pygame import display, image, surface, transform, draw
 from pygame.locals import RESIZABLE
 
 import src.engine as engine
@@ -9,6 +9,7 @@ from src.animation import Anim
 
 class Renderer:
     """Classe contenant le moteur de rendu. On utilise, pour cela la bibliothèque Pygame."""
+
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
         self.window = display.set_mode((600, 600), RESIZABLE)
@@ -23,9 +24,9 @@ class Renderer:
         self.tile_size = tile_size
 
         # Scan tout le tile set et le découpe pour créer des tiles de {tile_size} px de hauteur et de largeur
-        for y in range(tile_set.get_height()//tile_size):
-            for x in range(tile_set.get_width()//tile_size):
-                tile = tile_set.subsurface((x*tile_size, y*tile_size, tile_size, tile_size))
+        for y in range(tile_set.get_height() // tile_size):
+            for x in range(tile_set.get_width() // tile_size):
+                tile = tile_set.subsurface((x * tile_size, y * tile_size, tile_size, tile_size))
                 self.tiles.append(tile)
 
     def update(self):
@@ -43,9 +44,10 @@ class Renderer:
         self.renderer_layer(2, rendered_surface)
 
         # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
-        self.window.blit(transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
-                                                            math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
-                         (0, 0))
+        self.window.blit(
+            transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
+                                               math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
+            (0, 0))
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
@@ -65,9 +67,23 @@ class Renderer:
             anim: Anim = self.animations[entity.animation_name]
             frame = anim.get_frame(0.01666667)
 
+            # On calcule les coordonnées de rendu de l'entité
+            player_dest = (entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2,
+                           entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2)
+
             # On affiche l'image
-            rendered_surface.blit(frame, (entity.x-self.engine.camera.x+x_middle_offset-frame.get_width()/2,
-                                          entity.y-self.engine.camera.y+y_middle_offset-frame.get_height()/2))
+            rendered_surface.blit(frame, player_dest)
+
+            if self.engine.DEBUG_MODE:
+                top_let_corner_x = entity.x - self.engine.camera.x + x_middle_offset
+                top_let_corner_y = entity.y - self.engine.camera.y + y_middle_offset
+
+                draw.rect(rendered_surface, (255, 0, 0),
+                          (top_let_corner_x + entity.collision_rect[0],
+                           top_let_corner_y + entity.collision_rect[1],
+                           entity.collision_rect[2] - entity.collision_rect[0],
+                           entity.collision_rect[3] - entity.collision_rect[1]),
+                          width=1)
 
     def renderer_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
@@ -95,7 +111,6 @@ class Renderer:
                     continue
 
                 # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
-                rendered_surface.blit(self.tiles[tile_id-1],
-                                      ((x*self.tile_size-self.engine.camera.x+x_middle_offset),
-                                       (y*self.tile_size-self.engine.camera.y+y_middle_offset)))
-
+                rendered_surface.blit(self.tiles[tile_id - 1],
+                                      ((x * self.tile_size - self.engine.camera.x + x_middle_offset),
+                                       (y * self.tile_size - self.engine.camera.y + y_middle_offset)))

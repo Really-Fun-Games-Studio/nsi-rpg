@@ -12,6 +12,10 @@ class Engine:
     def __init__(self):
         # L'initialisation de Pygame est nécessaire pour tous les modules
         pygame.init()
+
+        # Debug mode utilisé pour tricher (voir les collisions, etc...) WOW ! n'utilisez pas ça pour jouer !
+        self.DEBUG_MODE = True
+
         self.clock = pygame.time.Clock()
 
         self.running = False
