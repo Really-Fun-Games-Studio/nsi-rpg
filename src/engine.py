@@ -55,6 +55,8 @@ class Engine:
         self.renderer.update()
         self.event_handler.update()
 
+        self.entity_manager.get_by_name("player").move(0, 0, self.map_manager)  # TODO : REMOVE !
+
     def stop(self):
         """Arrête le programme."""
         self.running = False
