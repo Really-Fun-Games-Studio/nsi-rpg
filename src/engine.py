@@ -27,11 +27,13 @@ class Engine:
         self.renderer.load_tile_set("assets/tiles.png", 16)
 
         anim = Anim(0.5)  # TODO : REMOVE (ONLY USED FOR TESTING)
-        anim.load_animation_from_directory("assets/entities/test/none")
-        self.renderer.register_animation(anim, "test_none")
+        anim.load_animation_from_directory("assets/entities/player/none")
+        self.renderer.register_animation(anim, "player_none")
 
-        test_entity = self.entity_manager.register_entity("test")
-        test_entity.link_animation("test_none")
+        player = self.entity_manager.register_entity("player")
+        player.link_animation("player_none")
+
+        self.camera.follow_entity(player)
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.

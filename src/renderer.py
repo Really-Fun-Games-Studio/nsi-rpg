@@ -33,7 +33,8 @@ class Renderer:
         self.window.fill((255, 255, 255))
 
         # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
-        rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom, display.get_window_size()[1] / self.engine.camera.zoom)
+        rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom,
+                                 display.get_window_size()[1] / self.engine.camera.zoom)
         rendered_surface = surface.Surface(rendered_surface_size)
 
         self.renderer_layer(0, rendered_surface)
@@ -60,15 +61,19 @@ class Renderer:
         y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
         for entity in self.engine.entity_manager.get_all_entities():
+            # On récupère la frame courante de l'animation
             anim: Anim = self.animations[entity.animation_name]
             frame = anim.get_frame(0.01666667)
-            rendered_surface.blit(frame, (entity.x-self.engine.camera.x+x_middle_offset, entity.y-self.engine.camera.y+y_middle_offset))
+
+            # On affiche l'image
+            rendered_surface.blit(frame, (entity.x-self.engine.camera.x+x_middle_offset-frame.get_width()/2,
+                                          entity.y-self.engine.camera.y+y_middle_offset-frame.get_height()/2))
 
     def renderer_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
         # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
-        x_map_range = int(display.get_window_size()[0] / 16 / self.engine.camera.zoom) + 2
-        y_map_range = int(display.get_window_size()[1] / 16 / self.engine.camera.zoom) + 2
+        x_map_range = int(display.get_window_size()[0] / self.tile_size / self.engine.camera.zoom) + 2
+        y_map_range = int(display.get_window_size()[1] / self.tile_size / self.engine.camera.zoom) + 2
 
         # On calcule le décalage pour centrer la caméra
         x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom

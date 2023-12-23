@@ -20,3 +20,7 @@ class EntityManager:
     def get_all_entities(self):
         """Donne la liste de toutes les entités enregistrées."""
         return list(self.entities.values())
+
+    def get_by_name(self, name: str):
+        """Donne l'entité avec le nom donné."""
+        return self.entities[name]

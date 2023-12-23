@@ -1,8 +1,8 @@
 class Entity:
     """Classe permettant de gérer les entités. Créée automatiquement par `EntityManager.register_entity()`"""
     def __init__(self, name: str):
-        self.x = 2
-        self.y = 2
+        self.x = 8
+        self.y = 8
 
         # Time utilisé pour les IA
         self.time = 0
@@ -13,7 +13,7 @@ class Entity:
 
     def update(self, delta: float):
         """Met à jour l'entité."""
-        self.x += 1
+        # self.x += 1
 
         self.time += delta
 

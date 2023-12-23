@@ -22,14 +22,15 @@ class EventHandler:
             elif e.type == KEYUP:
                 self.key_pressed.remove(e.key)
 
+        player = self.engine.entity_manager.get_by_name("player")
         if K_RIGHT in self.key_pressed:
-            self.engine.camera.target_x += 20
+            player.x += 2
         if K_LEFT in self.key_pressed:
-            self.engine.camera.target_x -= 20
+            player.x -= 2
         if K_UP in self.key_pressed:
-            self.engine.camera.target_y -= 20
+            player.y -= 2
         if K_DOWN in self.key_pressed:
-            self.engine.camera.target_y += 20
+            player.y += 2
         if K_x in self.key_pressed:
             self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
