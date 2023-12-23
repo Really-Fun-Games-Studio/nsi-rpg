@@ -36,6 +36,7 @@ class Engine:
         l'appelle."""
         self.renderer.update()
         self.event_handler.update()
+        self.camera.update()
 
     def stop(self):
         """Arrête le programme."""

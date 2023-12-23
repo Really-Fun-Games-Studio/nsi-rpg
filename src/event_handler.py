@@ -23,14 +23,14 @@ class EventHandler:
                 self.key_pressed.remove(e.key)
 
         if K_RIGHT in self.key_pressed:
-            self.engine.camera.x += 2
+            self.engine.camera.target_x += 20
         if K_LEFT in self.key_pressed:
-            self.engine.camera.x -= 2
+            self.engine.camera.target_x -= 20
         if K_UP in self.key_pressed:
-            self.engine.camera.y -= 2
+            self.engine.camera.target_y -= 20
         if K_DOWN in self.key_pressed:
-            self.engine.camera.y += 2
+            self.engine.camera.target_y += 20
         if K_x in self.key_pressed:
-            self.engine.camera.zoom *= 1.01
+            self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
-            self.engine.camera.zoom *= 0.99
+            self.engine.camera.target_zoom *= 0.99
