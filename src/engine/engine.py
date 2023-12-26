@@ -1,3 +1,4 @@
+from src.engine.boss_fight_manager import BossFightManager
 from src.engine.camera import Camera
 from src.engine.entity_manager import EntityManager
 from src.engine.event_handler import EventHandler
@@ -29,6 +30,7 @@ class Engine:
         self.map_manager = MapManager()
         self.camera = Camera()
         self.entity_manager = EntityManager()
+        self.boss_fight_manager = BossFightManager(self)
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
