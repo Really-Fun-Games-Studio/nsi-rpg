@@ -18,6 +18,8 @@ class Renderer:
         self.tile_size = 0
         self.animations: dict[str: Anim] = {}
 
+        self.boss_fight_animations: dict[str: Anim] = {}
+
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
         tile_set = image.load(file_path).convert_alpha()
@@ -44,10 +46,10 @@ class Renderer:
             gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
             gui_surface.fill((0, 0, 0, 0))
 
-            self.renderer_layer(0, rendered_surface)
+            self.render_layer(0, rendered_surface)
             self.render_entities(rendered_surface, gui_surface, delta)
-            self.renderer_layer(1, rendered_surface)
-            self.renderer_layer(2, rendered_surface)
+            self.render_layer(1, rendered_surface)
+            self.render_layer(2, rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
             self.window.blit(
@@ -66,6 +68,10 @@ class Renderer:
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
         self.animations[name] = animation
+
+    def register_boss_fight_animation(self, animation: Anim, name: str):
+        """Enregistre une animation de combat de boss."""
+        self.boss_fight_animations[name] = animation
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
@@ -132,7 +138,7 @@ class Renderer:
                            entity.collision_rect[3] - entity.collision_rect[1]),
                           width=1)
 
-    def renderer_layer(self, layer_id: int, rendered_surface: surface.Surface):
+    def render_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
         # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
         x_map_range = int(display.get_window_size()[0] / self.tile_size / self.engine.camera.zoom) + 2
