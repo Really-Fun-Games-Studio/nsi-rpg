@@ -9,10 +9,10 @@ class Game(Engine):
         super().__init__()
         self.map_manager.load_new("maps/map2.tmj")
 
-        self.renderer.load_tile_set("assets/tiles.png", 16)
+        self.renderer.load_tile_set("assets/textures/tiles.png", 16)
 
         anim = Anim(0.5)
-        anim.load_animation_from_directory("assets/entities/player/none")
+        anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
 
         player = self.entity_manager.register_entity("player")
@@ -25,7 +25,7 @@ class Game(Engine):
 
         for i in range(20):
             anim = Anim(0.5)
-            anim.load_animation_from_directory("assets/entities/player/none")
+            anim.load_animation_from_directory("assets/textures/entities/player/none")
             self.renderer.register_animation(anim, f"player_none_{i}")
 
             test = self.entity_manager.register_entity(f"test_{i}")
