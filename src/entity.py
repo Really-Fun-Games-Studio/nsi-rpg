@@ -10,7 +10,7 @@ class Entity:
         self.x = 8
         self.y = 8
 
-        self.collision_rect = [-7, -7, 7, 7]  # x1, y1, x2, y2
+        self.collision_rect = [0, 0, 0, 0]  # x1, y1, x2, y2
 
         # Time utilisé pour les IA
         self.time = 0

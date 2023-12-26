@@ -14,7 +14,7 @@ class Engine:
         pygame.init()
 
         # Debug mode utilisé pour tricher (voir les collisions, etc...) WOW ! n'utilisez pas ça pour jouer !
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.clock = pygame.time.Clock()
 
@@ -36,6 +36,7 @@ class Engine:
 
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
+        player.collision_rect = [-7, -7, 7, 7]
 
         self.camera.follow_entity(player)
 
@@ -54,8 +55,6 @@ class Engine:
         self.entity_manager.update(0.016666666)
         self.renderer.update()
         self.event_handler.update()
-
-        self.entity_manager.get_by_name("player").move(0, 0, self.map_manager)  # TODO : REMOVE !
 
     def stop(self):
         """Arrête le programme."""
