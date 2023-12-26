@@ -11,6 +11,10 @@ class Game(Engine):
 
         self.renderer.load_tile_set("assets/textures/tiles.png", 16)
 
+        self.create_player_entity()
+
+    def create_player_entity(self):
+        """Crée une entité joueur."""
         anim = Anim(0.5)
         anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
@@ -22,6 +26,7 @@ class Game(Engine):
         player.set_default_life(10)
 
         self.camera.follow_entity(player)
+
 
 game = Game()
 game.loop()
