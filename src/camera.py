@@ -28,5 +28,6 @@ class Camera:
         self.y += (self.target_y - self.y) / self.smoothness
         self.zoom += (self.target_zoom - self.zoom) / self.smoothness
 
-    def follow_entity(self, entity: Entity):
+    def follow_entity(self, entity: Entity | None):
+        """Active le suivit de l'entité donnée. Mettre `None` pour retirer le suivit."""
         self.followed_entity = entity
