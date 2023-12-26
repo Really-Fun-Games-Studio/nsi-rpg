@@ -8,7 +8,7 @@ class Entity:
         self.x = 8
         self.y = 8
 
-        self.collision_rect = [-7, -7, 20, 20]  # x1, y1, x2, y2
+        self.collision_rect = [-7, -7, 40, 40]  # x1, y1, x2, y2
 
         # Time utilisé pour les IA
         self.time = 0
@@ -23,22 +23,43 @@ class Entity:
 
         self.time += delta
 
+    def get_collisions(self, x: float, y: float, map_manager: MapManager):
+        """Calcule les collisions."""
+        # Pour les collisions, on utilise le layer 1 (le deuxième)
+
+        top_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
+                                int((y + self.collision_rect[1]) / 16))
+        top_right_corner_tile = (int((x + self.collision_rect[2]) / 16),
+                                 int((y + self.collision_rect[1]) / 16))
+
+        bottom_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
+                                   int((y + self.collision_rect[3]) / 16))
+        bottom_right_corner_tile = (int((x + self.collision_rect[2]) / 16),
+                                    int((y + self.collision_rect[3]) / 16))
+
+        collision = False
+
+        for xx in range(top_left_corner_tile[0], bottom_right_corner_tile[0]+1):
+            for yy in range(top_left_corner_tile[1], bottom_right_corner_tile[1]+1):
+                tile = map_manager.get_tile_at(xx, yy, 1)
+                if tile != 0:
+                    collision = True
+
+        return collision
+
     def move(self, x: float, y: float, map_manager: MapManager):
         """Fait bouger l'entité en tenant compte des collisions."""
 
-        # Pour les collisions, on utilise le layer 1 (le deuxième)
+        collision_x = self.get_collisions(self.x + x, self.y, map_manager)
+        collision_y = self.get_collisions(self.x, self.y + y, map_manager)
 
-        top_left_corner_tile = (int((self.x + x + self.collision_rect[0]) / 16),
-                                int((self.y + y + self.collision_rect[1]) / 16))
-        top_right_corner_tile = (int((self.x + x + self.collision_rect[2]) / 16),
-                                 int((self.y + y + self.collision_rect[1]) / 16))
+        if not collision_x:
+            self.x += x
+        if not collision_y:
+            self.y += y
 
-        bottom_left_corner_tile = (int((self.x + x + self.collision_rect[0]) / 16),
-                                   int((self.y + y + self.collision_rect[3]) / 16))
-        bottom_right_corner_tile = (int((self.x + x + self.collision_rect[2]) / 16),
-                                    int((self.y + y + self.collision_rect[3]) / 16))
 
-        print(top_left_corner_tile, top_right_corner_tile, bottom_left_corner_tile, bottom_right_corner_tile)
+        #print(top_left_corner_tile, top_right_corner_tile, bottom_left_corner_tile, bottom_right_corner_tile)
 
     def link_animation(self, name: str):
         self.animation_name = name

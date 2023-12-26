@@ -24,13 +24,13 @@ class EventHandler:
 
         player = self.engine.entity_manager.get_by_name("player")
         if K_RIGHT in self.key_pressed:
-            player.x += 2
+            player.move(2, 0, self.engine.map_manager)
         if K_LEFT in self.key_pressed:
-            player.x -= 2
+            player.move(-2, 0, self.engine.map_manager)
         if K_UP in self.key_pressed:
-            player.y -= 2
+            player.move(0, -2, self.engine.map_manager)
         if K_DOWN in self.key_pressed:
-            player.y += 2
+            player.move(0, 2, self.engine.map_manager)
         if K_x in self.key_pressed:
             self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
