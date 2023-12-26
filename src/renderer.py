@@ -30,7 +30,7 @@ class Renderer:
                 tile = tile_set.subsurface((x * tile_size, y * tile_size, tile_size, tile_size))
                 self.tiles.append(tile)
 
-    def update(self):
+    def update(self, delta: float):
         """Fait le rendu du jeu."""
         self.window.fill((255, 255, 255))
 
@@ -45,7 +45,7 @@ class Renderer:
             gui_surface.fill((0, 0, 0, 0))
 
             self.renderer_layer(0, rendered_surface)
-            self.render_entities(rendered_surface, gui_surface)
+            self.render_entities(rendered_surface, gui_surface, delta)
             self.renderer_layer(1, rendered_surface)
             self.renderer_layer(2, rendered_surface)
 
@@ -67,7 +67,7 @@ class Renderer:
         """Enregistre une animation."""
         self.animations[name] = animation
 
-    def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface):
+    def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
         # On calcule le décalage pour centrer la caméra
         x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
@@ -76,11 +76,18 @@ class Renderer:
         for entity in self.engine.entity_manager.get_all_entities():
             # On récupère la frame courante de l'animation
             anim: Anim = self.animations[entity.animation_name]
-            frame = anim.get_frame(0.01666667)
+            frame = anim.get_frame(delta)
+
+            # Si l'entité n'apparait pas à l'écran, on passe son rendu
+            if (entity.x - self.engine.camera.x + x_middle_offset + frame.get_width() < 0 or
+                    entity.x - self.engine.camera.x - x_middle_offset - frame.get_width() > 0 or
+                    entity.y - self.engine.camera.y + y_middle_offset + frame.get_height() < 0 or
+                    entity.y - self.engine.camera.y - y_middle_offset - frame.get_height() > 0):
+                continue
 
             # On calcule les coordonnées de rendu de l'entité
-            entity_dest = (entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2,
-                           entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2)
+            entity_dest = (math.floor(entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2),
+                           math.floor(entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2))
 
             # On affiche l'image
             rendered_surface.blit(frame, entity_dest)
@@ -95,10 +102,10 @@ class Renderer:
             cooldown_value = entity.damage_cooldown / entity.default_damage_cooldown
 
             # On calcule où placer la barre de vei sur la surface des GUI
-            life_bar_dest = ((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
-                             life_bar_width / 2,
-                             (entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
-                             self.engine.camera.zoom - life_bar_height - life_bar_y_offset)
+            life_bar_dest = (math.floor((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
+                                        life_bar_width / 2),
+                             math.floor((entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
+                                        self.engine.camera.zoom - life_bar_height - life_bar_y_offset))
 
             # Contour de la barre de vie
             draw.rect(gui_surface, (20, 0, 0), (life_bar_dest[0] - life_bar_border,
@@ -107,7 +114,7 @@ class Renderer:
                                                 life_bar_height + life_bar_border * 2))
 
             # Barre de vie
-            draw.rect(gui_surface, (255-255*life_bar_value, 255*life_bar_value, 0),
+            draw.rect(gui_surface, (255 - 255 * life_bar_value, 255 * life_bar_value, 0),
                       life_bar_dest + (life_bar_width * life_bar_value, life_bar_height))
 
             draw.rect(gui_surface, (200, 200, 200),

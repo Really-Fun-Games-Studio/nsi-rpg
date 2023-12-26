@@ -1,3 +1,5 @@
+import random
+
 from src.animation import Anim
 from src.camera import Camera
 from src.entity_manager import EntityManager
@@ -49,6 +51,19 @@ class Engine:
 
         self.camera.follow_entity(player)
 
+        for i in range(20):
+            anim = Anim(0.5)
+            anim.load_animation_from_directory("assets/entities/player/none")
+            self.renderer.register_animation(anim, f"player_none_{i}")
+
+            test = self.entity_manager.register_entity(f"test_{i}")
+            test.x = random.randint(0, 200)
+            test.y = random.randint(0, 200)
+            test.link_animation(f"player_none_{i}")
+            test.collision_rect = [-7, -7, 7, 7]
+
+            test.set_default_life(10)
+
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
         Attend jusqu'à la fin du jeu."""
@@ -62,7 +77,7 @@ class Engine:
         l'appelle."""
         self.camera.update()
         self.entity_manager.update(0.016666666)
-        self.renderer.update()
+        self.renderer.update(0.016666666)
         self.event_handler.update()
 
     def stop(self):

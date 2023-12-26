@@ -26,6 +26,12 @@ class Anim:
         # Avant de retourner l'image, on met à jour le delay
         self.update_current_frame(delta)
 
+        return self.frames[self.current_frame]
+
+    def update_current_frame(self, delta: float):
+        """Met à jour le delay de l'image courante avec le delta time."""
+        self.time += delta
+
         # Si le delay entre deux images est écoulé, on incrémente le numéro de l'image et on remet le temps à 0
         if self.time >= self.change_frame_time:
             self.current_frame += 1
@@ -34,12 +40,6 @@ class Anim:
             # Si on sort de la liste d'images, on revient au début
             if self.current_frame >= len(self.frames):
                 self.current_frame = 0
-
-        return self.frames[self.current_frame]
-
-    def update_current_frame(self, delta: float):
-        """Met à jour le delay de l'image courante avec le delta time."""
-        self.time += delta
 
     def get_specific_frame(self, base: int):
         """Donne la {base} ème image apres l'image courante."""
