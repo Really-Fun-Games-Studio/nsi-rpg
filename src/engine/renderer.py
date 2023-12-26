@@ -143,8 +143,8 @@ class Renderer:
         y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
         # On calcule le décalage du début de rendu des tiles
-        x_map_offset = int((self.engine.camera.x - x_middle_offset) / self.tile_size)
-        y_map_offset = int((self.engine.camera.y - y_middle_offset) / self.tile_size)
+        x_map_offset = math.floor((self.engine.camera.x - x_middle_offset) / self.tile_size)
+        y_map_offset = math.floor((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
         for x in range(x_map_offset, x_map_offset + x_map_range):
