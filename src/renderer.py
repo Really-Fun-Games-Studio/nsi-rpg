@@ -1,7 +1,7 @@
 import math
 
 from pygame import display, image, surface, transform, draw
-from pygame.locals import RESIZABLE
+from pygame.locals import RESIZABLE, SRCALPHA
 
 import src.engine as engine
 from src.animation import Anim
@@ -40,8 +40,12 @@ class Renderer:
                                      display.get_window_size()[1] / self.engine.camera.zoom)
             rendered_surface = surface.Surface(rendered_surface_size)
 
+            # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
+            gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
+            gui_surface.fill((0, 0, 0, 0))
+
             self.renderer_layer(0, rendered_surface)
-            self.render_entities(rendered_surface)
+            self.render_entities(rendered_surface, gui_surface)
             self.renderer_layer(1, rendered_surface)
             self.renderer_layer(2, rendered_surface)
 
@@ -50,6 +54,8 @@ class Renderer:
                 transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
                                                    math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
                 (0, 0))
+
+            self.window.blit(gui_surface, (0, 0))
 
         elif self.engine.game_state == GameState.BOSS_FIGHT:
             self.window.fill((255, 0, 0))
@@ -61,7 +67,7 @@ class Renderer:
         """Enregistre une animation."""
         self.animations[name] = animation
 
-    def render_entities(self, rendered_surface: surface.Surface):
+    def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface):
         """Rend toutes les entités."""
         # On calcule le décalage pour centrer la caméra
         x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
@@ -73,11 +79,22 @@ class Renderer:
             frame = anim.get_frame(0.01666667)
 
             # On calcule les coordonnées de rendu de l'entité
-            player_dest = (entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2,
+            entity_dest = (entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2,
                            entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2)
 
             # On affiche l'image
-            rendered_surface.blit(frame, player_dest)
+            rendered_surface.blit(frame, entity_dest)
+
+            # Rendu de la barre de vie des entités
+            life_bar_width = 50
+            life_bar_height = 8
+            life_bar_y_offset = 5
+
+            draw.rect(gui_surface, (255, 0, 0),
+                      ((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom - life_bar_width / 2,
+                       (entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
+                       self.engine.camera.zoom - life_bar_height - life_bar_y_offset,
+                       life_bar_width, life_bar_height))
 
             if self.engine.DEBUG_MODE:
                 top_let_corner_x = entity.x - self.engine.camera.x + x_middle_offset
