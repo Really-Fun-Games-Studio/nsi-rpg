@@ -27,8 +27,8 @@ class Entity:
 
     def get_collisions(self, x: float, y: float, map_manager: MapManager):
         """Calcule les collisions."""
-        # Pour les collisions, on utilise le layer 1 (le deuxième)
 
+        # On calcule les coordonnées des points en haut à gauche et en bas à droite
         top_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
                                 int((y + self.collision_rect[1]) / 16))
 
@@ -37,9 +37,14 @@ class Entity:
 
         collision = False
 
+        # On itère dans toute la zone de collision
         for xx in range(top_left_corner_tile[0], bottom_right_corner_tile[0]+1):
             for yy in range(top_left_corner_tile[1], bottom_right_corner_tile[1]+1):
+                # Pour les collisions, on utilise le layer 1 (le deuxième)
+                # On récupère la tile aux coordonnées données
                 tile = map_manager.get_tile_at(xx, yy, 1)
+
+                # Si la tile n'est pas du vide, il y a une collision.
                 if tile != 0:
                     collision = True
 
@@ -48,12 +53,11 @@ class Entity:
     def move(self, x: float, y: float, map_manager: MapManager):
         """Fait bouger l'entité en tenant compte des collisions."""
 
-        collision_x = self.get_collisions(self.x + x, self.y, map_manager)
-        collision_y = self.get_collisions(self.x, self.y + y, map_manager)
-
-        if not collision_x:
+        # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
+        if not self.get_collisions(self.x + x, self.y, map_manager):
             self.x += x
         else:
+            # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
             i = 0
             if x > 0:
                 while not self.get_collisions(self.x + i, self.y, map_manager):
@@ -66,7 +70,8 @@ class Entity:
 
             self.x += i
 
-        if not collision_y:
+        # On répète le procédé avec l'ordonnée
+        if not self.get_collisions(self.x, self.y + y, map_manager):
             self.y += y
         else:
             i = 0
@@ -81,8 +86,6 @@ class Entity:
 
             self.y += i
 
-
-        #print(top_left_corner_tile, top_right_corner_tile, bottom_left_corner_tile, bottom_right_corner_tile)
-
     def link_animation(self, name: str):
+        """Met à jour l'animation en cours de l'entité."""
         self.animation_name = name
