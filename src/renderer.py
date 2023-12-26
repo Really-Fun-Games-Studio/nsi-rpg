@@ -51,10 +51,11 @@ class Renderer:
                                                    math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
                 (0, 0))
 
-            # Apres avoir tout rendu, on met à jour l'écran
-            display.update()
         elif self.engine.game_state == GameState.BOSS_FIGHT:
             self.window.fill((255, 0, 0))
+
+        # Apres avoir tout rendu, on met à jour l'écran
+        display.update()
 
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
