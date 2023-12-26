@@ -112,5 +112,5 @@ class Renderer:
 
                 # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
                 rendered_surface.blit(self.tiles[tile_id - 1],
-                                      ((x * self.tile_size - self.engine.camera.x + x_middle_offset),
-                                       (y * self.tile_size - self.engine.camera.y + y_middle_offset)))
+                                      (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
+                                       math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset)))
