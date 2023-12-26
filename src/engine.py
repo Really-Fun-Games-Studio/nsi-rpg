@@ -1,21 +1,11 @@
-from enum import Enum
-
 from src.animation import Anim
 from src.camera import Camera
 from src.entity_manager import EntityManager
 from src.event_handler import EventHandler
 from src.map_manager import MapManager
 from src.renderer import Renderer
+from src.enums import GameState
 import pygame
-
-
-class GameState(Enum):
-    """Enumération utilisée pour définir l'état actuel du jeu."""
-    NONE = 0
-    NORMAL = 1
-    BOSS_FIGHT = 2
-    MAIN_MENU = 3
-    # AJouter si besoin, mais à utiliser de préférence avec parsimony
 
 
 class Engine:
@@ -28,23 +18,25 @@ class Engine:
         self.DEBUG_MODE = False
 
         # Etat courant du jeu
-        self.game_state = GameState.NONE
+        self.game_state = GameState.NORMAL
 
         self.clock = pygame.time.Clock()
 
         self.running = False
 
+        # Composants du moteur de jeu
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
         self.camera = Camera()
         self.entity_manager = EntityManager()
 
+        # TODO : REMOVE (ONLY USED FOR TESTING)
+
         self.map_manager.load_new("maps/map2.tmj")
 
         self.renderer.load_tile_set("assets/tiles.png", 16)
 
-        # TODO : REMOVE (ONLY USED FOR TESTING)
         anim = Anim(0.5)
         anim.load_animation_from_directory("assets/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
