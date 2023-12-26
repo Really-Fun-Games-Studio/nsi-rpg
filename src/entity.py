@@ -29,7 +29,7 @@ class Entity:
         """Met à jour l'entité."""
         self.time += delta
 
-    def get_damages(self, damages: int):
+    def take_damages(self, damages: int):
         """Inflige {damages} dégâts à l'entité."""
 
         # Si life_points est égal à -1, l'entité est immortelle
