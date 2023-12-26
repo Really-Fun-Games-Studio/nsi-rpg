@@ -1,7 +1,7 @@
 from pygame import event
 from pygame.locals import *
 
-import src.engine as engine
+import src.engine.engine as engine
 
 
 class EventHandler:

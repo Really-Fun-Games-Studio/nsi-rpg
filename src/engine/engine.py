@@ -1,12 +1,9 @@
-import random
-
-from src.animation import Anim
-from src.camera import Camera
-from src.entity_manager import EntityManager
-from src.event_handler import EventHandler
-from src.map_manager import MapManager
-from src.renderer import Renderer
-from src.enums import GameState
+from src.engine.camera import Camera
+from src.engine.entity_manager import EntityManager
+from src.engine.event_handler import EventHandler
+from src.engine.map_manager import MapManager
+from src.engine.renderer import Renderer
+from src.engine.enums import GameState
 import pygame
 
 

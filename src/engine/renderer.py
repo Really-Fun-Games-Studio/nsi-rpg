@@ -3,9 +3,9 @@ import math
 from pygame import display, image, surface, transform, draw
 from pygame.locals import RESIZABLE, SRCALPHA
 
-import src.engine as engine
-from src.animation import Anim
-from src.enums import GameState
+import src.engine.engine as engine
+from src.engine.animation import Anim
+from src.engine.enums import GameState
 
 
 class Renderer:

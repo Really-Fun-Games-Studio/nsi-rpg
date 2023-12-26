@@ -1,4 +1,4 @@
-from src.map_manager import MapManager
+from src.engine.map_manager import MapManager
 
 
 class Entity:

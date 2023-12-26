@@ -1,4 +1,4 @@
-from src.entity import Entity
+from src.engine.entity import Entity
 
 
 class EntityManager:

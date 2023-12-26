@@ -1,7 +1,7 @@
 import random
 
-from src.animation import Anim
-from src.engine import Engine
+from src.engine.animation import Anim
+from src.engine.engine import Engine
 
 
 class Game(Engine):
@@ -35,6 +35,7 @@ class Game(Engine):
             test.collision_rect = [-7, -7, 7, 7]
 
             test.set_default_life(10)
+
 
 game = Game()
 game.loop()
