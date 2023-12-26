@@ -10,6 +10,9 @@ class Entity:
         self.x = 8
         self.y = 8
 
+        self.life_points = -1
+        self.max_life_points = -1
+
         self.collision_rect = [0, 0, 0, 0]  # x1, y1, x2, y2
 
         # Time utilisé pour les IA
@@ -24,6 +27,17 @@ class Entity:
         # self.x += 1
 
         self.time += delta
+
+    def get_damages(self, damages: int):
+        """Inflige {damages} dégâts à l'entité."""
+
+        # Si life_points est égal à -1, l'entité est immortelle
+        if self.life_points != -1:
+            # On inflige les dégâts
+            self.life_points -= damages
+            # Si la vie passe en négatif, on la remet à 0
+            if self.life_points < 0:
+                self.life_points = 0
 
     def get_collisions(self, x: float, y: float, map_manager: MapManager):
         """Calcule les collisions."""

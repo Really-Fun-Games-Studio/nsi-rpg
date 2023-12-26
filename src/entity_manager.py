@@ -14,8 +14,11 @@ class EntityManager:
 
     def update(self, delta: float):
         """Met à jour toutes les entités enregistrées."""
-        for entity in self.entities.values():
+        for entity_name in list(self.entities.keys()):
+            entity = self.entities[entity_name]
             entity.update(delta)
+            if entity.life_points == 0:
+                self.entities.pop(entity_name)
 
     def get_all_entities(self):
         """Donne la liste de toutes les entités enregistrées."""
