@@ -11,6 +11,10 @@ class Entity:
         self.life_points = -1
         self.max_life_points = -1
 
+        # Cooldown entre deux points de dégât
+        self.damage_cooldown = 0
+        self.default_damage_cooldown = 0.5
+
         self.collision_rect = [0, 0, 0, 0]  # x1, y1, x2, y2
 
         # Time utilisé pour les IA
@@ -29,13 +33,20 @@ class Entity:
         """Met à jour l'entité."""
         self.time += delta
 
+        # Diminue la valeur du cooldown de dégât
+        self.damage_cooldown -= delta
+        if self.damage_cooldown < 0:
+            self.damage_cooldown = 0
+
     def take_damages(self, damages: int):
         """Inflige {damages} dégâts à l'entité."""
 
         # Si life_points est égal à -1, l'entité est immortelle
-        if self.life_points != -1:
+        if self.life_points != -1 and self.damage_cooldown == 0:
             # On inflige les dégâts
             self.life_points -= damages
+            # Remet le cooldown au maximum
+            self.damage_cooldown = self.default_damage_cooldown
             # Si la vie passe en négatif, on la remet à 0
             if self.life_points < 0:
                 self.life_points = 0

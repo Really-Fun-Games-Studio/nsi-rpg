@@ -35,3 +35,6 @@ class EventHandler:
             self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
             self.engine.camera.target_zoom *= 0.99
+        if K_l in self.key_pressed:
+            player.take_damages(1)
+

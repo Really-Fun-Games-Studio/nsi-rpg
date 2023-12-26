@@ -45,6 +45,8 @@ class Engine:
         player.link_animation("player_none")
         player.collision_rect = [-7, -7, 7, 7]
 
+        player.set_default_life(10)
+
         self.camera.follow_entity(player)
 
     def loop(self):
