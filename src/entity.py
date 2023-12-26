@@ -1,5 +1,3 @@
-import math
-
 from src.map_manager import MapManager
 
 
@@ -22,10 +20,13 @@ class Entity:
 
         self.animation_name = None
 
+    def set_default_life(self, life: int):
+        """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""
+        self.life_points = life
+        self.max_life_points = life
+
     def update(self, delta: float):
         """Met à jour l'entité."""
-        # self.x += 1
-
         self.time += delta
 
     def get_damages(self, damages: int):
