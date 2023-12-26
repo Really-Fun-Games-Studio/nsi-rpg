@@ -5,6 +5,7 @@ from pygame.locals import RESIZABLE
 
 import src.engine as engine
 from src.animation import Anim
+from src.enums import GameState
 
 
 class Renderer:
@@ -33,24 +34,27 @@ class Renderer:
         """Fait le rendu du jeu."""
         self.window.fill((255, 255, 255))
 
-        # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
-        rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom,
-                                 display.get_window_size()[1] / self.engine.camera.zoom)
-        rendered_surface = surface.Surface(rendered_surface_size)
+        if self.engine.game_state == GameState.NORMAL:
+            # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
+            rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom,
+                                     display.get_window_size()[1] / self.engine.camera.zoom)
+            rendered_surface = surface.Surface(rendered_surface_size)
 
-        self.renderer_layer(0, rendered_surface)
-        self.render_entities(rendered_surface)
-        self.renderer_layer(1, rendered_surface)
-        self.renderer_layer(2, rendered_surface)
+            self.renderer_layer(0, rendered_surface)
+            self.render_entities(rendered_surface)
+            self.renderer_layer(1, rendered_surface)
+            self.renderer_layer(2, rendered_surface)
 
-        # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
-        self.window.blit(
-            transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
-                                               math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
-            (0, 0))
+            # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
+            self.window.blit(
+                transform.scale(rendered_surface, (math.ceil(rendered_surface_size[0] * self.engine.camera.zoom),
+                                                   math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
+                (0, 0))
 
-        # Apres avoir tout rendu, on met à jour l'écran
-        display.update()
+            # Apres avoir tout rendu, on met à jour l'écran
+            display.update()
+        elif self.engine.game_state == GameState.BOSS_FIGHT:
+            self.window.fill((255, 0, 0))
 
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
