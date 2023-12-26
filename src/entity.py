@@ -1,3 +1,5 @@
+import math
+
 from src.map_manager import MapManager
 
 
@@ -8,7 +10,7 @@ class Entity:
         self.x = 8
         self.y = 8
 
-        self.collision_rect = [-7, -7, 40, 40]  # x1, y1, x2, y2
+        self.collision_rect = [-7, -7, 7, 7]  # x1, y1, x2, y2
 
         # Time utilisé pour les IA
         self.time = 0
@@ -29,13 +31,9 @@ class Entity:
 
         top_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
                                 int((y + self.collision_rect[1]) / 16))
-        top_right_corner_tile = (int((x + self.collision_rect[2]) / 16),
-                                 int((y + self.collision_rect[1]) / 16))
 
-        bottom_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
-                                   int((y + self.collision_rect[3]) / 16))
-        bottom_right_corner_tile = (int((x + self.collision_rect[2]) / 16),
-                                    int((y + self.collision_rect[3]) / 16))
+        bottom_right_corner_tile = (int((x + self.collision_rect[2]-1) / 16),
+                                    int((y + self.collision_rect[3]-1) / 16))
 
         collision = False
 
@@ -55,8 +53,33 @@ class Entity:
 
         if not collision_x:
             self.x += x
+        else:
+            i = 0
+            if x > 0:
+                while not self.get_collisions(self.x + i, self.y, map_manager):
+                    i += 1
+                i -= 1
+            else:
+                while not self.get_collisions(self.x + i, self.y, map_manager):
+                    i -= 1
+                i += 1
+
+            self.x += i
+
         if not collision_y:
             self.y += y
+        else:
+            i = 0
+            if y > 0:
+                while not self.get_collisions(self.x, self.y + i, map_manager):
+                    i += 1
+                i -= 1
+            else:
+                while not self.get_collisions(self.x, self.y + i, map_manager):
+                    i -= 1
+                i += 1
+
+            self.y += i
 
 
         #print(top_left_corner_tile, top_right_corner_tile, bottom_left_corner_tile, bottom_right_corner_tile)
