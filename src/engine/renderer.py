@@ -92,33 +92,34 @@ class Renderer:
             # On affiche l'image
             rendered_surface.blit(frame, entity_dest)
 
-            # Rendu de la barre de vie des entités
-            life_bar_width = 50
-            life_bar_height = 8
-            life_bar_y_offset = 5
-            life_bar_border = 2
+            if entity.max_life_points != -1:
+                # Rendu de la barre de vie des entités
+                life_bar_width = 50
+                life_bar_height = 8
+                life_bar_y_offset = 5
+                life_bar_border = 2
 
-            life_bar_value = entity.life_points / entity.max_life_points
-            cooldown_value = entity.damage_cooldown / entity.default_damage_cooldown
+                life_bar_value = entity.life_points / entity.max_life_points
+                cooldown_value = entity.damage_cooldown / entity.default_damage_cooldown
 
-            # On calcule où placer la barre de vei sur la surface des GUI
-            life_bar_dest = (math.floor((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
-                                        life_bar_width / 2),
-                             math.floor((entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
-                                        self.engine.camera.zoom - life_bar_height - life_bar_y_offset))
+                # On calcule où placer la barre de vei sur la surface des GUI
+                life_bar_dest = (math.floor((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
+                                            life_bar_width / 2),
+                                 math.floor((entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
+                                            self.engine.camera.zoom - life_bar_height - life_bar_y_offset))
 
-            # Contour de la barre de vie
-            draw.rect(gui_surface, (20, 0, 0), (life_bar_dest[0] - life_bar_border,
-                                                life_bar_dest[1] - life_bar_border,
-                                                life_bar_width + life_bar_border * 2,
-                                                life_bar_height + life_bar_border * 2))
+                # Contour de la barre de vie
+                draw.rect(gui_surface, (20, 0, 0), (life_bar_dest[0] - life_bar_border,
+                                                    life_bar_dest[1] - life_bar_border,
+                                                    life_bar_width + life_bar_border * 2,
+                                                    life_bar_height + life_bar_border * 2))
 
-            # Barre de vie
-            draw.rect(gui_surface, (255 - 255 * life_bar_value, 255 * life_bar_value, 0),
-                      life_bar_dest + (life_bar_width * life_bar_value, life_bar_height))
+                # Barre de vie
+                draw.rect(gui_surface, (255 - 255 * life_bar_value, 255 * life_bar_value, 0),
+                          life_bar_dest + (life_bar_width * life_bar_value, life_bar_height))
 
-            draw.rect(gui_surface, (200, 200, 200),
-                      life_bar_dest + (life_bar_width * life_bar_value * cooldown_value, life_bar_height))
+                draw.rect(gui_surface, (200, 200, 200),
+                          life_bar_dest + (life_bar_width * life_bar_value * cooldown_value, life_bar_height))
 
             if self.engine.DEBUG_MODE:
                 top_let_corner_x = entity.x - self.engine.camera.x + x_middle_offset
