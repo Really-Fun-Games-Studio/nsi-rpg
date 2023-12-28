@@ -17,11 +17,11 @@ class Anim:
         """Enregistre une nouvelle image dans la liste des frames."""
         self.frames.append(frame.convert_alpha())
 
-    def get_frame_nbr(self):
+    def get_frame_nbr(self) -> int:
         """Renvoie le nombre d'images enregistrées."""
         return len(self.frames)
 
-    def get_frame(self, delta: float):
+    def get_frame(self, delta: float) -> pygame.Surface:
         """Donne l'image courante de l'animation."""
         # Avant de retourner l'image, on met à jour le delay
         self.update_current_frame(delta)
@@ -41,7 +41,7 @@ class Anim:
             if self.current_frame >= len(self.frames):
                 self.current_frame = 0
 
-    def get_specific_frame(self, base: int):
+    def get_specific_frame(self, base: int) -> pygame.Surface:
         """Donne la {base} ème image apres l'image courante."""
         # Si le delay entre deux images est écoulé, on incrémente le numéro de l'image et on remet le temps à 0
         if self.time >= self.change_frame_time:
