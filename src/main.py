@@ -7,7 +7,7 @@ from src.engine.engine import Engine
 class Game(Engine):
     def __init__(self):
         super().__init__()
-        self.map_manager.load_new("maps/map3.tmj")
+        self.map_manager.load_new("maps/map4.tmj")
 
         self.renderer.load_tile_set("assets/textures/tiles.png", 16)
 
