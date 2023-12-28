@@ -19,6 +19,10 @@ class Renderer:
         self.animations: dict[str: Anim] = {}
 
         self.boss_fight_animations: dict[str: Anim] = {}
+        # Variables utilisées pour les combats de boss
+        self.boss_fight_boss_animations: dict[str: Anim] = {}
+        self.boss_fight_player_animations: dict[str: Anim] = {}
+        self.boss_fight_GUI_container = None
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -60,7 +64,9 @@ class Renderer:
             self.window.blit(gui_surface, (0, 0))
 
         elif self.engine.game_state == GameState.BOSS_FIGHT:
-            self.window.fill((255, 0, 0))
+            self.window.fill((255, 230, 230))
+            self.render_boss_fight_scene(delta)
+            self.render_boss_fight_gui()
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
@@ -69,9 +75,43 @@ class Renderer:
         """Enregistre une animation."""
         self.animations[name] = animation
 
-    def register_boss_fight_animation(self, animation: Anim, name: str):
-        """Enregistre une animation de combat de boss."""
-        self.boss_fight_animations[name] = animation
+    def register_boss_fight_boss_animation(self, animation: Anim, name: str):
+        """Ajoute une animation pour le boss lors d'un combat de boss."""
+        self.boss_fight_boss_animations[name] = animation
+
+    def register_boss_fight_player_animation(self, animation: Anim, name: str):
+        """Ajoute une animation pour le joueur lors d'un combat de boss."""
+        self.boss_fight_player_animations[name] = animation
+
+    def render_boss_fight_scene(self, delta: float):
+        """Rend les sprites du joueur et du boss lors d'un combat de boss."""
+
+        # On récupère l'image de l'animation du boss
+        boss_animation: Anim = self.boss_fight_boss_animations[self.engine.boss_fight_manager.current_boss_animation]
+        frame = boss_animation.get_frame(delta)
+
+        # On redimensionne l'image
+        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+
+        # On colle le boss à droite de la fenêtre
+        self.window.blit(frame, (display.get_window_size()[0]-frame.get_width()-display.get_window_size()[0]/20,
+                                 display.get_window_size()[1]/4-frame.get_height()/2))
+
+        # On récupère l'image de l'animation du joueur
+        player_animation = self.boss_fight_player_animations[self.engine.boss_fight_manager.current_player_animation]
+        frame = player_animation.get_frame(delta)
+
+        # On redimensionne l'image
+        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+
+        # On colle le joueur à gauche de la fenêtre
+        self.window.blit(frame, (display.get_window_size()[0]/20, display.get_window_size()[1]/4-frame.get_height()/2))
+
+    def render_boss_fight_gui(self):
+        """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
+
+        resized_container = transform.scale(self.boss_fight_GUI_container, (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
+        self.window.blit(resized_container, (0, display.get_window_size()[1]-resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
