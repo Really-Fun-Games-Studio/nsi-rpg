@@ -18,11 +18,17 @@ class Renderer:
         self.tile_size = 0
         self.animations: dict[str: Anim] = {}
 
-        self.boss_fight_animations: dict[str: Anim] = {}
         # Variables utilisées pour les combats de boss
         self.boss_fight_boss_animations: dict[str: Anim] = {}
         self.boss_fight_player_animations: dict[str: Anim] = {}
         self.boss_fight_GUI_container = None
+
+        # Variables utilisées par le menu principal
+        self.main_menu_assets: dict[str: Anim] = {}
+
+    def load_main_menu_assets(self, path: str):
+        """Charge les assets du menu principal depuis le dossier donné."""
+        
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -177,6 +183,9 @@ class Renderer:
                            entity.collision_rect[2] - entity.collision_rect[0],
                            entity.collision_rect[3] - entity.collision_rect[1]),
                           width=1)
+
+    def render_main_menu(self):
+        """Rend le menu principal du jeu."""
 
     def render_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
