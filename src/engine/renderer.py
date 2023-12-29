@@ -1,7 +1,7 @@
 import math
 
 from pygame import display, image, surface, transform, draw
-from pygame.locals import RESIZABLE, SRCALPHA
+from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
 import src.engine.engine as engine
 from src.engine.animation import Anim
@@ -13,7 +13,9 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.window = display.set_mode((600, 600), RESIZABLE)
+        self.window_type = FULLSCREEN
+        self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (600, 600)
+        self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
         self.tile_size = 0
         self.animations: dict[str: Anim] = {}
@@ -57,8 +59,8 @@ class Renderer:
             gui_surface.fill((0, 0, 0, 0))
 
             self.render_layer(0, rendered_surface)
-            self.render_entities(rendered_surface, gui_surface, delta)
             self.render_layer(1, rendered_surface)
+            self.render_entities(rendered_surface, gui_surface, delta)
             self.render_layer(2, rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale

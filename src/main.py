@@ -15,6 +15,8 @@ class Game(Engine):
         self.create_player_entity()
         self.load_boss_fight_assets()
 
+        self.DEBUG_MODE = True
+
         self.game_state = GameState.NORMAL
 
     def create_player_entity(self):
@@ -23,9 +25,13 @@ class Game(Engine):
         anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
 
+        anim = Anim(0.1)
+        anim.load_animation_from_directory("assets/textures/entities/player/walking")
+        self.renderer.register_animation(anim, "player_walking")
+
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
-        player.collision_rect = [-7, -7, 7, 7]
+        player.collision_rect = [-6, -7, 6, 16]
 
         player.set_default_life(10)
 
