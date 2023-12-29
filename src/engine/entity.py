@@ -73,11 +73,11 @@ class Entity:
         """Calcule les collisions."""
 
         # On calcule les coordonnées des points en haut à gauche et en bas à droite
-        top_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
-                                int((y + self.collision_rect[1]) / 16))
+        top_left_corner_tile = (math.floor((x + self.collision_rect[0]) / 16),
+                                math.floor((y + self.collision_rect[1]) / 16))
 
-        bottom_right_corner_tile = (int((x + self.collision_rect[2]-1) / 16),
-                                    int((y + self.collision_rect[3]-1) / 16))
+        bottom_right_corner_tile = (math.floor((x + self.collision_rect[2]-1) / 16),
+                                    math.floor((y + self.collision_rect[3]-1) / 16))
 
         collision = False
 
@@ -135,7 +135,6 @@ class Entity:
                 i += 1
 
             self.y += i
-
 
     def link_animation(self, name: str):
         """Met à jour l'animation en cours de l'entité."""
