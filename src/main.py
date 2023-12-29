@@ -15,7 +15,7 @@ class Game(Engine):
         self.create_player_entity()
         self.load_boss_fight_assets()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.NORMAL
 
@@ -34,7 +34,7 @@ class Game(Engine):
         player.collision_rect = [-6, -7, 6, 16]
 
         player.set_default_life(10)
-        player.max_speed = 2.
+        player.max_speed = 1.
 
         self.entity_manager.set_player_entity("player")
 

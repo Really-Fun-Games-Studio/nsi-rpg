@@ -32,6 +32,13 @@ class EntityManager:
             if entity.life_points == 0:
                 self.entities.pop(entity_name)
 
+        if self.player_entity_name:
+            player: Entity = self.get_by_name(self.player_entity_name)
+            if player.mouvements[0] != 0. or player.mouvements[1] != 0.:
+                player.link_animation("player_walking")
+            else:
+                player.link_animation("player_none")
+
     def get_all_entities(self):
         """Donne la liste de toutes les entités enregistrées."""
         return list(self.entities.values())
