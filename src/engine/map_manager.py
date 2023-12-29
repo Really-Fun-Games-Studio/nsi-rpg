@@ -19,8 +19,6 @@ class MapManager:
                     chunks[(chunk["x"]//self.chunk_width, chunk["y"]//self.chunk_height)] = chunk["data"]
                 self.map_layers.append(chunks)
 
-        print(self.map_layers)
-
     def get_tile_at(self, x: int, y: int, layer_id: int):
         """Donne l'id de la tile aux coordonnées données et à la couche choisie."""
 

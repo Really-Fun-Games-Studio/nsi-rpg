@@ -1,7 +1,7 @@
 import math
 
 from pygame import display, image, surface, transform, draw
-from pygame.locals import RESIZABLE, SRCALPHA
+from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
 import src.engine.engine as engine
 from src.engine.animation import Anim
@@ -13,10 +13,24 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.window = display.set_mode((600, 600), RESIZABLE)
+        self.window_type = FULLSCREEN
+        self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (600, 600)
+        self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
         self.tile_size = 0
         self.animations: dict[str: Anim] = {}
+
+        # Variables utilisées pour les combats de boss
+        self.boss_fight_boss_animations: dict[str: Anim] = {}
+        self.boss_fight_player_animations: dict[str: Anim] = {}
+        self.boss_fight_GUI_container = None
+
+        # Variables utilisées par le menu principal
+        self.main_menu_assets: dict[str: Anim] = {}
+
+    def load_main_menu_assets(self, path: str):
+        """Charge les assets du menu principal depuis le dossier donné."""
+        
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -44,10 +58,10 @@ class Renderer:
             gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
             gui_surface.fill((0, 0, 0, 0))
 
-            self.renderer_layer(0, rendered_surface)
+            self.render_layer(0, rendered_surface)
+            self.render_layer(1, rendered_surface)
             self.render_entities(rendered_surface, gui_surface, delta)
-            self.renderer_layer(1, rendered_surface)
-            self.renderer_layer(2, rendered_surface)
+            self.render_layer(2, rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
             self.window.blit(
@@ -58,7 +72,9 @@ class Renderer:
             self.window.blit(gui_surface, (0, 0))
 
         elif self.engine.game_state == GameState.BOSS_FIGHT:
-            self.window.fill((255, 0, 0))
+            self.window.fill((255, 230, 230))
+            self.render_boss_fight_scene(delta)
+            self.render_boss_fight_gui()
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
@@ -66,6 +82,44 @@ class Renderer:
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
         self.animations[name] = animation
+
+    def register_boss_fight_boss_animation(self, animation: Anim, name: str):
+        """Ajoute une animation pour le boss lors d'un combat de boss."""
+        self.boss_fight_boss_animations[name] = animation
+
+    def register_boss_fight_player_animation(self, animation: Anim, name: str):
+        """Ajoute une animation pour le joueur lors d'un combat de boss."""
+        self.boss_fight_player_animations[name] = animation
+
+    def render_boss_fight_scene(self, delta: float):
+        """Rend les sprites du joueur et du boss lors d'un combat de boss."""
+
+        # On récupère l'image de l'animation du boss
+        boss_animation: Anim = self.boss_fight_boss_animations[self.engine.boss_fight_manager.current_boss_animation]
+        frame = boss_animation.get_frame(delta)
+
+        # On redimensionne l'image
+        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+
+        # On colle le boss à droite de la fenêtre
+        self.window.blit(frame, (display.get_window_size()[0]-frame.get_width()-display.get_window_size()[0]/20,
+                                 display.get_window_size()[1]/4-frame.get_height()/2))
+
+        # On récupère l'image de l'animation du joueur
+        player_animation = self.boss_fight_player_animations[self.engine.boss_fight_manager.current_player_animation]
+        frame = player_animation.get_frame(delta)
+
+        # On redimensionne l'image
+        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+
+        # On colle le joueur à gauche de la fenêtre
+        self.window.blit(frame, (display.get_window_size()[0]/20, display.get_window_size()[1]/4-frame.get_height()/2))
+
+    def render_boss_fight_gui(self):
+        """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
+
+        resized_container = transform.scale(self.boss_fight_GUI_container, (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
+        self.window.blit(resized_container, (0, display.get_window_size()[1]-resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
@@ -132,7 +186,10 @@ class Renderer:
                            entity.collision_rect[3] - entity.collision_rect[1]),
                           width=1)
 
-    def renderer_layer(self, layer_id: int, rendered_surface: surface.Surface):
+    def render_main_menu(self):
+        """Rend le menu principal du jeu."""
+
+    def render_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
         # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
         x_map_range = int(display.get_window_size()[0] / self.tile_size / self.engine.camera.zoom) + 2
@@ -143,8 +200,8 @@ class Renderer:
         y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
         # On calcule le décalage du début de rendu des tiles
-        x_map_offset = int((self.engine.camera.x - x_middle_offset) / self.tile_size)
-        y_map_offset = int((self.engine.camera.y - y_middle_offset) / self.tile_size)
+        x_map_offset = math.floor((self.engine.camera.x - x_middle_offset) / self.tile_size)
+        y_map_offset = math.floor((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
         for x in range(x_map_offset, x_map_offset + x_map_range):
