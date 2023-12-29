@@ -36,6 +36,8 @@ class Entity:
 
         self.animation_name = None
 
+        self.shadow = None
+
     def set_default_life(self, life: int):
         """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""
         self.life_points = life

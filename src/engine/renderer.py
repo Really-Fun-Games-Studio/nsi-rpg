@@ -28,6 +28,9 @@ class Renderer:
         # Variables utilisées par le menu principal
         self.main_menu_assets: dict[str: Anim] = {}
 
+        # Ombres d'entités
+        self.shadows = {}
+
     def load_main_menu_assets(self, path: str):
         """Charge les assets du menu principal depuis le dossier donné."""
 
@@ -77,6 +80,11 @@ class Renderer:
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
+
+    def register_shadow(self, file_path: str, name: str):
+        """Enregistre une image d'ombre utilisée pour le rendu des entités."""
+        shadow = image.load(file_path).convert_alpha()
+        self.shadows[name] = shadow
 
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
@@ -131,10 +139,6 @@ class Renderer:
             anim: Anim = self.animations[entity.animation_name]
             frame = anim.get_frame(delta)
 
-            # On flip l'image horizontalement si l'entité est retournée
-            if entity.direction == 1:
-                frame = transform.flip(frame, True, False)
-
             # Si l'entité n'apparait pas à l'écran, on passe son rendu
             if (entity.x - self.engine.camera.x + x_middle_offset + frame.get_width() < 0 or
                     entity.x - self.engine.camera.x - x_middle_offset - frame.get_width() > 0 or
@@ -142,9 +146,20 @@ class Renderer:
                     entity.y - self.engine.camera.y - y_middle_offset - frame.get_height() > 0):
                 continue
 
+            # On flip l'image horizontalement si l'entité est retournée
+            if entity.direction == 1:
+                frame = transform.flip(frame, True, False)
+
             # On calcule les coordonnées de rendu de l'entité
             entity_dest = (math.floor(entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2),
                            math.floor(entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2))
+
+            # On récupert l'ombre de l'entité
+            if entity.shadow is not None:
+                shadow_image = self.shadows[entity.shadow]
+                # On rend l'ombre
+                rendered_surface.blit(shadow_image, entity_dest)
+
 
             # On affiche l'image
             rendered_surface.blit(frame, entity_dest)

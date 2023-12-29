@@ -38,6 +38,9 @@ class Game(Engine):
 
         self.entity_manager.set_player_entity("player")
 
+        player.shadow = "player_shadow"
+        self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
+
         self.camera.follow_entity(player)
 
     def load_boss_fight_assets(self):
