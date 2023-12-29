@@ -10,6 +10,12 @@ class Entity:
         self.x = 8
         self.y = 8
 
+        # Variables utilisées pour detecter les mouvements
+        self.last_x = 0
+        self.last_y = 0
+
+        self.mouvements = [0., 0.]
+
         self.max_speed = 1.
 
         self.life_points = -1
@@ -41,6 +47,14 @@ class Entity:
         self.damage_cooldown -= delta
         if self.damage_cooldown < 0:
             self.damage_cooldown = 0
+
+        # Si les coordonnées ont changé, l'entité a bougé
+
+        self.mouvements[0] = (self.x - self.last_x) / self.max_speed
+        self.mouvements[1] = (self.y - self.last_y) / self.max_speed
+
+        self.last_x = self.x
+        self.last_y = self.y
 
     def take_damages(self, damages: int):
         """Inflige {damages} dégâts à l'entité."""
