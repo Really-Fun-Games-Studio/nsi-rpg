@@ -30,7 +30,6 @@ class Renderer:
 
     def load_main_menu_assets(self, path: str):
         """Charge les assets du menu principal depuis le dossier donné."""
-        
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -218,3 +217,9 @@ class Renderer:
                 rendered_surface.blit(self.tiles[tile_id - 1],
                                       (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
                                        math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset)))
+
+                if self.engine.DEBUG_MODE and layer_id == 1:
+                    draw.rect(rendered_surface, (100, 100, 255),
+                              (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
+                               math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset),
+                               self.tile_size, self.tile_size), width=1)
