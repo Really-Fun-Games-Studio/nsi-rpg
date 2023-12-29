@@ -131,6 +131,10 @@ class Renderer:
             anim: Anim = self.animations[entity.animation_name]
             frame = anim.get_frame(delta)
 
+            # On flip l'image horizontalement si l'entité est retournée
+            if entity.direction == 1:
+                frame = transform.flip(frame, True, False)
+
             # Si l'entité n'apparait pas à l'écran, on passe son rendu
             if (entity.x - self.engine.camera.x + x_middle_offset + frame.get_width() < 0 or
                     entity.x - self.engine.camera.x - x_middle_offset - frame.get_width() > 0 or

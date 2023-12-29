@@ -10,7 +10,9 @@ class Entity:
         self.x = 8
         self.y = 8
 
-        # Variables utilisées pour detecter les mouvements
+        self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
+
+        # Variables utilisées pour détecter les mouvements
         self.last_x = 0
         self.last_y = 0
 
@@ -96,6 +98,13 @@ class Entity:
 
     def move(self, x: float, y: float, map_manager: MapManager):
         """Fait bouger l'entité en tenant compte des collisions."""
+
+        # On vérifie le sens du mouvement pour changer self.direction
+        if x > 0:
+            self.direction = 0
+        elif x < 0:
+            self.direction = 1
+        # On ne met pas de else car si x = 0, on ne change pas de direction
 
         # On normalise la vitesse
         initial_speed = math.sqrt(x**2+y**2)
