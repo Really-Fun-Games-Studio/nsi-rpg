@@ -22,24 +22,20 @@ class EventHandler:
             elif e.type == KEYUP:
                 self.key_pressed.remove(e.key)
 
-        player = self.engine.entity_manager.get_by_name("player")
-        player.link_animation("player_none")
-        if K_RIGHT in self.key_pressed:
-            player.move(2, 0, self.engine.map_manager)
-            player.link_animation("player_walking")
-        if K_LEFT in self.key_pressed:
-            player.move(-2, 0, self.engine.map_manager)
-            player.link_animation("player_walking")
-        if K_UP in self.key_pressed:
-            player.move(0, -2, self.engine.map_manager)
-            player.link_animation("player_walking")
-        if K_DOWN in self.key_pressed:
-            player.move(0, 2, self.engine.map_manager)
-            player.link_animation("player_walking")
+        if self.engine.entity_manager.player_entity_name:
+            if K_RIGHT in self.key_pressed:
+                self.engine.entity_manager.move_player_controls(1, 0)
+            if K_LEFT in self.key_pressed:
+                self.engine.entity_manager.move_player_controls(-1, 0)
+            if K_UP in self.key_pressed:
+                self.engine.entity_manager.move_player_controls(0, -1)
+            if K_DOWN in self.key_pressed:
+                self.engine.entity_manager.move_player_controls(0, 1)
+            if K_l in self.key_pressed:
+                self.engine.entity_manager.get_by_name("player").take_damages(1)
+
         if K_x in self.key_pressed:
             self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
             self.engine.camera.target_zoom *= 0.99
-        if K_l in self.key_pressed:
-            player.take_damages(1)
 

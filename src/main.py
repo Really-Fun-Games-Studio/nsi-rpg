@@ -34,6 +34,9 @@ class Game(Engine):
         player.collision_rect = [-6, -7, 6, 16]
 
         player.set_default_life(10)
+        player.max_speed = 2.
+
+        self.entity_manager.set_player_entity("player")
 
         self.camera.follow_entity(player)
 
