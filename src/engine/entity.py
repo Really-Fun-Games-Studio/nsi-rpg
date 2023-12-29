@@ -1,3 +1,5 @@
+import math
+
 from src.engine.map_manager import MapManager
 
 
@@ -7,6 +9,8 @@ class Entity:
     def __init__(self, name: str):
         self.x = 8
         self.y = 8
+
+        self.max_speed = 1.
 
         self.life_points = -1
         self.max_life_points = -1
@@ -81,7 +85,7 @@ class Entity:
 
         # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
         if not self.get_collisions(self.x + x, self.y, map_manager):
-            self.x += x
+            final_x = x
         else:
             # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
             i = 0
@@ -94,11 +98,11 @@ class Entity:
                     i -= 1
                 i += 1
 
-            self.x += i
+            final_x = i
 
         # On répète le procédé avec l'ordonnée
         if not self.get_collisions(self.x, self.y + y, map_manager):
-            self.y += y
+            final_y = y
         else:
             i = 0
             if y > 0:
@@ -110,7 +114,16 @@ class Entity:
                     i -= 1
                 i += 1
 
-            self.y += i
+            final_y = i
+
+        # On normalise le vecteur x, y pour ne pas dépacer la vitesse maximale de l'entité
+
+        total_len = math.sqrt(final_x**2+final_y**2)
+        if total_len == 0.:
+            return
+
+        self.x += final_x/total_len*self.max_speed
+        self.y += final_y/total_len*self.max_speed
 
     def link_animation(self, name: str):
         """Met à jour l'animation en cours de l'entité."""
