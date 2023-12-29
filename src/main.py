@@ -8,9 +8,9 @@ from src.engine.enums import GameState
 class Game(Engine):
     def __init__(self):
         super().__init__()
-        self.map_manager.load_new("maps/map4.tmj")
+        self.map_manager.load_new("maps/map5.tmj")
 
-        self.renderer.load_tile_set("assets/textures/tiles.png", 16)
+        self.renderer.load_tile_set("assets/textures/tileset.png", 16)
 
         self.create_player_entity()
         self.load_boss_fight_assets()
