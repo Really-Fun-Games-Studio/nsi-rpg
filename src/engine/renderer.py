@@ -1,4 +1,5 @@
 import math
+import random
 
 from pygame import display, image, surface, transform, draw
 from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
@@ -13,7 +14,7 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.window_type = FULLSCREEN
+        self.window_type = RESIZABLE
         self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (600, 600)
         self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
@@ -30,6 +31,38 @@ class Renderer:
 
         # Ombres d'entités
         self.shadows = {}
+
+        # Particules affichées
+        self.particles = []
+
+    def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
+                       min_speed: float, max_speed: float, min_life_time: float, max_life_time: float,
+                       color: tuple[int, int, int]):
+        """Emmet des particules aux coordonnées données dans un rectangle de demi-largeur {w} et de demi-hauteur {h}."""
+        for _ in range(count):
+            # On choisit la taille de la particule
+            part_size = random.randint(min_size, max_size)
+
+            # On choisit sa vitesse en x et en y
+            part_speed_x = random.uniform(min_speed, max_speed)
+
+            # On inverse la vitesse de manière aléatoire
+            if random.randint(0, 1) == 1:
+                part_speed_x = - part_speed_x
+            part_speed_y = random.uniform(min_speed, max_speed)
+            if random.randint(0, 1) == 1:
+                part_speed_y = - part_speed_y
+
+            # On choisit sa position dans le rectangle
+            part_x = random.randint(x-w, x+w-part_size)
+            part_y = random.randint(y-h, y+h-part_size)
+
+            # On choisit la durée de vie
+            part_life_time = random.uniform(min_life_time, max_life_time)
+
+            # On ajoute la particule dans la liste des particules
+            # Le 0 correspond au temps de vie depuis la création de la particule
+            self.particles.append([part_x, part_y, part_size, part_speed_x, part_speed_y, 0., part_life_time, color])
 
     def load_main_menu_assets(self, path: str):
         """Charge les assets du menu principal depuis le dossier donné."""
@@ -63,6 +96,7 @@ class Renderer:
             self.render_layer(0, rendered_surface)
             self.render_layer(1, rendered_surface)
             self.render_entities(rendered_surface, gui_surface, delta)
+            self.render_particles(rendered_surface, delta)
             self.render_layer(2, rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
@@ -97,6 +131,22 @@ class Renderer:
     def register_boss_fight_player_animation(self, animation: Anim, name: str):
         """Ajoute une animation pour le joueur lors d'un combat de boss."""
         self.boss_fight_player_animations[name] = animation
+
+    def render_particles(self, rendered_surface: surface.Surface, delta: float):
+        """Update et rend les particules."""
+        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+
+        for part in self.particles.copy():
+            part_dest = (math.floor(part[0] - self.engine.camera.x + x_middle_offset),
+                         math.floor(part[1] - self.engine.camera.y + y_middle_offset))
+
+            draw.rect(rendered_surface, part[7], part_dest + (part[2], part[2]))
+            part[5] += delta
+            part[0] += part[3]
+            part[1] += part[4]
+            if part[5] > part[6]:
+                self.particles.remove(part)
 
     def render_boss_fight_scene(self, delta: float):
         """Rend les sprites du joueur et du boss lors d'un combat de boss."""

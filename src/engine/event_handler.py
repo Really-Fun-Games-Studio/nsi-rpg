@@ -31,8 +31,14 @@ class EventHandler:
                 self.engine.entity_manager.move_player_controls(0, -1)
             if K_DOWN in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(0, 1)
+
+            # Only for tests ! Remove on release !!!!!
             if K_l in self.key_pressed:
                 self.engine.entity_manager.get_by_name("player").take_damages(1)
+            if K_p in self.key_pressed:
+                self.engine.renderer.emit_particles(self.engine.entity_manager.get_by_name("player").x,
+                                                    self.engine.entity_manager.get_by_name("player").y,
+                                                    16, 16, 16, 1, 8, 0, 1, 0.2, 1., (0, 200, 200))
 
         if K_x in self.key_pressed:
             self.engine.camera.target_zoom *= 1.01
