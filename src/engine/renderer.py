@@ -215,7 +215,6 @@ class Renderer:
                 # On rend l'ombre
                 rendered_surface.blit(shadow_image, entity_dest)
 
-
             # On affiche l'image
             rendered_surface.blit(frame, entity_dest)
 
@@ -276,12 +275,18 @@ class Renderer:
         x_map_offset = math.floor((self.engine.camera.x - x_middle_offset) / self.tile_size)
         y_map_offset = math.floor((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
+        # On précalcule le décallage des tiles sur l'écran
+        tile_x_offset = - self.engine.camera.x + x_middle_offset
+        tile_y_offset = - self.engine.camera.y + y_middle_offset
+
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
         for x in range(x_map_offset, x_map_offset + x_map_range):
+            # On précalcule les coordonnées en x
+            tile_render_x = math.floor(x * self.tile_size + tile_x_offset)
             for y in range(y_map_offset, y_map_offset + y_map_range):
 
                 # On récupère l'id de la tile à la position donnée
-                tile_id = self.engine.map_manager.get_tile_at(x, y, layer_id)
+                tile_id = self.engine.map_manager.get_tile_at_quick(x, y, layer_id)
 
                 # Si l'id est 0, il s'agit de vide donc on saute le rendu
                 if tile_id == 0:
@@ -289,8 +294,8 @@ class Renderer:
 
                 # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
                 rendered_surface.blit(self.tiles[tile_id - 1],
-                                      (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
-                                       math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset)))
+                                      (tile_render_x,
+                                       math.floor(y * self.tile_size + tile_y_offset)))
 
                 if self.engine.DEBUG_MODE and layer_id == 1:
                     draw.rect(rendered_surface, (100, 100, 255),

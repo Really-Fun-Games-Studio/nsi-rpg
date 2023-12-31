@@ -38,3 +38,10 @@ class MapManager:
 
         # Si on ne trouve pas le chunk, on renvoit "vide"
         return 0
+
+    def get_tile_at_quick(self, x: int, y: int, layer_id: int):
+        """Version optimisée de get_tile_at()."""
+        chunk = self.map_layers[layer_id].get((x//self.chunk_width, y//self.chunk_height))
+        if chunk is not None:
+            return chunk[x % 16 + y % 16 * self.chunk_width]
+        return 0
