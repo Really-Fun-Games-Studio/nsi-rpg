@@ -1,3 +1,5 @@
+import math
+
 from pygame import event
 from pygame.locals import *
 
@@ -36,8 +38,8 @@ class EventHandler:
             if K_l in self.key_pressed:
                 self.engine.entity_manager.get_by_name("player").take_damages(1)
             if K_p in self.key_pressed:
-                self.engine.renderer.emit_particles(self.engine.entity_manager.get_by_name("player").x,
-                                                    self.engine.entity_manager.get_by_name("player").y,
+                self.engine.renderer.emit_particles(math.floor(self.engine.entity_manager.get_by_name("player").x),
+                                                    math.floor(self.engine.entity_manager.get_by_name("player").y),
                                                     16, 16, 16, 1, 8, 0, 1, 0.2, 1., (0, 200, 200))
 
         if K_x in self.key_pressed:
