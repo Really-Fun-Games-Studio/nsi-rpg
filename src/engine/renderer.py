@@ -1,7 +1,7 @@
 import math
 import random
 
-from pygame import display, image, surface, transform, draw
+from pygame import display, image, surface, transform, draw, font
 from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
 import src.engine.engine as engine
@@ -111,6 +111,11 @@ class Renderer:
             self.window.fill((255, 230, 230))
             self.render_boss_fight_scene(delta)
             self.render_boss_fight_gui()
+
+        # Conteur de FPS en mode DEBUG
+        if self.engine.DEBUG_MODE:
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
+                             (0, 0))
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
