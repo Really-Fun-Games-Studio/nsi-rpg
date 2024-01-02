@@ -1,5 +1,6 @@
 import pygame.image
 
+from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
@@ -15,7 +16,7 @@ class Game(Engine):
         self.create_player_entity()
         self.load_boss_fight_assets()
 
-        self.DEBUG_MODE = False
+        self.DEBUG_MODE = True
 
         self.game_state = GameState.NORMAL
 
@@ -33,7 +34,7 @@ class Game(Engine):
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
 
-        player.set_default_life(10)
+        player.set_default_life(15)
         player.max_speed = 1.
 
         self.entity_manager.set_player_entity("player")
@@ -42,6 +43,13 @@ class Game(Engine):
         self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
 
         self.camera.follow_entity(player)
+
+    def spawn_mobs(self):
+        """Fait apparaitre les mobs de la map."""
+        mob = self.entity_manager.register_entity("wolf1")
+        mob.set_ai(WolfAI)
+
+
 
     def load_boss_fight_assets(self):
         """Charge les animations de combat des combats de boss."""

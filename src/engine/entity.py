@@ -1,6 +1,7 @@
 import math
 
 from src.engine.map_manager import MapManager
+from src.engine.mobs_AI import MobAI
 
 
 class Entity:
@@ -31,6 +32,7 @@ class Entity:
 
         # Time utilisé pour les IA
         self.time = 0
+        self.brain: MobAI | None = None
 
         self.name = name
 
@@ -42,6 +44,11 @@ class Entity:
         """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""
         self.life_points = life
         self.max_life_points = life
+
+    def set_ai(self, ai: MobAI):
+        self.brain = ai
+        self.brain.__init__(self)
+        print(ai.entity)
 
     def update(self, delta: float):
         """Met à jour l'entité."""
