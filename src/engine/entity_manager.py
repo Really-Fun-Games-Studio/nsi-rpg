@@ -9,7 +9,7 @@ class EntityManager:
         self.player_entity_name = ""
         self.map_manager = map_manager
 
-    def register_entity(self, name: str):
+    def register_entity(self, name: str) -> Entity:
         """Crée une entité et l'enregistre dans un dictionnaire."""
         entity = Entity(name)
         self.entities[name] = entity
@@ -39,10 +39,10 @@ class EntityManager:
             else:
                 player.link_animation("player_none")
 
-    def get_all_entities(self):
+    def get_all_entities(self) -> list[Entity]:
         """Donne la liste de toutes les entités enregistrées."""
         return list(self.entities.values())
 
-    def get_by_name(self, name: str):
+    def get_by_name(self, name: str) -> Entity:
         """Donne l'entité avec le nom donné."""
         return self.entities[name]
