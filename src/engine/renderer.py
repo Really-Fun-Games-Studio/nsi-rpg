@@ -116,6 +116,11 @@ class Renderer:
         if self.engine.DEBUG_MODE:
             self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
                              (0, 0))
+            player = self.engine.entity_manager.get_by_name('player')
+            self.window.blit(font.SysFont("Arial", 20).render(f"X: {player.x} Y:{player.y}",
+                                                              True, (255, 0, 0)), (0, 30))
+            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
+                                                              True, (255, 0, 0)), (0, 60))
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
@@ -180,7 +185,8 @@ class Renderer:
     def render_boss_fight_gui(self):
         """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
 
-        resized_container = transform.scale(self.boss_fight_GUI_container, (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
+        resized_container = transform.scale(self.boss_fight_GUI_container,
+                                            (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
         self.window.blit(resized_container, (0, display.get_window_size()[1]-resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
