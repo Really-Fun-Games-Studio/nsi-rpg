@@ -1,4 +1,7 @@
+import math
+
 from src.engine.map_manager import MapManager
+from src.engine.mobs_AI import MobAI
 
 
 class Entity:
@@ -7,6 +10,16 @@ class Entity:
     def __init__(self, name: str):
         self.x = 8
         self.y = 8
+
+        self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
+
+        # Variables utilisées pour détecter les mouvements
+        self.last_x = 0
+        self.last_y = 0
+
+        self.mouvements = [0., 0.]
+
+        self.max_speed = 1.
 
         self.life_points = -1
         self.max_life_points = -1
@@ -19,15 +32,25 @@ class Entity:
 
         # Time utilisé pour les IA
         self.time = 0
+        self.brain: MobAI | None = None
 
         self.name = name
 
         self.animation_name = None
 
+        self.shadow = None
+
     def set_default_life(self, life: int):
         """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""
         self.life_points = life
         self.max_life_points = life
+
+    def set_ai(self, ai: MobAI, engine: 'Engine'):
+        """Enregistre une classe permettant de gérer l'IA du mob."""
+
+        # La ligne suivante crée une instance de la classe d'IA. Cette ligne peut causer des warnings sur certains IDE
+        # mais elle est bien valide
+        self.brain = ai(self, engine.entity_manager, engine.map_manager)
 
     def update(self, delta: float):
         """Met à jour l'entité."""
@@ -37,6 +60,14 @@ class Entity:
         self.damage_cooldown -= delta
         if self.damage_cooldown < 0:
             self.damage_cooldown = 0
+
+        # Si les coordonnées ont changé, l'entité a bougé
+
+        self.mouvements[0] = (self.x - self.last_x) / self.max_speed
+        self.mouvements[1] = (self.y - self.last_y) / self.max_speed
+
+        self.last_x = self.x
+        self.last_y = self.y
 
     def take_damages(self, damages: int):
         """Inflige {damages} dégâts à l'entité."""
@@ -51,15 +82,22 @@ class Entity:
             if self.life_points < 0:
                 self.life_points = 0
 
+    def get_collisions_with_entity(self, other: 'Entity'):
+        """Retourne True si l'entité courante est en collision avec l'entité donnée."""
+        return (self.x+self.collision_rect[0] <= other.x+other.collision_rect[2] and
+                self.x+self.collision_rect[2] >= other.x+other.collision_rect[0] and
+                self.y+self.collision_rect[3] >= other.y+other.collision_rect[1] and
+                self.y+self.collision_rect[1] <= other.y+other.collision_rect[3])
+
     def get_collisions(self, x: float, y: float, map_manager: MapManager):
         """Calcule les collisions."""
 
         # On calcule les coordonnées des points en haut à gauche et en bas à droite
-        top_left_corner_tile = (int((x + self.collision_rect[0]) / 16),
-                                int((y + self.collision_rect[1]) / 16))
+        top_left_corner_tile = (math.floor((x + self.collision_rect[0]) / 16),
+                                math.floor((y + self.collision_rect[1]) / 16))
 
-        bottom_right_corner_tile = (int((x + self.collision_rect[2]-1) / 16),
-                                    int((y + self.collision_rect[3]-1) / 16))
+        bottom_right_corner_tile = (math.floor((x + self.collision_rect[2]-1) / 16),
+                                    math.floor((y + self.collision_rect[3]-1) / 16))
 
         collision = False
 
@@ -78,6 +116,19 @@ class Entity:
 
     def move(self, x: float, y: float, map_manager: MapManager):
         """Fait bouger l'entité en tenant compte des collisions."""
+
+        # On vérifie le sens du mouvement pour changer self.direction
+        if x > 0:
+            self.direction = 0
+        elif x < 0:
+            self.direction = 1
+        # On ne met pas de else car si x = 0, on ne change pas de direction
+
+        # On normalise la vitesse
+        initial_speed = math.sqrt(x**2+y**2)
+
+        x = x/initial_speed*self.max_speed
+        y = y/initial_speed*self.max_speed
 
         # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
         if not self.get_collisions(self.x + x, self.y, map_manager):

@@ -1,6 +1,7 @@
 import math
+import random
 
-from pygame import display, image, surface, transform, draw
+from pygame import display, image, surface, transform, draw, font
 from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
 import src.engine.engine as engine
@@ -13,7 +14,7 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.window_type = FULLSCREEN
+        self.window_type = RESIZABLE
         self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (600, 600)
         self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
@@ -28,9 +29,43 @@ class Renderer:
         # Variables utilisées par le menu principal
         self.main_menu_assets: dict[str: Anim] = {}
 
+        # Ombres d'entités
+        self.shadows = {}
+
+        # Particules affichées
+        self.particles = []
+
+    def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
+                       min_speed: float, max_speed: float, min_life_time: float, max_life_time: float,
+                       color: tuple[int, int, int]):
+        """Emmet des particules aux coordonnées données dans un rectangle de demi-largeur {w} et de demi-hauteur {h}."""
+        for _ in range(count):
+            # On choisit la taille de la particule
+            part_size = random.randint(min_size, max_size)
+
+            # On choisit sa vitesse en x et en y
+            part_speed_x = random.uniform(min_speed, max_speed)
+
+            # On inverse la vitesse de manière aléatoire
+            if random.randint(0, 1) == 1:
+                part_speed_x = - part_speed_x
+            part_speed_y = random.uniform(min_speed, max_speed)
+            if random.randint(0, 1) == 1:
+                part_speed_y = - part_speed_y
+
+            # On choisit sa position dans le rectangle
+            part_x = random.randint(x-w, x+w-part_size)
+            part_y = random.randint(y-h, y+h-part_size)
+
+            # On choisit la durée de vie
+            part_life_time = random.uniform(min_life_time, max_life_time)
+
+            # On ajoute la particule dans la liste des particules
+            # Le 0 correspond au temps de vie depuis la création de la particule
+            self.particles.append([part_x, part_y, part_size, part_speed_x, part_speed_y, 0., part_life_time, color])
+
     def load_main_menu_assets(self, path: str):
         """Charge les assets du menu principal depuis le dossier donné."""
-        
 
     def load_tile_set(self, file_path: str, tile_size: int):
         """Charge le jeu de tuiles en utilisant le fichier donné et la taille donnée."""
@@ -61,6 +96,7 @@ class Renderer:
             self.render_layer(0, rendered_surface)
             self.render_layer(1, rendered_surface)
             self.render_entities(rendered_surface, gui_surface, delta)
+            self.render_particles(rendered_surface, delta)
             self.render_layer(2, rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
@@ -76,8 +112,23 @@ class Renderer:
             self.render_boss_fight_scene(delta)
             self.render_boss_fight_gui()
 
+        # Conteur de FPS en mode DEBUG
+        if self.engine.DEBUG_MODE:
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
+                             (0, 0))
+            player = self.engine.entity_manager.get_by_name('player')
+            self.window.blit(font.SysFont("Arial", 20).render(f"X: {player.x} Y:{player.y}",
+                                                              True, (255, 0, 0)), (0, 30))
+            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
+                                                              True, (255, 0, 0)), (0, 60))
+
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
+
+    def register_shadow(self, file_path: str, name: str):
+        """Enregistre une image d'ombre utilisée pour le rendu des entités."""
+        shadow = image.load(file_path).convert_alpha()
+        self.shadows[name] = shadow
 
     def register_animation(self, animation: Anim, name: str):
         """Enregistre une animation."""
@@ -90,6 +141,22 @@ class Renderer:
     def register_boss_fight_player_animation(self, animation: Anim, name: str):
         """Ajoute une animation pour le joueur lors d'un combat de boss."""
         self.boss_fight_player_animations[name] = animation
+
+    def render_particles(self, rendered_surface: surface.Surface, delta: float):
+        """Update et rend les particules."""
+        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+
+        for part in self.particles.copy():
+            part_dest = (math.floor(part[0] - self.engine.camera.x + x_middle_offset),
+                         math.floor(part[1] - self.engine.camera.y + y_middle_offset))
+
+            draw.rect(rendered_surface, part[7], part_dest + (part[2], part[2]))
+            part[5] += delta
+            part[0] += part[3]
+            part[1] += part[4]
+            if part[5] > part[6]:
+                self.particles.remove(part)
 
     def render_boss_fight_scene(self, delta: float):
         """Rend les sprites du joueur et du boss lors d'un combat de boss."""
@@ -118,7 +185,8 @@ class Renderer:
     def render_boss_fight_gui(self):
         """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
 
-        resized_container = transform.scale(self.boss_fight_GUI_container, (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
+        resized_container = transform.scale(self.boss_fight_GUI_container,
+                                            (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
         self.window.blit(resized_container, (0, display.get_window_size()[1]-resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
@@ -139,9 +207,19 @@ class Renderer:
                     entity.y - self.engine.camera.y - y_middle_offset - frame.get_height() > 0):
                 continue
 
+            # On flip l'image horizontalement si l'entité est retournée
+            if entity.direction == 1:
+                frame = transform.flip(frame, True, False)
+
             # On calcule les coordonnées de rendu de l'entité
             entity_dest = (math.floor(entity.x - self.engine.camera.x + x_middle_offset - frame.get_width() / 2),
                            math.floor(entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2))
+
+            # On récupert l'ombre de l'entité
+            if entity.shadow is not None:
+                shadow_image = self.shadows[entity.shadow]
+                # On rend l'ombre
+                rendered_surface.blit(shadow_image, entity_dest)
 
             # On affiche l'image
             rendered_surface.blit(frame, entity_dest)
@@ -203,12 +281,18 @@ class Renderer:
         x_map_offset = math.floor((self.engine.camera.x - x_middle_offset) / self.tile_size)
         y_map_offset = math.floor((self.engine.camera.y - y_middle_offset) / self.tile_size)
 
+        # On précalcule le décallage des tiles sur l'écran
+        tile_x_offset = - self.engine.camera.x + x_middle_offset
+        tile_y_offset = - self.engine.camera.y + y_middle_offset
+
         # On itère pour chaque couche, toutes les tiles visibles par la caméra
         for x in range(x_map_offset, x_map_offset + x_map_range):
+            # On précalcule les coordonnées en x
+            tile_render_x = math.floor(x * self.tile_size + tile_x_offset)
             for y in range(y_map_offset, y_map_offset + y_map_range):
 
                 # On récupère l'id de la tile à la position donnée
-                tile_id = self.engine.map_manager.get_tile_at(x, y, layer_id)
+                tile_id = self.engine.map_manager.get_tile_at_quick(x, y, layer_id)
 
                 # Si l'id est 0, il s'agit de vide donc on saute le rendu
                 if tile_id == 0:
@@ -216,5 +300,11 @@ class Renderer:
 
                 # Puis, on cherche à quelle image elle correspond et on la colle sur notre surface
                 rendered_surface.blit(self.tiles[tile_id - 1],
-                                      (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
-                                       math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset)))
+                                      (tile_render_x,
+                                       math.floor(y * self.tile_size + tile_y_offset)))
+
+                if self.engine.DEBUG_MODE and layer_id == 1:
+                    draw.rect(rendered_surface, (100, 100, 255),
+                              (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
+                               math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset),
+                               self.tile_size, self.tile_size), width=1)

@@ -29,7 +29,7 @@ class Engine:
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
         self.camera = Camera()
-        self.entity_manager = EntityManager()
+        self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
 
     def loop(self):

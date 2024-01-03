@@ -28,18 +28,20 @@ class MapManager:
         # On calcule les coordonnées du chunk
         coordinates = (x//self.chunk_width, y//self.chunk_height)
 
-        # On transforme les coordonnées globales en coordonnées dans le chunk
-        x %= 16
-        y %= 16
+        # On vérifie que le chunk existe
+        if coordinates in layer:
+            chunk = layer[coordinates]
 
-        if coordinates not in layer:
-            return 0
+            # On transforme les coordonnées globales en coordonnées dans le chunk,
+            # On calcule l'index et on renvoie la tile
+            return chunk[x % 16 + y % 16 * self.chunk_width]
 
-        chunk = layer[coordinates]
+        # Si on ne trouve pas le chunk, on renvoit "vide"
+        return 0
 
-        # On vérifie que la tile demandée existe sinon on répond "vide"
-        if x >= self.chunk_width or x < 0 or y >= self.chunk_height or y < 0:
-            return 0
-
-        # On calcule l'index et on renvoie la tile
-        return chunk[x+y*self.chunk_width]
+    def get_tile_at_quick(self, x: int, y: int, layer_id: int):
+        """Version optimisée de get_tile_at()."""
+        chunk = self.map_layers[layer_id].get((x//self.chunk_width, y//self.chunk_height))
+        if chunk is not None:
+            return chunk[x % 16 + y % 16 * self.chunk_width]
+        return 0
