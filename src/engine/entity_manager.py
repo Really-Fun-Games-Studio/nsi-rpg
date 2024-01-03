@@ -33,7 +33,7 @@ class EntityManager:
                 self.entities.pop(entity_name)
 
             if entity.brain is not None:
-                entity.brain.update()
+                entity.brain.update(delta)
 
         if self.player_entity_name:
             player: Entity = self.get_by_name(self.player_entity_name)

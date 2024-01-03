@@ -82,7 +82,7 @@ class Entity:
             if self.life_points < 0:
                 self.life_points = 0
 
-    def ge_collisions_with_entity(self, other: 'Entity'):
+    def get_collisions_with_entity(self, other: 'Entity'):
         """Retourne True si l'entité courante est en collision avec l'entité donnée."""
         return (self.x+self.collision_rect[0] <= other.x+other.collision_rect[2] and
                 self.x+self.collision_rect[2] >= other.x+other.collision_rect[0] and
