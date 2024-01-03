@@ -32,6 +32,9 @@ class EntityManager:
             if entity.life_points == 0:
                 self.entities.pop(entity_name)
 
+            if entity.brain is not None:
+                entity.brain.update()
+
         if self.player_entity_name:
             player: Entity = self.get_by_name(self.player_entity_name)
             if player.mouvements[0] != 0. or player.mouvements[1] != 0.:

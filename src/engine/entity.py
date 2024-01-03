@@ -45,10 +45,10 @@ class Entity:
         self.life_points = life
         self.max_life_points = life
 
-    def set_ai(self, ai: MobAI):
-        self.brain = ai
-        self.brain.__init__(self)
-        print(ai.entity)
+    def set_ai(self, ai: MobAI, engine: 'Engine'):
+        """Enregistre une classe permettant de gérer l'IA du mob."""
+        self.brain = ai(self, engine.entity_manager, engine.map_manager)
+        print(self.brain.entity)
 
     def update(self, delta: float):
         """Met à jour l'entité."""
