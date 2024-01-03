@@ -46,21 +46,24 @@ class WolfAI(MobAI):
 
         else:
             # Comportement d'attente
+
+            # On diminue la vitesse
             self.entity.max_speed = 0.5
 
             self.timer -= delta
+            # Si le timer est fini et que le loup était en train d'attendre, il commence à marcher
             if self.timer <= 0 and self.comportment == 0:
                 self.comportment = 1
                 self.timer = random.random() * 5.
+
+                # On choisit la direction
                 self.walk_x = (random.random()-0.5)*2
                 self.walk_y = (random.random()-0.5)*2
-
+            # Si le timer est fini et que le loup était de marcher, il commence à attendre
             elif self.timer <= 0 and self.comportment == 1:
                 self.comportment = 0
                 self.timer = random.random() * 3
 
-            print(self.timer)
-
-            self.entity.move(self.walk_x, self.walk_y, self.map_manager)
-
-
+            # On fait avancer le loup quand il le doit
+            if self.comportment == 1:
+                self.entity.move(self.walk_x, self.walk_y, self.map_manager)
