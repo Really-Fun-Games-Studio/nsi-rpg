@@ -47,8 +47,10 @@ class Entity:
 
     def set_ai(self, ai: MobAI, engine: 'Engine'):
         """Enregistre une classe permettant de gérer l'IA du mob."""
+
+        # La ligne suivante crée une instance de la classe d'IA. Cette ligne peut causer des warnings sur certains IDE
+        # mais elle est bien valide
         self.brain = ai(self, engine.entity_manager, engine.map_manager)
-        print(self.brain.entity)
 
     def update(self, delta: float):
         """Met à jour l'entité."""
@@ -79,6 +81,13 @@ class Entity:
             # Si la vie passe en négatif, on la remet à 0
             if self.life_points < 0:
                 self.life_points = 0
+
+    def ge_collisions_with_entity(self, other: 'Entity'):
+        """Retourne True si l'entité courante est en collision avec l'entité donnée."""
+        return (self.x+self.collision_rect[0] <= other.x+other.collision_rect[2] and
+                self.x+self.collision_rect[2] >= other.x+other.collision_rect[0] and
+                self.y+self.collision_rect[3] >= other.y+other.collision_rect[1] and
+                self.y+self.collision_rect[1] <= other.y+other.collision_rect[3])
 
     def get_collisions(self, x: float, y: float, map_manager: MapManager):
         """Calcule les collisions."""

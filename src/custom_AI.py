@@ -19,7 +19,8 @@ class WolfAI(MobAI):
 
         player_distance = math.sqrt(x_distance ** 2 + y_distance ** 2)
 
-        #player.take_damages(1)
+        if player.ge_collisions_with_entity(self.entity):
+            player.take_damages(1)
 
         if abs(player_distance) > self.entity.max_speed:
             self.entity.move(x_distance / player_distance*self.entity.max_speed,
