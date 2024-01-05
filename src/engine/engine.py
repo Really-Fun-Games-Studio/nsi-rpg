@@ -1,5 +1,6 @@
 from src.engine.boss_fight_manager import BossFightManager
 from src.engine.camera import Camera
+from src.engine.dialogs_manager import DialogsManager
 from src.engine.entity_manager import EntityManager
 from src.engine.event_handler import EventHandler
 from src.engine.event_sheduler import EventSheduler
@@ -33,6 +34,7 @@ class Engine:
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
+        self.dialogs_manager = DialogsManager()
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.

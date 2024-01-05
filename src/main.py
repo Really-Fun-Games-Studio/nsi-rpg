@@ -12,6 +12,7 @@ class Game(Engine):
         self.map_manager.load_new("maps/map5.tmj")
 
         self.renderer.load_tile_set("assets/textures/tileset.png", 16)
+        self.dialogs_manager.load_dialogs("assets/dialogs.json")
 
         self.create_player_entity()
         self.load_boss_fight_assets()
