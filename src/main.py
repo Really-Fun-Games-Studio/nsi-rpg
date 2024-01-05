@@ -17,9 +17,11 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = False
+        self.DEBUG_MODE = True
 
         self.game_state = GameState.NORMAL
+
+        self.event_sheduler.register_area((0, 20, 20, 20), None)
 
     def create_player_entity(self):
         """Crée une entité joueur."""
