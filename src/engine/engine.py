@@ -52,6 +52,7 @@ class Engine:
         self.renderer.update(0.016666666)
         self.event_handler.update()
         self.event_sheduler.update()
+        self.dialogs_manager.update(0.016666666)
 
     def stop(self):
         """Arrête le programme."""
