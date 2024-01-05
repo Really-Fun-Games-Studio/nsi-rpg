@@ -7,6 +7,7 @@ class DialogsManager:
         self.current_dialogs = []
         self.current_dialog_id = -1
         self.dialogs = {}
+        self.reading_dialog = False
 
     def next_dialog(self):
         """Passe au dialogue suivant. Renvoie True si le dialogue est fini."""
@@ -14,11 +15,17 @@ class DialogsManager:
         if self.current_dialog_id == len(self.current_dialogs):
             self.current_dialogs = []
             self.current_dialog_id = -1
+            self.reading_dialog = False
 
     def start_dialog(self, name: str):
         """Lance le dialogue au nom donné."""
-        self.current_dialogs = self.dialogs[name]
-        self.current_dialog_id = 0
+        if not self.reading_dialog:
+            self.current_dialogs = self.dialogs[name]
+            self.current_dialog_id = 0
+
+            print(self.current_dialogs)
+
+            self.reading_dialog = True
 
     def get_current_dialog_sentence(self) -> str:
         """Renvoie la phrase actuelle du dialogue."""
