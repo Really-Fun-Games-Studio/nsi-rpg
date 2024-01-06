@@ -22,7 +22,8 @@ class EventHandler:
             elif e.type == KEYDOWN:
                 self.key_pressed.append(e.key)
             elif e.type == KEYUP:
-                self.key_pressed.remove(e.key)
+                if e.key in self.key_pressed:
+                    self.key_pressed.remove(e.key)
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:
@@ -33,6 +34,10 @@ class EventHandler:
                 self.engine.entity_manager.move_player_controls(0, -1)
             if K_DOWN in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(0, 1)
+
+            if K_SPACE in self.key_pressed:
+                self.engine.dialogs_manager.next_signal()
+                self.key_pressed.remove(K_SPACE)
 
             if self.engine.DEBUG_MODE:
                 if K_l in self.key_pressed:
