@@ -149,10 +149,41 @@ class Renderer:
             # On récupère le texte
             sentence = self.engine.dialogs_manager.get_current_dialog_sentence()
 
+            # On crée la font qui permettra de faire le rendu du texte après
             text_font = font.SysFont("Arial", display.get_window_size()[0]//30)
-            print(text_font.size(sentence))
-            rendered_text = text_font.render(sentence, True, (0, 0, 0))
-            self.window.blit(rendered_text, (display.get_window_size()[0]/30, display.get_window_size()[1] - resized_box.get_height()+display.get_window_size()[0]/30))
+
+            # On calcule la taille du décalage puis on calcule la largeur maximale que peut faire une ligne
+            x_border = display.get_window_size()[0]/30
+            max_width = display.get_window_size()[0]-2*x_border
+
+            # On passe le texte dans un algorithme qui coupe le texte entre les espaces pour empecher de dépacer la
+            # taille maximale de la ligne
+            lines = []
+            current_line = ""
+            for i in sentence:
+                current_line += i
+                # Si on déplace de la ligne, on ajoute la ligne jusqu'au dernier mot
+                if text_font.size(current_line)[0] > max_width:
+                    lines.append(current_line[:current_line.rfind(" ")])
+                    current_line = current_line[current_line.rfind(" "):]
+
+            # Si la ligne est incomplète, on ajoute la ligne
+            lines.append(current_line)
+
+            # On itère dans les lignes avec un enumerate pour avoir sont index
+            for i in enumerate(lines):
+                # On récupère le texte et s'il commence par un espace, on le retire
+                text = i[1]
+                if len(text) > 0 and text[0] == " ":
+                    text = text[1:]
+
+                # On rend la ligne au bon endroit sur l'écran
+                rendered_text = text_font.render(text, True, (0, 0, 0))
+                self.window.blit(rendered_text,
+                                 (x_border,
+                                  display.get_window_size()[1] - resized_box.get_height() +
+                                  display.get_window_size()[0]/30 +
+                                  (text_font.get_height()+display.get_window_size()[0]/200)*i[0]))
 
     def render_debug_area(self, rendered_surface: surface.Surface):
         """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
