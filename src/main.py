@@ -22,7 +22,7 @@ class Game(Engine):
 
         self.game_state = GameState.NORMAL
 
-        self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test3"), ["player"])
+        self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test"), ["player"], False, True)
 
         self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
 
