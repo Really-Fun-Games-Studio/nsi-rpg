@@ -1,4 +1,5 @@
 import json
+from types import FunctionType
 
 
 class DialogsManager:
@@ -13,6 +14,8 @@ class DialogsManager:
 
         self.LETTER_WRITING_DELAY = 0.02
         self.letter_timer = 0
+
+        self.dialogue_finished_callback = None
 
     def next_signal(self):
         """Fonction exécutée lorsque l'utilisateur demande de passer au prochain dialogue. Si un dialogue est en
@@ -30,13 +33,15 @@ class DialogsManager:
         """Passe au dialogue suivant. Renvoie True si le dialogue est fini."""
         self.current_dialog_id += 1
         self.writing_dialog = True
-        if self.current_dialog_id >= len(self.current_dialogs):
+        if self.current_dialog_id >= len(self.current_dialogs):  # Le dialogue est fini.
             self.current_dialogs = []
             self.current_dialog_id = -1
             self.writing_dialog = False
             self.reading_dialog = False
+            if self.dialogue_finished_callback is not None:
+                self.dialogue_finished_callback()
 
-    def start_dialog(self, name: str):
+    def start_dialog(self, name: str, dialogue_finished_callback: FunctionType | classmethod | staticmethod = None):
         """Lance le dialogue au nom donné."""
 
         # Si un dialogue n'est pas déja lancé, on lance le dialogue au nom donné
@@ -46,6 +51,8 @@ class DialogsManager:
             self.current_dialogue_letter_id = 0
 
             self.reading_dialog = True
+
+            self.dialogue_finished_callback = dialogue_finished_callback
 
     def get_current_dialog_sentence(self, progressive=True) -> str:
         """Renvoie la phrase actuelle du dialogue."""
