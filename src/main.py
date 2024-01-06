@@ -26,6 +26,8 @@ class Game(Engine):
 
         self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
 
+        self.event_handler.register_button_area((0, 0, 20, 20), lambda : print("salut"))
+
     def create_player_entity(self):
         """Crée une entité joueur."""
         anim = Anim(0.5)
