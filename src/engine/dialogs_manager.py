@@ -9,9 +9,20 @@ class DialogsManager:
         self.dialogs = {}
         self.reading_dialog = False
         self.current_dialogue_letter_id = 0
+        self.writing_dialog = False
 
-        self.LETTER_WRITTING_DELAY = 0.01
+        self.LETTER_WRITING_DELAY = 0.02
         self.letter_timer = 0
+
+    def next_signal(self):
+        """Fonction exécutée lorsque l'utilisateur demande de passer au prochain dialogue. Si un dialogue est en
+        train d'être écrit, il écrit tout d'un coup."""
+
+        if self.writing_dialog:
+            self.current_dialogue_letter_id = len(self.current_dialogs[self.current_dialog_id])
+            self.writing_dialog = False
+        else:
+            self.next_dialog()
 
     def next_dialog(self):
         """Passe au dialogue suivant. Renvoie True si le dialogue est fini."""
@@ -19,6 +30,7 @@ class DialogsManager:
         if self.current_dialog_id == len(self.current_dialogs):
             self.current_dialogs = []
             self.current_dialog_id = -1
+            self.writing_dialog = False
             self.reading_dialog = False
 
     def start_dialog(self, name: str):
@@ -46,9 +58,12 @@ class DialogsManager:
         if self.reading_dialog:
             self.letter_timer -= delta
 
+            self.writing_dialog = True
+
             if self.letter_timer <= 0:
-                self.letter_timer = self.LETTER_WRITTING_DELAY
+                self.letter_timer = self.LETTER_WRITING_DELAY
                 self.current_dialogue_letter_id += 1
                 if self.current_dialogue_letter_id > len(self.current_dialogs[self.current_dialog_id]):
                     self.current_dialogue_letter_id -= 1
+                    self.writing_dialog = False
 
