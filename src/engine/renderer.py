@@ -127,6 +127,21 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
                                                               True, (255, 0, 0)), (0, 60))
 
+            # On rend maintenant toutes les zones de détection de la fenêtre
+            for area in self.engine.event_handler.buttons_area:
+                window_size = display.get_window_size()
+                if area[2] == 0:
+                    draw.rect(self.window, (255, 255, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0],
+                               area[0][2] * window_size[0], area[0][3] * window_size[0]))
+                elif area[2] == 1:
+                    draw.rect(self.window, (255, 255, 0),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1],
+                               area[0][2] * window_size[1], area[0][3] * window_size[1]))
+                else:
+                    draw.rect(self.window, (255, 255, 0),
+                              area[0], width=1)
+
         # Rendu présent dans tous les types de jeu
         self.render_dialogs_box()
 
@@ -192,6 +207,7 @@ class Renderer:
         x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
         y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
+        # On itère et on rend toutes les zones de détection
         for area in self.engine.event_sheduler.area_callbacks:
             area_rect = area[0]
             draw.rect(rendered_surface, (200, 100, 0),
