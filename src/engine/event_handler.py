@@ -32,12 +32,23 @@ class EventHandler:
         return rect[0] < point[0] < rect[0] + rect[2] and rect[1] < point[1] < rect[1] + rect[3]
 
     def register_button_area(self, rect: tuple[float | int, float | int, float | int, float | int],
-                             callback: FunctionType | classmethod | staticmethod,
+                             callback: FunctionType | classmethod | staticmethod, name: str,
                              is_window_relative: int = -1):
         """Enregistre une zone comme bouton. La fonction donnée sera donc executé lorsque la zone sur la fenêtre
         sera cliqué. is_window_relative doit être 0 pour que le rect soit multipliée par la largeur de la fenêtre et 1
         pour qu'elle soit multipliée par la hauteur"""
-        self.buttons_area.append((rect, callback, is_window_relative))
+        self.buttons_area.append((rect, callback, is_window_relative, name))
+
+    def remove_button_area(self, name: str):
+        """Supprime les boutons aux noms donnés."""
+
+        # On itère dans toute la liste et on ne garde que les éléments ne portant pas le nom cherché
+        cleared_list = []
+        for area in self.buttons_area:
+            if area[3] != name:
+                cleared_list.append(area)
+
+        self.buttons_area = cleared_list
 
     def update(self):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
