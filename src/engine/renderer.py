@@ -15,7 +15,8 @@ class Renderer:
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
         self.window_type = RESIZABLE
-        self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (600, 600)
+        self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (
+        600, 600)
         self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
         self.tile_size = 0
@@ -25,6 +26,9 @@ class Renderer:
         self.boss_fight_boss_animations: dict[str: Anim] = {}
         self.boss_fight_player_animations: dict[str: Anim] = {}
         self.boss_fight_GUI_container = None
+
+        # Boite de dialogue
+        self.dialogs_box = None
 
         # Variables utilisées par le menu principal
         self.main_menu_assets: dict[str: Anim] = {}
@@ -54,8 +58,8 @@ class Renderer:
                 part_speed_y = - part_speed_y
 
             # On choisit sa position dans le rectangle
-            part_x = random.randint(x-w, x+w-part_size)
-            part_y = random.randint(y-h, y+h-part_size)
+            part_x = random.randint(x - w, x + w - part_size)
+            part_y = random.randint(y - h, y + h - part_size)
 
             # On choisit la durée de vie
             part_life_time = random.uniform(min_life_time, max_life_time)
@@ -98,6 +102,7 @@ class Renderer:
             self.render_entities(rendered_surface, gui_surface, delta)
             self.render_particles(rendered_surface, delta)
             self.render_layer(2, rendered_surface)
+            self.render_debug_area(rendered_surface)
 
             # Enfin, on redimensionne notre surface et on la colle sur la fenêtre principale
             self.window.blit(
@@ -122,8 +127,93 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
                                                               True, (255, 0, 0)), (0, 60))
 
+            # On rend maintenant toutes les zones de détection de la fenêtre
+            for area in self.engine.event_handler.buttons_area:
+                window_size = display.get_window_size()
+                if area[2] == 0:
+                    draw.rect(self.window, (255, 255, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0],
+                               area[0][2] * window_size[0], area[0][3] * window_size[0]), width=1)
+                elif area[2] == 1:
+                    draw.rect(self.window, (255, 255, 0),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1],
+                               area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
+                else:
+                    draw.rect(self.window, (255, 255, 0),
+                              area[0], width=1)
+
+        # Rendu présent dans tous les types de jeu
+        self.render_dialogs_box()
+
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
+
+    def render_dialogs_box(self):
+        """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
+
+        # Rend le conteneur des dialogues
+        if self.engine.dialogs_manager.reading_dialog:
+            resized_box = transform.scale(self.dialogs_box,
+                                          (display.get_window_size()[0],
+                                           self.dialogs_box.get_height() / self.dialogs_box.get_width() *
+                                           display.get_window_size()[0]))
+            self.window.blit(resized_box, (0, display.get_window_size()[1] - resized_box.get_height()))
+
+            # Rend le texte
+
+            # On récupère le texte
+            sentence = self.engine.dialogs_manager.get_current_dialog_sentence()
+
+            # On crée la font qui permettra de faire le rendu du texte après
+            text_font = font.SysFont("Arial", display.get_window_size()[0]//30)
+
+            # On calcule la taille du décalage puis on calcule la largeur maximale que peut faire une ligne
+            x_border = display.get_window_size()[0]/30
+            max_width = display.get_window_size()[0]-2*x_border
+
+            # On passe le texte dans un algorithme qui coupe le texte entre les espaces pour empecher de dépacer la
+            # taille maximale de la ligne
+            lines = []
+            current_line = ""
+            for i in sentence:
+                current_line += i
+                # Si on déplace de la ligne, on ajoute la ligne jusqu'au dernier mot
+                if text_font.size(current_line)[0] > max_width:
+                    lines.append(current_line[:current_line.rfind(" ")])
+                    current_line = current_line[current_line.rfind(" "):]
+
+            # Si la ligne est incomplète, on ajoute la ligne
+            lines.append(current_line)
+
+            # On itère dans les lignes avec un enumerate pour avoir sont index
+            for i in enumerate(lines):
+                # On récupère le texte et s'il commence par un espace, on le retire
+                text = i[1]
+                if len(text) > 0 and text[0] == " ":
+                    text = text[1:]
+
+                # On rend la ligne au bon endroit sur l'écran
+                rendered_text = text_font.render(text, True, (0, 0, 0))
+                self.window.blit(rendered_text,
+                                 (x_border,
+                                  display.get_window_size()[1] - resized_box.get_height() +
+                                  display.get_window_size()[0]/30 +
+                                  (text_font.get_height()+display.get_window_size()[0]/200)*i[0]))
+
+    def render_debug_area(self, rendered_surface: surface.Surface):
+        """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
+
+        # On calcule le décalage pour centrer la caméra
+        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+
+        # On itère et on rend toutes les zones de détection
+        for area in self.engine.event_sheduler.area_callbacks:
+            area_rect = area[0]
+            draw.rect(rendered_surface, (200, 100, 0),
+                      (math.floor(x_middle_offset + area_rect[0] - self.engine.camera.x),
+                       math.floor(y_middle_offset + area_rect[1] - self.engine.camera.y),
+                       math.floor(area_rect[2]), math.floor(area_rect[3])), width=1)
 
     def register_shadow(self, file_path: str, name: str):
         """Enregistre une image d'ombre utilisée pour le rendu des entités."""
@@ -169,8 +259,8 @@ class Renderer:
         frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
 
         # On colle le boss à droite de la fenêtre
-        self.window.blit(frame, (display.get_window_size()[0]-frame.get_width()-display.get_window_size()[0]/20,
-                                 display.get_window_size()[1]/4-frame.get_height()/2))
+        self.window.blit(frame, (display.get_window_size()[0] - frame.get_width() - display.get_window_size()[0] / 20,
+                                 display.get_window_size()[1] / 4 - frame.get_height() / 2))
 
         # On récupère l'image de l'animation du joueur
         player_animation = self.boss_fight_player_animations[self.engine.boss_fight_manager.current_player_animation]
@@ -180,14 +270,17 @@ class Renderer:
         frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
 
         # On colle le joueur à gauche de la fenêtre
-        self.window.blit(frame, (display.get_window_size()[0]/20, display.get_window_size()[1]/4-frame.get_height()/2))
+        self.window.blit(frame,
+                         (display.get_window_size()[0] / 20, display.get_window_size()[1] / 4 - frame.get_height() / 2))
 
     def render_boss_fight_gui(self):
         """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
 
         resized_container = transform.scale(self.boss_fight_GUI_container,
-                                            (display.get_window_size()[0], self.boss_fight_GUI_container.get_height()/self.boss_fight_GUI_container.get_width()*display.get_window_size()[0]))
-        self.window.blit(resized_container, (0, display.get_window_size()[1]-resized_container.get_height()))
+                                            (display.get_window_size()[0],
+                                             self.boss_fight_GUI_container.get_height() / self.boss_fight_GUI_container.get_width() *
+                                             display.get_window_size()[0]))
+        self.window.blit(resized_container, (0, display.get_window_size()[1] - resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
@@ -235,10 +328,11 @@ class Renderer:
                 cooldown_value = entity.damage_cooldown / entity.default_damage_cooldown
 
                 # On calcule où placer la barre de vei sur la surface des GUI
-                life_bar_dest = (math.floor((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
-                                            life_bar_width / 2),
-                                 math.floor((entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
-                                            self.engine.camera.zoom - life_bar_height - life_bar_y_offset))
+                life_bar_dest = (
+                math.floor((entity.x - self.engine.camera.x + x_middle_offset) * self.engine.camera.zoom -
+                           life_bar_width / 2),
+                math.floor((entity.y - self.engine.camera.y + y_middle_offset - frame.get_height() / 2) *
+                           self.engine.camera.zoom - life_bar_height - life_bar_y_offset))
 
                 # Contour de la barre de vie
                 draw.rect(gui_surface, (20, 0, 0), (life_bar_dest[0] - life_bar_border,

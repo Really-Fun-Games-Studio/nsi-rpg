@@ -12,14 +12,21 @@ class Game(Engine):
         self.map_manager.load_new("maps/map5.tmj")
 
         self.renderer.load_tile_set("assets/textures/tileset.png", 16)
+        self.dialogs_manager.load_dialogs("assets/dialogs.json")
 
         self.create_player_entity()
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = False
+        self.DEBUG_MODE = True
 
         self.game_state = GameState.NORMAL
+
+        self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test"), ["player"], False, True)
+
+        self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
+
+        self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
 
     def create_player_entity(self):
         """Crée une entité joueur."""
@@ -61,7 +68,7 @@ class Game(Engine):
         mob.set_default_life(5)
         mob.max_speed = 1.
 
-        mob.x, mob.y = 160, 16
+        mob.x, mob.y = 1600, 16
 
     def load_boss_fight_assets(self):
         """Charge les animations de combat des combats de boss."""
@@ -72,7 +79,7 @@ class Game(Engine):
         boss_none.load_animation_from_directory("assets/textures/boss_fight/boss_sprite/test/none")
         self.renderer.register_boss_fight_boss_animation(boss_none, "none")
 
-        self.renderer.boss_fight_GUI_container = pygame.image.load("assets/textures/boss_fight/fight_actions_GUI.png")
+        self.renderer.boss_fight_GUI_container = pygame.image.load("assets/textures/boss_fight/fight_actions_GUI.png").convert_alpha()
 
 
 game = Game()
