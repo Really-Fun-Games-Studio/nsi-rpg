@@ -11,8 +11,9 @@ class EventSheduler:
         self.engine = engine
 
     def register_area(self, area_rect: tuple[int, int, int, int], callback: FunctionType | classmethod | staticmethod,
-                      linked_entities_name: list[Entity]):
-        self.area_callbacks.append((area_rect, callback, linked_entities_name))
+                      linked_entities_name: list[Entity], single_use: bool = True, no_spam: bool = False):
+        self.area_callbacks.append((area_rect, callback, linked_entities_name, single_use, no_spam, []))
+        # La liste vide en dernier argument correspond aux entités actuellement dans la zone
 
     @staticmethod
     def get_collisions_with_entity(rect: tuple[int, int, int, int], entity: 'Entity'):
@@ -26,8 +27,15 @@ class EventSheduler:
         """Met à jour l'event sheluder et execute les actions si les conditions à son execution sont respéctées."""
 
         # On itère dans la liste des zones de détection
-        for area in self.area_callbacks:
+        for area in self.area_callbacks.copy():
             # On itère dans toutes les entités enregistrées
             for entity in area[2]:
-                if self.get_collisions_with_entity(area[0], self.engine.entity_manager.get_by_name(entity)):
+                entity_in_area = self.get_collisions_with_entity(area[0], self.engine.entity_manager.get_by_name(entity))
+                if entity_in_area and not (area[4] and entity in area[5]):
                     area[1](entity)
+                    if area[3]:
+                        self.area_callbacks.remove(area)
+                    if area[4]:
+                        area[5].append(entity)
+                elif (not entity_in_area) and (area[4] and entity in area[5]):
+                    area[5].remove(entity)
