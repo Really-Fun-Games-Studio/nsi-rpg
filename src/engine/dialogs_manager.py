@@ -18,16 +18,19 @@ class DialogsManager:
         """Fonction exécutée lorsque l'utilisateur demande de passer au prochain dialogue. Si un dialogue est en
         train d'être écrit, il écrit tout d'un coup."""
 
-        if self.writing_dialog:
-            self.current_dialogue_letter_id = len(self.current_dialogs[self.current_dialog_id])
-            self.writing_dialog = False
-        else:
-            self.next_dialog()
+        if self.reading_dialog:
+            if self.writing_dialog:
+                self.current_dialogue_letter_id = len(self.current_dialogs[self.current_dialog_id])
+            else:
+                self.next_dialog()
+
+        print("next")
 
     def next_dialog(self):
         """Passe au dialogue suivant. Renvoie True si le dialogue est fini."""
         self.current_dialog_id += 1
-        if self.current_dialog_id == len(self.current_dialogs):
+        self.writing_dialog = True
+        if self.current_dialog_id >= len(self.current_dialogs):
             self.current_dialogs = []
             self.current_dialog_id = -1
             self.writing_dialog = False
@@ -35,9 +38,12 @@ class DialogsManager:
 
     def start_dialog(self, name: str):
         """Lance le dialogue au nom donné."""
+
+        # Si un dialogue n'est pas déja lancé, on lance le dialogue au nom donné
         if not self.reading_dialog:
             self.current_dialogs = self.dialogs[name]
             self.current_dialog_id = 0
+            self.current_dialogue_letter_id = 0
 
             self.reading_dialog = True
 
@@ -58,12 +64,12 @@ class DialogsManager:
         if self.reading_dialog:
             self.letter_timer -= delta
 
-            self.writing_dialog = True
-
             if self.letter_timer <= 0:
                 self.letter_timer = self.LETTER_WRITING_DELAY
                 self.current_dialogue_letter_id += 1
                 if self.current_dialogue_letter_id > len(self.current_dialogs[self.current_dialog_id]):
                     self.current_dialogue_letter_id -= 1
                     self.writing_dialog = False
+
+        #print(self.writing_dialog, self.reading_dialog)
 
