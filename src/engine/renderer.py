@@ -145,8 +145,13 @@ class Renderer:
             self.window.blit(resized_box, (0, display.get_window_size()[1] - resized_box.get_height()))
 
             # Rend le texte
-            text_font = font.SysFont("Arial", display.get_window_size()[0]//20)
-            rendered_text = text_font.render(self.engine.dialogs_manager.get_current_dialog_sentence(), True, (0, 0, 0))
+
+            # On récupère le texte
+            sentence = self.engine.dialogs_manager.get_current_dialog_sentence()
+
+            text_font = font.SysFont("Arial", display.get_window_size()[0]//30)
+            print(text_font.size(sentence))
+            rendered_text = text_font.render(sentence, True, (0, 0, 0))
             self.window.blit(rendered_text, (display.get_window_size()[0]/30, display.get_window_size()[1] - resized_box.get_height()+display.get_window_size()[0]/30))
 
     def render_debug_area(self, rendered_surface: surface.Surface):

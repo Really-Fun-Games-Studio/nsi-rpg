@@ -10,7 +10,7 @@ class DialogsManager:
         self.reading_dialog = False
         self.current_dialogue_letter_id = 0
 
-        self.LETTER_WRITTING_DELAY = 0.5
+        self.LETTER_WRITTING_DELAY = 0.01
         self.letter_timer = 0
 
     def next_dialog(self):
@@ -26,8 +26,6 @@ class DialogsManager:
         if not self.reading_dialog:
             self.current_dialogs = self.dialogs[name]
             self.current_dialog_id = 0
-
-            print(self.current_dialogs)
 
             self.reading_dialog = True
 
@@ -54,4 +52,3 @@ class DialogsManager:
                 if self.current_dialogue_letter_id > len(self.current_dialogs[self.current_dialog_id]):
                     self.current_dialogue_letter_id -= 1
 
-                print(self.get_current_dialog_sentence())
