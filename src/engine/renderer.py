@@ -7,6 +7,7 @@ from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
+from src.engine.menu_manager import Label
 
 
 class Renderer:
@@ -111,6 +112,9 @@ class Renderer:
             self.render_boss_fight_scene(delta)
             self.render_boss_fight_gui()
 
+        # Rend les menus
+        self.render_menus()
+
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
             self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
@@ -145,6 +149,47 @@ class Renderer:
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
+
+    def render_menus(self):
+        """Rend le menu enregistré comme visible."""
+        window_size = display.get_window_size()
+
+        # Si un menu est affiché, on itère dans tous ses widgets
+        if self.engine.menu_manager.active_menu is not None:
+            for widget in self.engine.menu_manager.active_menu.widgets:
+                # On multiplie les coordonnées par la taille de la fenetre si besoin
+                if widget.is_window_relative == 0:
+                    x = widget.x * window_size[0]
+                    y = widget.y * window_size[0]
+                elif widget.is_window_relative == 1:
+                    x = widget.x * window_size[1]
+                    y = widget.y * window_size[1]
+                elif widget.is_window_relative == 2:
+                    x = widget.x * window_size[0]
+                    y = widget.y * window_size[1]
+                else:
+                    x = widget.x
+                    y = widget.y
+
+                # On vérifie quel est le widget
+                if isinstance(widget, Label):
+                    # On multiplie la taille du texte si besoin
+                    if widget.is_window_relative == 0:
+                        size = widget.size*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        size = widget.size*window_size[1]
+                    elif widget.is_window_relative == 2:
+                        size = widget.size*min(window_size[0], window_size[1])
+                    else:
+                        size = widget.size
+
+                    text_font = font.SysFont("Arial", round(size))
+                    rendered_text = text_font.render(widget.text, True, widget.color)
+                    if widget.centered:
+                        self.window.blit(rendered_text, (x-rendered_text.get_width()//2,
+                                                         y-rendered_text.get_height()//2))
+                    else:
+                        self.window.blit(rendered_text, (x, y))
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""

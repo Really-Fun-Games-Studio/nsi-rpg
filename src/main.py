@@ -4,6 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
+from src.engine.menu_manager import Menu, Label
 
 
 class Game(Engine):
@@ -27,6 +28,16 @@ class Game(Engine):
         self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
 
         self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
+
+        self.setup_main_menu()
+
+    def setup_main_menu(self):
+        """Crée les éléments du menu principal."""
+        menu = Menu()
+        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 255, 0), True, 2))
+        self.menu_manager.register_menu(menu, "main")
+
+        self.menu_manager.show("main")
 
     def create_player_entity(self):
         """Crée une entité joueur."""
