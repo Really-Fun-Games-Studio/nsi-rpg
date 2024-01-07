@@ -21,7 +21,7 @@ class Game(Engine):
 
         self.DEBUG_MODE = True
 
-        self.game_state = GameState.NORMAL
+        self.game_state = GameState.MAIN_MENU
 
         self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test"), ["player"], False, True)
 
@@ -31,6 +31,10 @@ class Game(Engine):
 
         self.setup_main_menu()
 
+    def start_game(self):
+        self.game_state = GameState.NORMAL
+        self.menu_manager.hide()
+
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
@@ -39,7 +43,7 @@ class Game(Engine):
         base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "boutton", 0.1, (0, 255, 0), lambda : print("play"), base_image, hover_image, True, 0))
+        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 255, 0), self.start_game, base_image, hover_image, True, 0))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")

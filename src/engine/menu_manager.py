@@ -68,23 +68,28 @@ class MenuManager:
         """Ajoute le menu donné au manager de menu avec le nom donné."""
         self.menus[name] = menu
 
-        # On itère dans tous les bouttons pour leur ajouter une interaction
-        for btn in menu.widgets:
-            if isinstance(btn, Button):
-                width = btn.base_image.get_width()/self.engine.renderer.window_size[0]
-                height = btn.base_image.get_height()/self.engine.renderer.window_size[1]
-                area_x = btn.x
-                area_y = btn.y
-                if btn.centered:
-                    area_x -= width/2
-                    area_y -= height/2
-                self.engine.event_handler.register_button_area((area_x, area_y, width, height), btn.callback, btn.area_name,
-                                                        btn.is_window_relative, btn.set_hover_state)
-
     def show(self, name: str):
         """Affiche le menu au nom donné."""
         self.active_menu = self.menus[name]
 
+        # On itère dans tous les bouttons pour leur ajouter une interaction
+        for btn in self.active_menu.widgets:
+            if isinstance(btn, Button):
+                width = btn.base_image.get_width() / self.engine.renderer.window_size[0]
+                height = btn.base_image.get_height() / self.engine.renderer.window_size[1]
+                area_x = btn.x
+                area_y = btn.y
+                if btn.centered:
+                    area_x -= width / 2
+                    area_y -= height / 2
+                self.engine.event_handler.register_button_area((area_x, area_y, width, height), btn.callback,
+                                                               btn.area_name,
+                                                               btn.is_window_relative, btn.set_hover_state)
+
     def hide(self):
         """Affiche le menu actuelement à l'écran."""
+        # On itère dans tous les bouttons pour retirer l'interaction
+        for btn in self.active_menu.widgets:
+            if isinstance(btn, Button):
+                self.engine.event_handler.remove_button_area(btn.area_name)
         self.active_menu = None
