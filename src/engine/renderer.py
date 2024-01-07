@@ -206,9 +206,9 @@ class Renderer:
                     rendered_text = text_font.render(widget.text, True, widget.color)
 
                     if widget.hovered:
-                        btn_image = widget.base_image
-                    else:
                         btn_image = widget.hover_image
+                    else:
+                        btn_image = widget.base_image
                     btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
                                                             btn_image.get_height()*window_size[0]/self.window_size[0]))
 
