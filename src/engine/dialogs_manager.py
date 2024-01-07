@@ -36,6 +36,7 @@ class DialogsManager:
     def next_dialog(self):
         """Passe au dialogue suivant. Appelle le callback si le dialogue est fini."""
         self.current_dialog_id += 1
+        self.current_dialogue_letter_id = 0
         self.writing_dialog = True
         if self.current_dialog_id >= len(self.current_dialogs):  # Le dialogue est fini.
             self.current_dialogs = []
@@ -51,7 +52,7 @@ class DialogsManager:
 
         # Si un dialogue n'est pas déja lancé, on lance le dialogue au nom donné
         if not self.reading_dialog:
-            self.event_handler.register_button_area((0, 0, 1, 1), self.next_signal, "next_dialog", 0)
+            self.event_handler.register_button_area((0, 0, 1, 1), self.next_signal, "next_dialog", 2)
 
             self.current_dialogs = self.dialogs[name]
             self.current_dialog_id = 0
@@ -84,6 +85,3 @@ class DialogsManager:
                 if self.current_dialogue_letter_id > len(self.current_dialogs[self.current_dialog_id]):
                     self.current_dialogue_letter_id -= 1
                     self.writing_dialog = False
-
-        #print(self.writing_dialog, self.reading_dialog)
-

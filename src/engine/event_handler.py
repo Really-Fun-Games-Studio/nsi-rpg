@@ -29,6 +29,10 @@ class EventHandler:
             return (rect[0]*window_size[1] < point[0] < rect[0]*window_size[1] + rect[2]*window_size[1] and
                     rect[1]*window_size[1] < point[1] < rect[1]*window_size[1] + rect[3]*window_size[1])
 
+        elif is_window_relative == 2:
+            return (rect[0]*window_size[0] < point[0] < rect[0]*window_size[0] + rect[2]*window_size[0] and
+                    rect[1]*window_size[1] < point[1] < rect[1]*window_size[1] + rect[3]*window_size[1])
+
         return rect[0] < point[0] < rect[0] + rect[2] and rect[1] < point[1] < rect[1] + rect[3]
 
     def register_button_area(self, rect: tuple[float | int, float | int, float | int, float | int],

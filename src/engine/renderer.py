@@ -138,6 +138,10 @@ class Renderer:
                     draw.rect(self.window, (255, 255, 0),
                               (area[0][0] * window_size[1], area[0][1] * window_size[1],
                                area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
+                elif area[2] == 2:
+                    draw.rect(self.window, (255, 255, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[1],
+                               area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
                 else:
                     draw.rect(self.window, (255, 255, 0),
                               area[0], width=1)
