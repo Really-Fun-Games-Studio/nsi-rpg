@@ -14,6 +14,7 @@ class EventHandler:
         self.engine = core
         self.key_pressed = []
         self.buttons_area = []
+        self.hovered_area = []
 
     @staticmethod
     def get_click_collision(rect: tuple[float | int, float | int, float | int, float | int], point: tuple[int, int],
@@ -37,11 +38,12 @@ class EventHandler:
 
     def register_button_area(self, rect: tuple[float | int, float | int, float | int, float | int],
                              callback: FunctionType | classmethod | staticmethod, name: str,
-                             is_window_relative: int = -1):
+                             is_window_relative: int = -1,
+                             hover_callback: FunctionType | classmethod | staticmethod = None):
         """Enregistre une zone comme bouton. La fonction donnée sera donc executé lorsque la zone sur la fenêtre
         sera cliqué. is_window_relative doit être 0 pour que le rect soit multipliée par la largeur de la fenêtre et 1
         pour qu'elle soit multipliée par la hauteur"""
-        self.buttons_area.append((rect, callback, is_window_relative, name))
+        self.buttons_area.append((rect, callback, is_window_relative, name, hover_callback))
 
     def remove_button_area(self, name: str):
         """Supprime les boutons aux noms donnés."""
@@ -72,6 +74,10 @@ class EventHandler:
                     for area in self.buttons_area:
                         if self.get_click_collision(area[0], e.pos, area[2]):
                             area[1]()
+            elif e.type == MOUSEMOTION:
+                for area in self.buttons_area:
+                    if area[4] is not None and self.get_click_collision(area[0], e.pos, area[2]):
+                        area[4]()
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:

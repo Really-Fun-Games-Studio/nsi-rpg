@@ -191,7 +191,6 @@ class Renderer:
                     else:
                         self.window.blit(rendered_text, (x, y))
                 elif isinstance(widget, Button):
-                    print("a")
                     # On multiplie la taille du texte si besoin
                     if widget.is_window_relative == 0:
                         size = widget.size*window_size[0]
@@ -204,14 +203,24 @@ class Renderer:
 
                     text_font = font.SysFont("Arial", round(size))
 
-                    # On affiche l'image du boutton
-                    self.window.blit(widget.base_image, (x-widget.base_image.get_width()//2,
-                                                         y-widget.base_image.get_height()//2))
-
                     rendered_text = text_font.render(widget.text, True, widget.color)
-                    self.window.blit(rendered_text, (x-rendered_text.get_width()//2,
-                                                     y-rendered_text.get_height()//2))
 
+                    btn_image = widget.base_image
+                    btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
+                                                            btn_image.get_height()*window_size[0]/self.window_size[0]))
+
+                    # On affiche l'image du boutton
+                    if widget.centered:
+                        self.window.blit(btn_image, (x-btn_image.get_width()//2,
+                                                     y-btn_image.get_height()//2))
+
+                        self.window.blit(rendered_text, (x-rendered_text.get_width()//2,
+                                                         y-rendered_text.get_height()//2))
+
+                    else:
+                        self.window.blit(btn_image, (x, y))
+
+                        self.window.blit(rendered_text, (x, y))
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""

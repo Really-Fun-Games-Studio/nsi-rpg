@@ -36,7 +36,7 @@ class Engine:
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self.event_handler)
-        self.menu_manager = MenuManager()
+        self.menu_manager = MenuManager(self)
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.

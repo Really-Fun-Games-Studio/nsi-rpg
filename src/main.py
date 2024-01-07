@@ -38,7 +38,7 @@ class Game(Engine):
 
         base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "boutton", 0.1, (0, 255, 0), lambda : print("play"), base_image, base_image, True, 2))
+        menu.add_widget(Button(0.5, 0.3, "boutton", 0.1, (0, 255, 0), lambda : print("play"), base_image, base_image, True, 0))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")
