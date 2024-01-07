@@ -5,6 +5,7 @@ from src.engine.event_handler import EventHandler
 from src.engine.map_manager import MapManager
 from src.engine.renderer import Renderer
 from src.engine.enums import GameState
+from src.engine.sound_manager import SoundManager
 import pygame
 
 
@@ -31,6 +32,7 @@ class Engine:
         self.camera = Camera()
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
+        self.sound_manager = SoundManager(60)
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
@@ -47,6 +49,7 @@ class Engine:
         self.entity_manager.update(0.016666666)
         self.renderer.update(0.016666666)
         self.event_handler.update()
+        self.sound_manager.update(1/60)
 
     def stop(self):
         """Arrête le programme."""

@@ -112,7 +112,7 @@ class Renderer:
             self.render_boss_fight_scene(delta)
             self.render_boss_fight_gui()
 
-        # Conteur de FPS en mode DEBUG
+        # Conteur de données (FPS, Coords, Volume) en mode DEBUG
         if self.engine.DEBUG_MODE:
             self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
                              (0, 0))
@@ -121,6 +121,8 @@ class Renderer:
                                                               True, (255, 0, 0)), (0, 30))
             self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
                                                               True, (255, 0, 0)), (0, 60))
+            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.get_music_volume()}",
+                                                              True, (255, 0, 0)), (0, 90))
 
         # Apres avoir tout rendu, on met à jour l'écran
         display.update()
