@@ -76,8 +76,15 @@ class EventHandler:
                             area[1]()
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
-                    if area[4] is not None and self.get_click_collision(area[0], e.pos, area[2]):
-                        area[4]()
+                    if area[4] is not None:
+                        if self.get_click_collision(area[0], e.pos, area[2]):
+                            if area not in self.hovered_area:
+                                area[4](True)
+                                self.hovered_area.append(area)
+                        else:
+                            if area in self.hovered_area:
+                                area[4](False)
+                                self.hovered_area.remove(area)
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:

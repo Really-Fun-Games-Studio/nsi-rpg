@@ -42,6 +42,7 @@ class Button(Widget):
         self.hovered = False
 
     def set_hover_state(self, state: bool):
+        """Modifie la valeur du hover."""
         self.hovered = state
 
 
@@ -78,8 +79,7 @@ class MenuManager:
                     area_x -= width/2
                     area_y -= height/2
                 self.engine.event_handler.register_button_area((area_x, area_y, width, height), btn.callback, btn.area_name,
-                                                        btn.is_window_relative, lambda: print("hover"))
-                print(btn.is_window_relative)
+                                                        btn.is_window_relative, btn.set_hover_state)
 
     def show(self, name: str):
         """Affiche le menu au nom donné."""
