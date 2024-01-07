@@ -1,3 +1,10 @@
+import threading
+import tkinter
+from types import FunctionType
+
+import pygame
+
+
 class Widget:
     """Classe parente des widgets de menu."""
     def __init__(self, x, y, is_window_relative):
@@ -9,12 +16,27 @@ class Widget:
 class Label(Widget):
     """Un widget de texte."""
     def __init__(self, x: int | float, y: int | float, text: str, size: int | float, color: tuple[int, int, int],
-                 centered: bool = False, is_window_relative: bool = -1):
+                 centered: bool = False, is_window_relative: int = -1):
         super().__init__(x, y, is_window_relative)
         self.text = text
         self.size = size
         self.centered = centered
         self.color = color
+
+
+class Button(Widget):
+    """Un widget de bouton."""
+    def __init__(self, x: int | float, y: int | float, text: str, size: int | float, color: tuple[int, int, int],
+                 callback: FunctionType | classmethod | staticmethod, base_image: pygame.Surface,
+                 hover_image: pygame.Surface, centered: bool = False, is_window_relative: int = -1):
+        super().__init__(x, y, is_window_relative)
+        self.text = text
+        self.size = size
+        self.color = color
+        self.callback = callback
+        self.base_image = base_image
+        self.hover_image = hover_image
+        self.centered = centered
 
 
 class Menu:

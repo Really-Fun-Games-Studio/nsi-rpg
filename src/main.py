@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
-from src.engine.menu_manager import Menu, Label
+from src.engine.menu_manager import Menu, Label, Button
 
 
 class Game(Engine):
@@ -35,6 +35,10 @@ class Game(Engine):
         """Crée les éléments du menu principal."""
         menu = Menu()
         menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 255, 0), True, 2))
+
+        base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
+
+        menu.add_widget(Button(0.5, 0.3, "boutton", 0.1, (0, 255, 0), lambda : print("play"), base_image, base_image, True, 2))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")

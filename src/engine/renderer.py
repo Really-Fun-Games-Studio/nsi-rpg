@@ -7,7 +7,7 @@ from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
-from src.engine.menu_manager import Label
+from src.engine.menu_manager import Label, Button
 
 
 class Renderer:
@@ -190,6 +190,28 @@ class Renderer:
                                                          y-rendered_text.get_height()//2))
                     else:
                         self.window.blit(rendered_text, (x, y))
+                elif isinstance(widget, Button):
+                    print("a")
+                    # On multiplie la taille du texte si besoin
+                    if widget.is_window_relative == 0:
+                        size = widget.size*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        size = widget.size*window_size[1]
+                    elif widget.is_window_relative == 2:
+                        size = widget.size*min(window_size[0], window_size[1])
+                    else:
+                        size = widget.size
+
+                    text_font = font.SysFont("Arial", round(size))
+
+                    # On affiche l'image du boutton
+                    self.window.blit(widget.base_image, (x-widget.base_image.get_width()//2,
+                                                         y-widget.base_image.get_height()//2))
+
+                    rendered_text = text_font.render(widget.text, True, widget.color)
+                    self.window.blit(rendered_text, (x-rendered_text.get_width()//2,
+                                                     y-rendered_text.get_height()//2))
+
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
