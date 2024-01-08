@@ -117,13 +117,17 @@ class Renderer:
 
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
-            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {self.engine.clock.get_fps()}", True, (255, 0, 0)),
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}", True, (255, 0, 0)),
                              (0, 0))
             player = self.engine.entity_manager.get_by_name('player')
-            self.window.blit(font.SysFont("Arial", 20).render(f"X: {player.x} Y:{player.y}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",
                                                               True, (255, 0, 0)), (0, 30))
-            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {self.engine.camera.zoom}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.camera.zoom, 2)}",
                                                               True, (255, 0, 0)), (0, 60))
+            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos()}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}",
+                                                              True, (255, 0, 0)), (0, 90))
+            self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
+                                                              True, (255, 0, 0)), (0, 120))
 
             # On rend maintenant toutes les zones de détection de la fenêtre
             for area in self.engine.event_handler.buttons_area:
