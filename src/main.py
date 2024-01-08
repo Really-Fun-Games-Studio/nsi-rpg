@@ -50,6 +50,8 @@ class Game(Engine):
 
     def create_player_entity(self):
         """Crée une entité joueur."""
+
+        # On crée les animations
         anim = Anim(0.5)
         anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
@@ -58,17 +60,28 @@ class Game(Engine):
         anim.load_animation_from_directory("assets/textures/entities/player/walking")
         self.renderer.register_animation(anim, "player_walking")
 
+        # On crée l'entité
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
 
-        player.set_default_life(15)
-        player.max_speed = 1.1
-
-        self.entity_manager.set_player_entity("player")
-
         player.shadow = "player_shadow"
         self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
+
+        # On définit ses attributs
+        player.set_default_life(15)
+        player.max_speed = 1.5
+        player.x = 220.
+        player.y = 767.
+
+        # On place la caméra au niveau du joueur
+        self.camera.x = player.x
+        self.camera.y = player.y
+        self.camera.target_x = player.x
+        self.camera.target_y = player.y
+
+        # On enregistre l'entité
+        self.entity_manager.set_player_entity("player")
 
         self.camera.follow_entity(player)
 
