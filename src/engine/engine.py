@@ -1,8 +1,11 @@
 from src.engine.boss_fight_manager import BossFightManager
 from src.engine.camera import Camera
+from src.engine.dialogs_manager import DialogsManager
 from src.engine.entity_manager import EntityManager
 from src.engine.event_handler import EventHandler
+from src.engine.event_sheduler import EventSheduler
 from src.engine.map_manager import MapManager
+from src.engine.menu_manager import MenuManager
 from src.engine.renderer import Renderer
 from src.engine.enums import GameState
 from src.engine.sound_manager import SoundManager
@@ -32,6 +35,9 @@ class Engine:
         self.camera = Camera()
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
+        self.event_sheduler = EventSheduler(self)
+        self.dialogs_manager = DialogsManager(self.event_handler)
+        self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(60)
 
     def loop(self):
@@ -49,6 +55,8 @@ class Engine:
         self.entity_manager.update(0.016666666)
         self.renderer.update(0.016666666)
         self.event_handler.update()
+        self.event_sheduler.update()
+        self.dialogs_manager.update(0.016666666)
         self.sound_manager.update(1/60)
 
     def stop(self):

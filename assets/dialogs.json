@@ -1,0 +1,5 @@
+{
+  "test": ["test1111", "test2", "test très long permettant de tester le retour à la ligne dans le renderer du jeu dans la fonction qui rend les dialogues et il faut éviter d'en faire des si long car ça pourrait dépacer en bas de l'écran ! Bonne journée !"],
+  "test2": ["salut", "aurevoir"],
+  "test3": ["test très long permettant de tester le retour à la ligne dans le renderer du jeu dans la fonction qui rend les dialogues et il faut éviter d'en faire des si long car ça pourrait dépacer en bas de l'écran ! Bonne journée !"]
+}
