@@ -5,7 +5,7 @@ from math import sqrt
 from time import time
 
 class SoundManager:
-    def __init__(self, music_base_volume: float, ):
+    def __init__(self, music_base_volume: float):
         self.__tick = 0 # Compteur de la valeur d'un tick (Utilisé pour le comptage de tick)
         self.tick = 0 # Compteur de tick
         self.time = 0 # Temps local a la class (en s)
@@ -32,28 +32,37 @@ class SoundManager:
         self.sound_hears_anchor = None
 
 
-    def update(self, delta: float):
+    def update(self, delta: float, music_master_volume: float, sound_global_master_volume: float, sound_master_volume: float):
         self.__tick += delta
         self.tick = int(self.__tick / delta)
         self.time = self.tick * delta
+
+        self.music_master_volume = music_master_volume
+        self.sound_global_master_volume = sound_global_master_volume
+        self.sound_master_volume = sound_master_volume
+
 
         if self.sound_hears_anchor: # Update la position des "Oreilles" du joueur (Ou de l'entité séléctionné comme ancre pour les oreilles)
             self.sound_hears_x = self.sound_hears_anchor.x
             self.sound_hears_y = self.sound_hears_anchor.y
 
         for key in self.sound_global_currently_playing.keys(): # Son globaux
-            if self.sound_global_currently_playing[key][2] > self.time:
+            sound_container = self.sound_global_currently_playing[key]
+            if sound_container[2] > self.time:
                 self.sound_global_currently_playing.pop(key)
+            else:
+                sound_container[0].set_volume(round(sound_global_master_volume / 100 * sound_container[1] / 100, 3))
 
         for key in self.sound_currently_playing.keys(): # Son locaux
-            if self.sound_currently_playing[key][3] > self.time: # Timeout des sons
+            sound_container = self.sound_currently_playing[key]
+            if sound_container[3] > self.time: # Timeout des sons
                 self.sound_currently_playing.pop(key)
 
             else: # Gère le volume en fonction de la position
-                sound = self.sound_currently_playing[key][0]
-                max_volume = self.sound_currently_playing[key][1]
-                pos_x, pos_y = self.sound_currently_playing[2]
-                sound.set_volume(max(0, int((max_volume / 100) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (max_volume / 100))
+                sound = sound_container[0]
+                max_volume = sound_container[1]
+                pos_x, pos_y = sound_container[2]
+                sound.set_volume(max(0, int((round(sound_master_volume / 100 * max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(sound_master_volume / 100 * max_volume / 100, 3)))
 
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
             if not mixer.music.get_busy() or self.music_next_request:
@@ -97,7 +106,7 @@ class SoundManager:
 
     def music_set_volume(self, new_volume: float):
         """Définit le nouveau volume de la musique"""
-        mixer.music.set_volume((round(new_volume / 100, 3)))
+        mixer.music.set_volume((round(self.music_master_volume / 100 * new_volume / 100, 3)))
     
     def music_pause(self, fade_s: float, restart_tolerance: float = 33):
         """Met en pause la musique, la musique reprendra à la fin de la musique moin la tolérance (en pourcentage)"""
@@ -182,7 +191,6 @@ class SoundManager:
     def sound_global_play(self, name: str, volume: float):
         """Joue un son avec le même son dans tout le monde"""
         sound = self.sound_loaded[name]
-        sound.set_volume(round(volume / 100, 3))
 
         stop_at = self.time + sound.get_length()
         unique_id = self.create_unique_id()
