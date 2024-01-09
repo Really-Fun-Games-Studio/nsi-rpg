@@ -23,10 +23,10 @@ class SoundManager:
         self.music_is_paused = False
         self.music_pos_delay = 0
 
-        self.sound_currently_playing = {float: [mixer.Sound, float, [float, float], float]} # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]}
+        self.sound_currently_playing: dict[float: list[mixer.Sound, float, list[float, float], float]] = {} # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]}
 
-        self.sound_loaded = {str: mixer.Sound} # Format : {name: mixer.Sound}
-        self.sound_global_currently_playing = {float: [mixer.Sound, float, float]} # Format {unique_id: [Sound, volume, stop_at]}
+        self.sound_loaded: dict[str: mixer.Sound] = {}# Format : {name: mixer.Sound}
+        self.sound_global_currently_playing: dict[float: list[mixer.Sound, float, float]] = {} # Format {unique_id: [Sound, volume, stop_at]}
         
 
         self.sound_hears_anchor = None
