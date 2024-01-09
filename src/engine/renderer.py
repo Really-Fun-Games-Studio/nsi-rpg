@@ -124,7 +124,7 @@ class Renderer:
                                                               True, (255, 0, 0)), (0, 30))
             self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.camera.zoom, 2)}",
                                                               True, (255, 0, 0)), (0, 60))
-            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos()}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos()}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}, Shuffled: {self.engine.sound_manager.music_shuffle_playlist}",
                                                               True, (255, 0, 0)), (0, 90))
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
