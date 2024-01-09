@@ -160,11 +160,24 @@ class SoundManager:
     def sound_play(self, name: str, max_volume: float, pos_x: float, pos_y: float):
         sound = self.sound_loaded[name]
         stop_at = stop_at = self.time + sound.get_length()
+        unique_id = self.create_unique_id()
 
-        self.sound_currently_playing[self.create_unique_id()] = [sound, max_volume, [pos_x, pos_y], stop_at] # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]
+        self.sound_currently_playing[unique_id] = [sound, max_volume, [pos_x, pos_y], stop_at] # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]
+        return unique_id
+    
+    def sound_stop(self, name: str, unique_id: float = None, all: bool = False):
+        if all:
+            for key in self.sound_currently_playing.keys():
+                self.sound_currently_playing.pop(key)[0].stop()
 
-    def sound_stop(self, name: str, all: bool = False):
-        return
+        elif unique_id:
+            sound_container = self.sound_currently_playing.get(unique_id, None)
+            if sound_container:
+                self.sound_currently_playing.pop(unique_id)[0].stop()
+        else:
+            for key in self.sound_currently_playing.keys():
+                if self.sound_loaded[name] == self.sound_currently_playing[key][0]:
+                    self.sound_currently_playing.pop(key)[0].stop()
 
     def sound_global_play(self, name: str, volume: float):
         """Joue un son avec le même son dans tout le monde"""
@@ -172,8 +185,11 @@ class SoundManager:
         sound.set_volume(round(volume / 100, 3))
 
         stop_at = self.time + sound.get_length()
-        self.sound_global_currently_playing[self.create_unique_id()] = [sound, volume, stop_at]
+        unique_id = self.create_unique_id()
+
+        self.sound_global_currently_playing[unique_id] = [sound, volume, stop_at]
         sound.play()
+        return unique_id
     
     def sound_global_stop(self, name: str, unique_id: float = None, all: bool = False):
         if all:
@@ -187,4 +203,4 @@ class SoundManager:
         else:
             for key in self.sound_global_currently_playing.keys():
                 if self.sound_loaded[name] == self.sound_global_currently_playing[key][0]:
-                    self.sound_global_currently_playing[key].pop().stop()
+                    self.sound_global_currently_playing.pop(key)[0].stop()
