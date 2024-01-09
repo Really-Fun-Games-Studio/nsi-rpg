@@ -1,4 +1,5 @@
 from pygame import mixer
+from random import randint
 
 class SoundManager:
     def __init__(self, music_base_volume: float):
@@ -9,6 +10,7 @@ class SoundManager:
         self.music_current_song = ""
         self.music_play_playlist = False
         self.music_current_index = 0
+        self.music_shuffle_playlist = True
 
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""
@@ -39,16 +41,27 @@ class SoundManager:
                     if self.music_current_song in self.music_playlist:
                         just_played_index = self.music_playlist.index(self.music_current_song)
 
-                        if len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
+                        if self.music_shuffle_playlist and len(self.music_playlist) != 1:
+                            while True:
+                                new_index = randint(0, len(self.music_playlist) - 1)
+                                if new_index != just_played_index:
+                                    break
+
+                            self.music_current_index = new_index
+                            self.__music_play(self.music_playlist[new_index])
+
+                        elif len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
                             self.music_current_index = 0
                             self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
+
                         else:
                             self.music_current_index = just_played_index + 1
                             self.__music_play(self.music_playlist[self.music_current_index]) # Joue la musique suivante dans la playlist
 
-                    else: # Song removed from playlist, no idea what was the index, starting again from start
-                        self.music_current_index = 0
-                        self.__music_play(self.music_playlist[0])
+                    else: # Song removed from playlist, no idea what was the index, starting again from start or from random index if playlist_shuffle = True
+                        new_index = randint(0, len(self.music_playlist) - 1)
+                        self.music_current_index = new_index
+                        self.__music_play(self.music_playlist[new_index])
                     
 
 
@@ -104,5 +117,8 @@ class SoundManager:
     def music_stop_playlist(self):
         self.music_play_playlist = False
     
+    def music_playlist_set_shuffle(self, shuffle: bool):
+        self.music_shuffle_playlist = shuffle
+
     def music_next(self):
         self.music_next_request = True
