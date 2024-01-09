@@ -30,7 +30,6 @@ class SoundManager:
                 if self.music_next_request:
                     self.music_next_request = False
                     mixer.music.fadeout(1)
-                    print(self.music_playlist)
 
                 if len(self.music_playlist) == 0:
                     pass
