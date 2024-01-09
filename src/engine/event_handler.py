@@ -110,6 +110,7 @@ class EventHandler:
                 if K_o in self.key_pressed:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
+                    self.key_pressed.remove(K_o)
 
         if K_x in self.key_pressed:
             self.engine.camera.target_zoom *= 1.01
