@@ -1,4 +1,5 @@
 from src.engine.entity import Entity
+from random import randint
 from pygame import mixer
 from math import sqrt
 from time import time
@@ -13,6 +14,8 @@ class SoundManager:
         self.music_current_song = ""
         self.music_play_playlist = False
         self.music_current_index = 0
+        self.music_shuffle_playlist = True
+        self.music_next_request = False
         self.music_set_volume(music_base_volume)
 
         self.music_before_pause_pos = 0
@@ -43,20 +46,40 @@ class SoundManager:
                 self.sound_global_currently_playing.pop(key)
 
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
-            if not mixer.music.get_busy():
-                
+            if not mixer.music.get_busy() or self.music_next_request:
+                if self.music_next_request:
+                    self.music_next_request = False
+                    mixer.music.fadeout(1)
+
                 if len(self.music_playlist) == 0:
                     pass
                 elif self.music_current_song == "":
                     self.__music_play(self.music_playlist[0])
                 else:
-                    just_played_index = self.music_playlist.index(self.music_current_song)
-                    if len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
-                        self.music_current_index = 0
-                        self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
-                    else:
-                        self.music_current_index = just_played_index + 1
-                        self.__music_play(self.music_playlist[self.music_current_index]) # Joue la musique suivante dans la playlist
+                    if self.music_current_song in self.music_playlist:
+                        just_played_index = self.music_playlist.index(self.music_current_song)
+
+                        if self.music_shuffle_playlist and len(self.music_playlist) != 1:
+                            while True:
+                                new_index = randint(0, len(self.music_playlist) - 1)
+                                if new_index != just_played_index:
+                                    break
+
+                            self.music_current_index = new_index
+                            self.__music_play(self.music_playlist[new_index])
+
+                        elif len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
+                            self.music_current_index = 0
+                            self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
+
+                        else:
+                            self.music_current_index = just_played_index + 1
+                            self.__music_play(self.music_playlist[self.music_current_index]) # Joue la musique suivante dans la playlist
+
+                    else: # Song removed from playlist, no idea what was the index, starting again from start or from random index if playlist_shuffle = True
+                        new_index = randint(0, len(self.music_playlist) - 1)
+                        self.music_current_index = new_index
+                        self.__music_play(self.music_playlist[new_index])
 
 
     def music_get_volume(self):
@@ -108,6 +131,12 @@ class SoundManager:
     
     def music_stop_playlist(self):
         self.music_play_playlist = False
+    
+    def music_playlist_set_shuffle(self, shuffle: bool):
+        self.music_shuffle_playlist = shuffle
+
+    def music_next(self):
+        self.music_next_request = True
 
     def sound_link_hears(self, entity: Entity):
         self.sound_hears_anchor = entity
