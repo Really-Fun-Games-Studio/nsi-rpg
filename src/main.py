@@ -19,7 +19,7 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.MAIN_MENU
 
@@ -29,11 +29,18 @@ class Game(Engine):
 
         self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
 
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
+        self.sound_manager.music_start_playlist()
+
         self.setup_main_menu()
 
     def start_game(self):
         self.game_state = GameState.NORMAL
         self.menu_manager.hide()
+
+        self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Bruit de foret pour yannis.mp3")
+        self.sound_manager.music_next()
 
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""

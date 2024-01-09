@@ -13,6 +13,7 @@ class SoundManager:
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""
         self.music_is_paused = False
+        self.music_next_request = False
 
         self.music_pos_delay = 0
 
@@ -25,20 +26,31 @@ class SoundManager:
         self.time = self.tick * delta
 
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
-            if not mixer.music.get_busy():
-                
+            if not mixer.music.get_busy() or self.music_next_request:
+                if self.music_next_request:
+                    self.music_next_request = False
+                    mixer.music.fadeout(1)
+                    print(self.music_playlist)
+
                 if len(self.music_playlist) == 0:
                     pass
                 elif self.music_current_song == "":
                     self.__music_play(self.music_playlist[0])
                 else:
-                    just_played_index = self.music_playlist.index(self.music_current_song)
-                    if len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
+                    if self.music_current_song in self.music_playlist:
+                        just_played_index = self.music_playlist.index(self.music_current_song)
+
+                        if len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
+                            self.music_current_index = 0
+                            self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
+                        else:
+                            self.music_current_index = just_played_index + 1
+                            self.__music_play(self.music_playlist[self.music_current_index]) # Joue la musique suivante dans la playlist
+
+                    else: # Song removed from playlist, no idea what was the index, starting again from start
                         self.music_current_index = 0
-                        self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
-                    else:
-                        self.music_current_index = just_played_index + 1
-                        self.__music_play(self.music_playlist[self.music_current_index]) # Joue la musique suivante dans la playlist
+                        self.__music_play(self.music_playlist[0])
+                    
 
 
     def music_get_volume(self):
@@ -84,7 +96,7 @@ class SoundManager:
     def music_remove_from_playlist(self, song_path: str = None, index: int = None):
         if song_path:
             index = self.music_playlist.index(song_path)
-        if index:
+        if index != None:
             self.music_playlist.pop(index)
 
     def music_start_playlist(self):
@@ -92,3 +104,6 @@ class SoundManager:
     
     def music_stop_playlist(self):
         self.music_play_playlist = False
+    
+    def music_next(self):
+        self.music_next_request = True
