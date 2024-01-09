@@ -163,6 +163,8 @@ class SoundManager:
 
         self.sound_currently_playing[self.create_unique_id()] = [sound, max_volume, [pos_x, pos_y], stop_at] # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]
 
+    def sound_stop(self, name: str, all: bool = False):
+        return
 
     def sound_global_play(self, name: str, volume: float):
         """Joue un son avec le même son dans tout le monde"""
@@ -173,7 +175,16 @@ class SoundManager:
         self.sound_global_currently_playing[self.create_unique_id()] = [sound, volume, stop_at]
         sound.play()
     
-    def sound_global_stop(self, name: str, all: bool = False):
+    def sound_global_stop(self, name: str, unique_id: float = None, all: bool = False):
         if all:
             for key in self.sound_global_currently_playing.keys():
                 self.sound_global_currently_playing.pop(key)[0].stop()
+
+        elif unique_id:
+            sound_container = self.sound_global_currently_playing.get(unique_id, None)
+            if sound_container:
+                self.sound_global_currently_playing.pop(unique_id)[0].stop()
+        else:
+            for key in self.sound_global_currently_playing.keys():
+                if self.sound_loaded[name] == self.sound_global_currently_playing[key][0]:
+                    self.sound_global_currently_playing[key].pop().stop()
