@@ -47,7 +47,7 @@ class Game(Engine):
         menu.add_widget(Slider(40, 200, base_image, hover_image))
         self.menu_manager.register_menu(menu, "main")
 
-        self.event_handler.register_slider_area((50, 50), (50, 300, 200, 200), (True, True))
+        self.event_handler.register_slider_area((0.1, 0.1), (0.1, 0.1, 0.3, 0.3), (True, True), 0)
 
         self.menu_manager.show("main")
 
