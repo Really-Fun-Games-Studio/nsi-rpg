@@ -5,6 +5,7 @@ from pygame import event, display
 from pygame.locals import *
 
 import src.engine.engine as engine
+from src.engine.menu_manager import Slider
 
 
 class EventHandler:
@@ -15,6 +16,7 @@ class EventHandler:
         self.key_pressed = []
         self.buttons_area = []
         self.hovered_area = []
+        self.sliders_area = []
 
     @staticmethod
     def get_click_collision(rect: tuple[float | int, float | int, float | int, float | int], point: tuple[int, int],
@@ -56,6 +58,14 @@ class EventHandler:
 
         self.buttons_area = cleared_list
 
+    def register_slider_area(self, rect: list[float | int, float | int, float | int, float | int],
+                             is_window_relative: int = -1):
+        """Enregistre une zone comme une zone déplaçable à l'écran."""
+        assert isinstance(rect, list)  # utilisé pour empêcher les tuples
+
+        self.sliders_area.append([rect, is_window_relative, False])
+        # Le premier booléen correspond à l'état de suivi de la souris
+
     def update(self):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
 
@@ -74,6 +84,14 @@ class EventHandler:
                     for area in self.buttons_area:
                         if self.get_click_collision(area[0], e.pos, area[2]):
                             area[1]()
+
+                    for area in self.sliders_area:
+                        if self.get_click_collision(area[0], e.pos, area[1]):
+                            area[2] = True
+            elif e.type == MOUSEBUTTONUP:
+                for area in self.sliders_area:
+                    area[2] = False
+
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
                     if area[4] is not None:
@@ -85,6 +103,11 @@ class EventHandler:
                             if area in self.hovered_area:
                                 area[4](False)
                                 self.hovered_area.remove(area)
+
+                for area in self.sliders_area:
+                    if area[2]:
+                        area[0][0] = e.pos[0]
+                        area[0][1] = e.pos[1]
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:
