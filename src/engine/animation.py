@@ -1,7 +1,6 @@
 # Classe animation adaptée depuis ESG Engine :
 # https://github.com/yannis300307/ESG_Engine/blob/main/ESG_Engine/client/animation.py
 import os
-
 import pygame
 
 

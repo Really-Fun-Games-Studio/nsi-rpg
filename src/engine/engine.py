@@ -38,7 +38,7 @@ class Engine:
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self.event_handler)
         self.menu_manager = MenuManager(self)
-        self.sound_manager = SoundManager(60)
+        self.sound_manager = SoundManager()
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
@@ -57,7 +57,7 @@ class Engine:
         self.event_handler.update()
         self.event_sheduler.update()
         self.dialogs_manager.update(0.016666666)
-        self.sound_manager.update(1/60)
+        self.sound_manager.update(1/60, 100, 100, 100)
 
     def stop(self):
         """Arrête le programme."""

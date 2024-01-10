@@ -5,10 +5,14 @@ from math import sqrt
 from time import time
 
 class SoundManager:
-    def __init__(self, music_base_volume: float):
+    def __init__(self):
         self.__tick = 0 # Compteur de la valeur d'un tick (Utilisé pour le comptage de tick)
         self.tick = 0 # Compteur de tick
         self.time = 0 # Temps local a la class (en s)
+        
+        self.music_master_volume = 60
+        self.sound_global_master_volume = 100
+        self.sound_master_volume = 100
 
         self.music_playlist = []
         self.music_current_song = ""
@@ -16,7 +20,7 @@ class SoundManager:
         self.music_current_index = 0
         self.music_shuffle_playlist = True
         self.music_next_request = False
-        self.music_set_volume(music_base_volume)
+        self.music_set_volume(self.music_master_volume)
 
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""
@@ -31,6 +35,16 @@ class SoundManager:
 
         self.sound_hears_anchor = None
 
+
+        self.do1 = True
+        self.do2 = True
+        self.do3 = True
+        self.do4 = True
+        self.music_add_to_playlist(".\\assets\\OST\\Vampire Killer.mp3")
+        self.music_add_to_playlist(".\\assets\\OST\\Hyrule Field - The Legend of Zelda Ocarina of Time.mp3")
+        self.music_add_to_playlist(".\\assets\\OST\\Lost Woods - The Legend of Zelda Ocarina of Time.mp3")
+        self.music_add_to_playlist(".\\assets\\OST\\Title Theme - The Legend of Zelda Ocarina of Time.mp3")
+        self.music_start_playlist()
 
     def update(self, delta: float, music_master_volume: float, sound_global_master_volume: float, sound_master_volume: float):
         self.__tick += delta
@@ -65,15 +79,13 @@ class SoundManager:
                 sound.set_volume(max(0, int((round(sound_master_volume / 100 * max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(sound_master_volume / 100 * max_volume / 100, 3)))
 
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
-            if not mixer.music.get_busy() or self.music_next_request:
-                if self.music_next_request:
-                    self.music_next_request = False
-                    mixer.music.fadeout(1)
-
+            if not mixer.music.get_busy():
                 if len(self.music_playlist) == 0:
                     pass
+
                 elif self.music_current_song == "":
                     self.__music_play(self.music_playlist[0])
+
                 else:
                     if self.music_current_song in self.music_playlist:
                         just_played_index = self.music_playlist.index(self.music_current_song)
@@ -100,6 +112,25 @@ class SoundManager:
                         self.music_current_index = new_index
                         self.__music_play(self.music_playlist[new_index])
 
+        if self.music_next_request:
+            self.music_next_request = False
+            mixer.music.fadeout(1)
+
+        if self.do1 and self.time > 5:
+            self.music_playlist_set_shuffle(False)
+            self.do1 = False
+
+        if self.do2 and self.time > 15:
+            self.music_next()
+            self.do2 = False
+
+        if self.do3 and self.time > 25:
+            self.music_pause()
+            self.do3 = False
+
+        if self.do4 and self.time > 35:
+            self.music_next()
+            self.do4 = False
 
     def music_get_volume(self):
         return mixer.music.get_volume() * 100
@@ -108,7 +139,7 @@ class SoundManager:
         """Définit le nouveau volume de la musique"""
         mixer.music.set_volume((round(self.music_master_volume / 100 * new_volume / 100, 3)))
     
-    def music_pause(self, fade_s: float, restart_tolerance: float = 33):
+    def music_pause(self, fade_s: float = 0, restart_tolerance: float = 33):
         """Met en pause la musique, la musique reprendra à la fin de la musique moin la tolérance (en pourcentage)"""
         self.music_is_paused = True
         self.music_before_pause_pos = self.music_get_current_song_pos() + fade_s * restart_tolerance / 100 # Récupère la position a laquelle le son doit reprendre lors du .resume()
@@ -116,7 +147,7 @@ class SoundManager:
         
         mixer.music.fadeout(fade_s * 1000)
 
-    def music_resume(self, fade_s: float):
+    def music_resume(self, fade_s: float = 0):
         self.__music_play(self.music_before_pause_song, fade_s, self.music_before_pause_pos)
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""
