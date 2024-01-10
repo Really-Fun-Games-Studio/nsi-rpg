@@ -63,7 +63,7 @@ class EventHandler:
                              motion_axes: tuple[bool, bool],
                              is_window_relative: int = -1):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
-        self.sliders_area.append([[motion_axes[0], motion_axes[1]]+list(size), is_window_relative, False, (0, 0), motion_axes, motion_rect])
+        self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0), motion_axes, motion_rect])
         print(self.sliders_area[0])
         # Le premier booléen correspond à l'état de suivi de la souris
 
@@ -87,7 +87,9 @@ class EventHandler:
                             area[1]()
 
                     for area in self.sliders_area:
-                        if self.get_click_collision(area[0], e.pos, area[1]):
+                        if self.get_click_collision(
+                                (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]),
+                                                    e.pos, area[1]):
                             area[2] = True
                             area[3] = (e.pos[0] - area[0][0], e.pos[1] - area[0][1])  # add support for responsibility
             elif e.type == MOUSEBUTTONUP:
@@ -113,15 +115,15 @@ class EventHandler:
                         if area[4][1]:
                             area[0][1] = e.pos[1]-area[3][1]
 
-                        if area[0][0]+area[0][2]/2 < area[5][0]:
-                            area[0][0] = area[5][0]-area[0][2]/2
-                        if area[0][0]+area[0][2]/2 > area[5][0]+area[5][2]:
-                            area[0][0] = area[5][0]+area[5][2]-area[0][2]/2
+                        if area[0][0] < area[5][0]:
+                            area[0][0] = area[5][0]
+                        if area[0][0] > area[5][0]+area[5][2]:
+                            area[0][0] = area[5][0]+area[5][2]
 
-                        if area[0][1]+area[0][3]/2 < area[5][1]:
-                            area[0][1] = area[5][1]-area[0][3]/2
-                        if area[0][1]+area[0][3]/2 > area[5][1]+area[5][3]:
-                            area[0][1] = area[5][1]+area[5][3]-area[0][3]/2
+                        if area[0][1] < area[5][1]:
+                            area[0][1] = area[5][1]
+                        if area[0][1] > area[5][1]+area[5][3]:
+                            area[0][1] = area[5][1]+area[5][3]
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:
