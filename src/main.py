@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
-from src.engine.menu_manager import Menu, Label, Button
+from src.engine.menu_manager import Menu, Label, Button, Slider
 
 
 class Game(Engine):
@@ -44,7 +44,10 @@ class Game(Engine):
         hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
         menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, base_image, hover_image, True, 0))
+        menu.add_widget(Slider(40, 200, base_image, hover_image))
         self.menu_manager.register_menu(menu, "main")
+
+        self.event_handler.register_slider_area([10, 10, 50, 50])
 
         self.menu_manager.show("main")
 

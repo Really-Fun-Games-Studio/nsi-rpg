@@ -7,7 +7,7 @@ from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
-from src.engine.menu_manager import Label, Button
+from src.engine.menu_manager import Label, Button, Slider
 
 
 class Renderer:
@@ -129,9 +129,10 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
 
+            window_size = display.get_window_size()
+
             # On rend maintenant toutes les zones de détection de la fenêtre
             for area in self.engine.event_handler.buttons_area:
-                window_size = display.get_window_size()
                 if area[2] == 0:
                     draw.rect(self.window, (255, 255, 0),
                               (area[0][0] * window_size[0], area[0][1] * window_size[0],
@@ -146,6 +147,24 @@ class Renderer:
                                area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
                 else:
                     draw.rect(self.window, (255, 255, 0),
+                              area[0], width=1)
+
+            for area in self.engine.event_handler.sliders_area:
+                print(area)
+                if area[1] == 0:
+                    draw.rect(self.window, (0, 255, 20),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0],
+                               area[0][2] * window_size[0], area[0][3] * window_size[0]), width=1)
+                elif area[1] == 1:
+                    draw.rect(self.window, (0, 255, 20),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1],
+                               area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
+                elif area[1] == 2:
+                    draw.rect(self.window, (0, 255, 20),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[1],
+                               area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
+                else:
+                    draw.rect(self.window, (0, 255, 20),
                               area[0], width=1)
 
         # Rendu présent dans tous les types de jeu
@@ -236,6 +255,26 @@ class Renderer:
                         self.window.blit(btn_image, (x, y))
 
                         self.window.blit(rendered_text, (x, y))
+                elif isinstance(widget, Slider):
+                    if widget.hovered:
+                        btn_image = widget.hover_image
+                    else:
+                        btn_image = widget.base_image
+
+                    if widget.is_window_relative == 0:
+                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
+                                                                btn_image.get_height()*window_size[0]/self.window_size[0]))
+                    elif widget.is_window_relative == 1:
+                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[1]/self.window_size[1],
+                                                                btn_image.get_height()*window_size[1]/self.window_size[1]))
+                    elif widget.is_window_relative == 2:
+                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
+                                                                btn_image.get_height()*window_size[1]/self.window_size[1]))
+
+                    # On affiche l'image du boutton
+
+                    self.window.blit(btn_image, (x+widget.value*widget.width, y))
+
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
