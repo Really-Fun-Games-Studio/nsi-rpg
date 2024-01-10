@@ -112,6 +112,6 @@ class EventHandler:
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
 
         if K_x in self.key_pressed:
-            self.engine.camera.target_zoom *= 1.01
+            self.engine.settings_manager.zoom *= 1.01
         if K_c in self.key_pressed:
-            self.engine.camera.target_zoom *= 0.99
+            self.engine.settings_manager.zoom *= 0.99

@@ -122,7 +122,7 @@ class Renderer:
             player = self.engine.entity_manager.get_by_name('player')
             self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",
                                                               True, (255, 0, 0)), (0, 30))
-            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.camera.zoom, 2)}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.settings_manager.get_zoom(), 2)}",
                                                               True, (255, 0, 0)), (0, 60))
             self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos()}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}",
                                                               True, (255, 0, 0)), (0, 90))

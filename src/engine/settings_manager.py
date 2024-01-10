@@ -7,7 +7,9 @@ class SettingsManager:
 
         self.zoom = 1.75
     
-
+    def get_zoom(self):
+        return self.zoom
+    
     def get_music_master_volume(self):
         return round(self.master_volume / 100 * self.music_master_volume, 3)
     

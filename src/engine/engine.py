@@ -33,7 +33,7 @@ class Engine:
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
-        self.camera = Camera()
+        self.camera = Camera(self.DEBUG_MODE, self.settings_manager.get_zoom())
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
@@ -53,7 +53,7 @@ class Engine:
     def update(self):
         """Fonction qui regroupe toutes les updates des composants. Elle permet de mettre à jour le jeu quand on
         l'appelle."""
-        self.camera.update()
+        self.camera.update(self.settings_manager.get_zoom())
         self.entity_manager.update(0.016666666)
         self.renderer.update(0.016666666)
         self.event_handler.update()
