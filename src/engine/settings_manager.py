@@ -1,11 +1,11 @@
 class SettingsManager:
-    def __init__(self) -> None:
-        self.master_volume = 60
+    def __init__(self, default_master_volume: float, default_zoom: float) -> None:
+        self.master_volume = default_master_volume
         self.sound_master_volume = 100
         self.music_master_volume = 100
         self.sound_global_master_volume = 100
 
-        self.zoom = 1.75
+        self.zoom = default_zoom
     
     def get_zoom(self):
         return self.zoom

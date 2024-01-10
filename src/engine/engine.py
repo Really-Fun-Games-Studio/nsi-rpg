@@ -40,7 +40,7 @@ class Engine:
         self.dialogs_manager = DialogsManager(self.event_handler)
         self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(60)
-        self.settings_manager = SettingsManager()
+        self.settings_manager = SettingsManager(60, 1.75)
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
