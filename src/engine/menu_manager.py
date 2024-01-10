@@ -24,6 +24,31 @@ class Label(Widget):
         self.color = color
 
 
+class Slider(Widget):
+    """Un widget pouvant être glissé pour récupérer une valeur."""
+
+    def __init__(self, x: int | float, y: int | float,
+                 base_image: pygame.Surface,
+                 hover_image: pygame.Surface,
+                 is_window_relative: int = -1,
+                 area_name: str = "menu_slider"):
+        super().__init__(x, y, is_window_relative)
+        self.base_image = base_image
+        self.hover_image = hover_image
+        self.area_name = area_name
+        self.hovered = False
+        self.follow_mouse = False
+        self.value = 0.
+        self.width = 100
+
+    def set_hover_state(self, state: bool):
+        """Modifie la valeur du hover."""
+        self.hovered = state
+
+    def set_mouse_pos(self, x: int):
+        self.value = (x-self.x)/self.width
+
+
 class Button(Widget):
     """Un widget de bouton."""
     def __init__(self, x: int | float, y: int | float, text: str, size: int | float, color: tuple[int, int, int],
