@@ -9,6 +9,7 @@ from src.engine.menu_manager import MenuManager
 from src.engine.renderer import Renderer
 from src.engine.enums import GameState
 from src.engine.sound_manager import SoundManager
+from src.engine.settings_manager import SettingsManager
 import pygame
 
 
@@ -39,6 +40,7 @@ class Engine:
         self.dialogs_manager = DialogsManager(self.event_handler)
         self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(60)
+        self.settings_manager = SettingsManager()
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
@@ -57,7 +59,9 @@ class Engine:
         self.event_handler.update()
         self.event_sheduler.update()
         self.dialogs_manager.update(0.016666666)
-        self.sound_manager.update(1/60)
+        self.sound_manager.update(1/60, self.settings_manager.get_music_master_volume(), 
+                                  self.settings_manager.get_sound_global_master_volume(),
+                                  self.settings_manager.get_sound_master_volume())
 
     def stop(self):
         """Arrête le programme."""
