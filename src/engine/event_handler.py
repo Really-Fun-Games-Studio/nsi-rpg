@@ -111,7 +111,7 @@ class EventHandler:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
 
-        if K_x in self.key_pressed:
-            self.engine.settings_manager.zoom *= 1.01
-        if K_c in self.key_pressed:
-            self.engine.settings_manager.zoom *= 0.99
+                if K_x in self.key_pressed:
+                    self.engine.settings_manager.zoom *= 1.01
+                if K_c in self.key_pressed:
+                    self.engine.settings_manager.zoom *= 0.99
