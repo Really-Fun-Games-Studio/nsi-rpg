@@ -5,10 +5,14 @@ from math import sqrt
 from time import time
 
 class SoundManager:
-    def __init__(self, music_base_volume: float):
+    def __init__(self, music_master_volume: float, sound_global_master_volume: float, sound_master_volume: float):
         self.__tick = 0 # Compteur de la valeur d'un tick (Utilisé pour le comptage de tick)
         self.tick = 0 # Compteur de tick
         self.time = 0 # Temps local a la class (en s)
+
+        self.music_master_volume = music_master_volume
+        self.sound_global_master_volume = sound_global_master_volume
+        self.sound_master_volume = sound_master_volume
 
         self.music_playlist = []
         self.music_current_song = ""
@@ -16,7 +20,7 @@ class SoundManager:
         self.music_current_index = 0
         self.music_shuffle_playlist = True
         self.music_next_request = False
-        self.music_set_volume(music_base_volume)
+        self.music_set_volume(music_master_volume)
 
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""

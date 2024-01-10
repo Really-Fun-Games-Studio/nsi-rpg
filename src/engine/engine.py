@@ -30,6 +30,7 @@ class Engine:
         self.running = False
 
         # Composants du moteur de jeu
+        self.settings_manager = SettingsManager(60, 1.75) # DOIT ABSOLUMENT ETRE EN PREMIER (Sinon les autres composants qui nécessite les settings crash)
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
@@ -39,8 +40,10 @@ class Engine:
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self.event_handler)
         self.menu_manager = MenuManager(self)
-        self.sound_manager = SoundManager(60)
-        self.settings_manager = SettingsManager(60, 1.75)
+        self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 
+                                  self.settings_manager.get_sound_global_master_volume(),
+                                  self.settings_manager.get_sound_master_volume())
+        
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.

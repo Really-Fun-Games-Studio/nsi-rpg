@@ -3,6 +3,8 @@ from src.engine.entity import Entity
 
 class Camera:
     def __init__(self, DEBUG_MODE: bool, zoom: float):
+        self.DEBUG_MODE = DEBUG_MODE
+        
         self.x = 0
         self.y = 0
         self.zoom = zoom
