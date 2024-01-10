@@ -1,6 +1,7 @@
 import math
 from types import FunctionType
 
+import pygame.display
 from pygame import event, display
 from pygame.locals import *
 
@@ -70,6 +71,8 @@ class EventHandler:
     def update(self):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
 
+        window_size = pygame.display.get_window_size()
+
         # Récupère les événements
         for e in event.get():
             if e.type == QUIT:
@@ -91,7 +94,14 @@ class EventHandler:
                                 (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]),
                                                     e.pos, area[1]):
                             area[2] = True
-                            area[3] = (e.pos[0] - area[0][0], e.pos[1] - area[0][1])  # add support for responsibility
+                            if area[1] == 0:
+                                area[3] = (e.pos[0]/window_size[0] - area[0][0], e.pos[1]/window_size[0] - area[0][1])
+                            elif area[1] == 1:
+                                area[3] = (e.pos[0]/window_size[1] - area[0][0], e.pos[1]/window_size[1] - area[0][1])
+                            elif area[1] == 2:
+                                area[3] = (e.pos[0]/window_size[0] - area[0][0], e.pos[1]/window_size[1] - area[0][1])
+                            else:
+                                area[3] = (e.pos[0] - area[0][0], e.pos[1] - area[0][1])
             elif e.type == MOUSEBUTTONUP:
                 for area in self.sliders_area:
                     area[2] = False
@@ -110,11 +120,26 @@ class EventHandler:
 
                 for area in self.sliders_area:
                     if area[2]:
+                        print(area)
                         if area[4][0]:
-                            area[0][0] = e.pos[0]-area[3][0]
+                            if area[1] == 0:
+                                area[0][0] = e.pos[0]/window_size[0]-area[3][0]
+                            elif area[1] == 1:
+                                area[0][0] = e.pos[0]/window_size[1]-area[3][0]
+                            elif area[1] == 2:
+                                area[0][0] = e.pos[0]/window_size[0]-area[3][0]
+                            else:
+                                area[0][0] = e.pos[0] - area[3][0]
                         if area[4][1]:
-                            area[0][1] = e.pos[1]-area[3][1]
-
+                            if area[1] == 0:
+                                area[0][1] = e.pos[1]/window_size[0]-area[3][1]
+                            elif area[1] == 1:
+                                area[0][1] = e.pos[1]/window_size[1]-area[3][1]
+                            elif area[1] == 2:
+                                area[0][1] = e.pos[1]/window_size[1]-area[3][1]
+                            else:
+                                area[0][1] = e.pos[1]-area[3][1]
+                        
                         if area[0][0] < area[5][0]:
                             area[0][0] = area[5][0]
                         if area[0][0] > area[5][0]+area[5][2]:
