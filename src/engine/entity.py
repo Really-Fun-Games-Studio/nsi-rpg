@@ -119,21 +119,23 @@ class Entity:
     def move(self, x: float, y: float, map_manager: MapManager):
         """Fait bouger l'entité en tenant compte des collisions."""
 
-        # On vérifie le sens du mouvement pour changer self.direction
-        if x > 0:
-            self.direction = 0
-        elif x < 0:
-            self.direction = 1
-        # On ne met pas de else car si x = 0, on ne change pas de direction
+        if not self.locked: # Si l'entité n'est pas verrouillée on calcul le mouvement
+            
+            # On vérifie le sens du mouvement pour changer self.direction
+            if x > 0:
+                self.direction = 0
+            elif x < 0:
+                self.direction = 1
+            # On ne met pas de else car si x = 0, on ne change pas de direction
 
-        # On normalise la vitesse
-        initial_speed = math.sqrt(x**2+y**2)
+            # On normalise la vitesse
+            initial_speed = math.sqrt(x**2+y**2)
 
-        x = x/initial_speed*self.max_speed
-        y = y/initial_speed*self.max_speed
+            x = x/initial_speed*self.max_speed
+            y = y/initial_speed*self.max_speed
 
-        # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
-        if not self.locked: # Si l'entité n'est pas verrouillée on applique le movement
+            # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
+        
             if not self.get_collisions(self.x + x, self.y, map_manager):
                 self.x += x
             else:
