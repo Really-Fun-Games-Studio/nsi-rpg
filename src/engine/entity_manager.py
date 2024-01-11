@@ -34,7 +34,7 @@ class EntityManager:
             if entity.life_points == 0:
                 self.entities.pop(entity_name)
 
-            if entity.brain is not None:
+            if entity.brain is not None and not self.paused:
                 entity.brain.update(delta)
 
         if self.player_entity_name:
@@ -53,6 +53,7 @@ class EntityManager:
         return self.entities[name]
 
     def pause(self):
+        """Met en pause tout les mouvements de toutes les entitées"""
         for e in self.get_all_entities():
             if e.locked:
                 self.locked_before_pause.append(e)
@@ -62,6 +63,7 @@ class EntityManager:
 
     
     def resume(self):
+        """Reprend les mouvement de toutes les entitées qui n'étaient pas lock avant l'appel de .pause()"""
         for e in self.get_all_entities():
             if not e in self.locked_before_pause:
                 e.unlock()
