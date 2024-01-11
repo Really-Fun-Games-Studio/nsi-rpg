@@ -87,9 +87,9 @@ class MenuManager:
                                                                btn.is_window_relative, btn.set_hover_state)
 
     def hide(self):
-        """Affiche le menu actuelement à l'écran."""
+        """Cache le menu actuelement à l'écran."""
         # On itère dans tous les bouttons pour retirer l'interaction
-        for btn in self.active_menu.widgets:
-            if isinstance(btn, Button):
-                self.engine.event_handler.remove_button_area(btn.area_name)
+        for elem in self.active_menu.widgets:
+            if isinstance(elem, Button):
+                self.engine.event_handler.remove_button_area(elem.area_name)
         self.active_menu = None
