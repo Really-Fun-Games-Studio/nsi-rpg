@@ -1,14 +1,13 @@
 import json
 from types import FunctionType
 
-from src.engine.event_handler import EventHandler
+from src.engine.engine import Engine
 
 
 class DialogsManager:
     """Classe qui gère la lecture des dialogues."""
-    def __init__(self, event_handler: EventHandler):
-        self.event_handler = event_handler
-
+    def __init__(self, engine: 'Engine'):
+        self.engine = engine
         self.current_dialogs = []
         self.current_dialog_id = -1
         self.dialogs = {}
@@ -41,7 +40,8 @@ class DialogsManager:
             self.current_dialog_id = -1
             self.writing_dialog = False
             self.reading_dialog = False
-            self.event_handler.remove_button_area("next_dialog")
+            self.engine.entity_manager.resume()
+            self.engine.event_handler.remove_button_area("next_dialog")
             if self.dialogue_finished_callback is not None:
                 self.dialogue_finished_callback()
 
@@ -50,7 +50,9 @@ class DialogsManager:
 
         # Si un dialogue n'est pas déja lancé, on lance le dialogue au nom donné
         if not self.reading_dialog:
-            self.event_handler.register_button_area((0, 0, 1, 1), self.next_signal, "next_dialog", 2)
+            self.engine.entity_manager.pause()
+
+            self.engine.event_handler.register_button_area((0, 0, 1, 1), self.next_signal, "next_dialog", 2)
 
             self.current_dialogs = self.dialogs[name]
             self.current_dialog_id = 0
