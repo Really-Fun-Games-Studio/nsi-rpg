@@ -5,7 +5,7 @@ class Camera:
     def __init__(self):
         self.x = 0
         self.y = 0
-        self.zoom = 1.
+        self.zoom = 1.75
 
         # Décalage lors du mouvement du joueur
         self.player_moving_offset = 100

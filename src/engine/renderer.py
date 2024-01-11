@@ -117,7 +117,7 @@ class Renderer:
 
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
-            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}", True, (255, 0, 0)),
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}, Game Status: {'Paused' if self.engine.entity_manager.paused else 'Playing'}", True, (255, 0, 0)),
                              (0, 0))
             player = self.engine.entity_manager.get_by_name('player')
             self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",

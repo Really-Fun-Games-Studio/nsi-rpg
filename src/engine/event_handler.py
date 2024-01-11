@@ -74,6 +74,7 @@ class EventHandler:
                     for area in self.buttons_area:
                         if self.get_click_collision(area[0], e.pos, area[2]):
                             area[1]()
+
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
                     if area[4] is not None:
@@ -111,7 +112,8 @@ class EventHandler:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
 
-        if K_x in self.key_pressed:
-            self.engine.camera.target_zoom *= 1.01
-        if K_c in self.key_pressed:
-            self.engine.camera.target_zoom *= 0.99
+                if K_x in self.key_pressed:
+                    self.engine.camera.target_zoom *= 1.01
+                if K_c in self.key_pressed:
+                    self.engine.camera.target_zoom *= 0.99
+        
