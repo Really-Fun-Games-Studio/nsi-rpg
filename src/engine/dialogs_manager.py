@@ -31,8 +31,6 @@ class DialogsManager:
             else:
                 self.next_dialog()
 
-        print("next")
-
     def next_dialog(self):
         """Passe au dialogue suivant. Appelle le callback si le dialogue est fini."""
         self.current_dialog_id += 1
