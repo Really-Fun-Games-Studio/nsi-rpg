@@ -11,6 +11,8 @@ class Entity:
         self.x = 8
         self.y = 8
 
+        self.locked = False
+
         self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
 
         # Variables utilisées pour détecter les mouvements
@@ -131,38 +133,46 @@ class Entity:
         y = y/initial_speed*self.max_speed
 
         # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
-        if not self.get_collisions(self.x + x, self.y, map_manager):
-            self.x += x
-        else:
-            # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
-            i = 0
-            if x > 0:
-                while not self.get_collisions(self.x + i, self.y, map_manager):
-                    i += 1
-                i -= 1
+        if not self.locked: # Si l'entité n'est pas verrouillée on applique le movement
+            if not self.get_collisions(self.x + x, self.y, map_manager):
+                self.x += x
             else:
-                while not self.get_collisions(self.x + i, self.y, map_manager):
+                # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
+                i = 0
+                if x > 0:
+                    while not self.get_collisions(self.x + i, self.y, map_manager):
+                        i += 1
                     i -= 1
-                i += 1
-
-            self.x += i
-
-        # On répète le procédé avec l'ordonnée
-        if not self.get_collisions(self.x, self.y + y, map_manager):
-            self.y += y
-        else:
-            i = 0
-            if y > 0:
-                while not self.get_collisions(self.x, self.y + i, map_manager):
+                else:
+                    while not self.get_collisions(self.x + i, self.y, map_manager):
+                        i -= 1
                     i += 1
-                i -= 1
-            else:
-                while not self.get_collisions(self.x, self.y + i, map_manager):
-                    i -= 1
-                i += 1
 
-            self.y += i
+                self.x += i
+
+            # On répète le procédé avec l'ordonnée
+            if not self.get_collisions(self.x, self.y + y, map_manager):
+                self.y += y
+            else:
+                i = 0
+                if y > 0:
+                    while not self.get_collisions(self.x, self.y + i, map_manager):
+                        i += 1
+                    i -= 1
+                else:
+                    while not self.get_collisions(self.x, self.y + i, map_manager):
+                        i -= 1
+                    i += 1
+
+                self.y += i
 
     def link_animation(self, name: str):
         """Met à jour l'animation en cours de l'entité."""
         self.animation_name = name
+
+
+    def lock(self):
+        self.locked = True
+
+    def unlock(self):
+        self.locked = False
