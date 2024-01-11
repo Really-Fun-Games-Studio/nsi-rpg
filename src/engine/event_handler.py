@@ -74,6 +74,7 @@ class EventHandler:
                     for area in self.buttons_area:
                         if self.get_click_collision(area[0], e.pos, area[2]):
                             area[1]()
+
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
                     if area[4] is not None:
@@ -87,13 +88,13 @@ class EventHandler:
                                 self.hovered_area.remove(area)
 
         if self.engine.entity_manager.player_entity_name:
-            if K_RIGHT in self.key_pressed:
+            if K_RIGHT in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
                 self.engine.entity_manager.move_player_controls(1, 0)
-            if K_LEFT in self.key_pressed:
+            if K_LEFT in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
                 self.engine.entity_manager.move_player_controls(-1, 0)
-            if K_UP in self.key_pressed:
+            if K_UP in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
                 self.engine.entity_manager.move_player_controls(0, -1)
-            if K_DOWN in self.key_pressed:
+            if K_DOWN in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
                 self.engine.entity_manager.move_player_controls(0, 1)
 
             if K_SPACE in self.key_pressed:
