@@ -523,3 +523,6 @@ class Renderer:
         self.fadeout_fade_color = fade_color
         self.fadeout_fade_opacity = round(fade_opacity * 255 / 100)
         self.fadeout_fade_callback = callback
+
+    def fadein(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
+        return
