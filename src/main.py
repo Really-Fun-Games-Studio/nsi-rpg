@@ -33,6 +33,9 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
+        
+    def play_button_callback(self):
+        self.renderer.fadeout(10, (0, 255, 0), 100, self.start_game)
         self.menu_manager.hide()
 
     def setup_main_menu(self):
@@ -43,7 +46,7 @@ class Game(Engine):
         base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, base_image, hover_image, True, 0))
+        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.play_button_callback, base_image, hover_image, True, 0))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")
