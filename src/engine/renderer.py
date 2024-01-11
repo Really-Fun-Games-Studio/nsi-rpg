@@ -152,25 +152,43 @@ class Renderer:
             for area in self.engine.event_handler.sliders_area:
                 if area[1] == 0:
                     draw.rect(self.window, (0, 255, 20),
-                              (area[0][0] * window_size[0], area[0][1] * window_size[0],
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[0],
                                area[0][2] * window_size[0], area[0][3] * window_size[0]), width=1)
                     draw.rect(self.window, (0, 255, 200),
                               (area[5][0] * window_size[0], area[5][1] * window_size[0],
                                area[5][2] * window_size[0], area[5][3] * window_size[0]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0] - 2, area[0][1] * window_size[0]),
+                              (area[0][0] * window_size[0] + 2, area[0][1] * window_size[0]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] - 2),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] + 2))
                 elif area[1] == 1:
                     draw.rect(self.window, (0, 255, 20),
-                              (area[0][0] * window_size[1], area[0][1] * window_size[1],
+                              ((area[0][0]-area[0][2]/2) * window_size[1], (area[0][1]-area[0][3]/2) * window_size[1],
                                area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
                     draw.rect(self.window, (0, 255, 200),
                               (area[5][0] * window_size[1], area[5][1] * window_size[1],
                                area[5][2] * window_size[1], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1] - 2, area[0][1] * window_size[1]),
+                              (area[0][0] * window_size[1] + 2, area[0][1] * window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] - 2),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] + 2))
                 elif area[1] == 2:
                     draw.rect(self.window, (0, 255, 20),
-                              (area[0][0] * window_size[0], area[0][1] * window_size[1],
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[1],
                                area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
                     draw.rect(self.window, (0, 255, 200),
                               (area[5][0] * window_size[0], area[5][1] * window_size[1],
                                area[5][2] * window_size[0], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0] - 2, area[0][1]*window_size[1]),
+                              (area[0][0]*window_size[0] + 2, area[0][1]*window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] - 2),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] + 2))
                 else:
                     draw.rect(self.window, (0, 255, 20),
                               (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]), width=1)

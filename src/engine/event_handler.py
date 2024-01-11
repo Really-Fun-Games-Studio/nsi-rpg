@@ -65,7 +65,6 @@ class EventHandler:
                              is_window_relative: int = -1):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
         self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0), motion_axes, motion_rect])
-        print(self.sliders_area[0])
         # Le premier booléen correspond à l'état de suivi de la souris
 
     def update(self):
@@ -91,7 +90,7 @@ class EventHandler:
 
                     for area in self.sliders_area:
                         if self.get_click_collision(
-                                (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]),
+                                (area[0][0]-area[0][2]/2, area[0][1]-area[0][3]/2, area[0][2], area[0][3]),
                                                     e.pos, area[1]):
                             area[2] = True
                             if area[1] == 0:
@@ -120,7 +119,6 @@ class EventHandler:
 
                 for area in self.sliders_area:
                     if area[2]:
-                        print(area)
                         if area[4][0]:
                             if area[1] == 0:
                                 area[0][0] = e.pos[0]/window_size[0]-area[3][0]
