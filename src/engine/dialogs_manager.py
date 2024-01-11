@@ -1,12 +1,10 @@
 import json
 from types import FunctionType
-
-from src.engine.engine import Engine
-
+import src.engine.engine as engine
 
 class DialogsManager:
     """Classe qui gère la lecture des dialogues."""
-    def __init__(self, engine: 'Engine'):
+    def __init__(self, engine: 'engine.Engine'):
         self.engine = engine
         self.current_dialogs = []
         self.current_dialog_id = -1
