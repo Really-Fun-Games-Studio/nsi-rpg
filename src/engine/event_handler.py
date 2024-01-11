@@ -88,13 +88,13 @@ class EventHandler:
                                 self.hovered_area.remove(area)
 
         if self.engine.entity_manager.player_entity_name:
-            if K_RIGHT in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
+            if K_RIGHT in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(1, 0)
-            if K_LEFT in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
+            if K_LEFT in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(-1, 0)
-            if K_UP in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
+            if K_UP in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(0, -1)
-            if K_DOWN in self.key_pressed and not self.engine.dialogs_manager.reading_dialog:
+            if K_DOWN in self.key_pressed:
                 self.engine.entity_manager.move_player_controls(0, 1)
 
             if K_SPACE in self.key_pressed:
@@ -116,3 +116,11 @@ class EventHandler:
             self.engine.camera.target_zoom *= 1.01
         if K_c in self.key_pressed:
             self.engine.camera.target_zoom *= 0.99
+
+        if self.engine.dialogs_manager.reading_dialog:
+            if not self.engine.entity_manager.paused:
+                self.engine.entity_manager.pause()
+        else:
+            if self.engine.entity_manager.paused:
+                self.engine.entity_manager.resume()
+        
