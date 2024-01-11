@@ -1,6 +1,8 @@
 import math
 import random
+from time import time_ns
 
+from types import FunctionType
 from pygame import display, image, surface, transform, draw, font
 from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
@@ -15,6 +17,7 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
+        self.time = 0 # Heure locale depuis le début des appels de la fonction update
         self.window_type = RESIZABLE
         self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (
         600, 600)
@@ -36,6 +39,13 @@ class Renderer:
 
         # Particules affichées
         self.particles = []
+
+        # Varialbes du fade
+        self.fadeout_is_fading = False
+        self.fadeout_fade_in_s = 0
+        self.fadeout_fade_color = (255, 255, 255)
+        self.fadeout_fade_opacity = 100
+        self.fadeout_fade_callback = None
 
     def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
                        min_speed: float, max_speed: float, min_life_time: float, max_life_time: float,
@@ -80,6 +90,29 @@ class Renderer:
 
     def update(self, delta: float):
         """Fait le rendu du jeu."""
+        self.time += delta
+
+        self.fadeout_is_fading = True
+
+        if self.fadeout_is_fading:
+            self.fadeout_fade_color
+            self.fadeout_fade_opacity
+            self.fadeout_fade_callback
+            self.fadeout_fade_in_s
+
+            
+
+
+            surf = surface.Surface(display.get_window_size(), SRCALPHA) # On dessine sur toute la fenêtre
+            surf.fill((100, 100, 100, 50))
+            self.window.blit(surf, (0, 0))
+            print(surf.get_colorkey())
+
+
+
+
+
+
         self.window.fill((255, 255, 255))
 
         if self.engine.game_state == GameState.NORMAL:
@@ -488,3 +521,12 @@ class Renderer:
                               (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
                                math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset),
                                self.tile_size, self.tile_size), width=1)
+
+    def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (255, 255, 255), fade_opacity: int = 100, callback: FunctionType = None):
+        """Fait un fondu vers la couleur (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
+
+        self.fadeout_is_fading = True
+        self.fadeout_fade_in_s = fade_s
+        self.fadeout_fade_color = fade_color
+        self.fadeout_fade_opacity = fade_opacity
+        self.fadeout_fade_callback = callback
