@@ -112,15 +112,8 @@ class EventHandler:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
 
-        if K_x in self.key_pressed:
-            self.engine.camera.target_zoom *= 1.01
-        if K_c in self.key_pressed:
-            self.engine.camera.target_zoom *= 0.99
-
-        if self.engine.dialogs_manager.reading_dialog:
-            if not self.engine.entity_manager.paused:
-                self.engine.entity_manager.pause()
-        else:
-            if self.engine.entity_manager.paused:
-                self.engine.entity_manager.resume()
+                if K_x in self.key_pressed:
+                    self.engine.camera.target_zoom *= 1.01
+                if K_c in self.key_pressed:
+                    self.engine.camera.target_zoom *= 0.99
         
