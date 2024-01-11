@@ -8,6 +8,7 @@ class EntityManager:
         self.entities: dict[str:Entity] = {}
         self.player_entity_name = ""
         self.map_manager = map_manager
+        self.locked_before_pause: list[Entity] = []
         self.paused = False
 
     def register_entity(self, name: str) -> Entity:
@@ -27,22 +28,21 @@ class EntityManager:
 
     def update(self, delta: float):
         """Met à jour toutes les entités enregistrées."""
-        if not self.paused:
-            for entity_name in list(self.entities.keys()):
-                entity = self.entities[entity_name]
-                entity.update(delta)
-                if entity.life_points == 0:
-                    self.entities.pop(entity_name)
+        for entity_name in list(self.entities.keys()):
+            entity = self.entities[entity_name]
+            entity.update(delta)
+            if entity.life_points == 0:
+                self.entities.pop(entity_name)
 
-                if entity.brain is not None:
-                    entity.brain.update(delta)
+            if entity.brain is not None:
+                entity.brain.update(delta)
 
-            if self.player_entity_name:
-                player: Entity = self.get_by_name(self.player_entity_name)
-                if player.mouvements[0] != 0. or player.mouvements[1] != 0.:
-                    player.link_animation("player_walking")
-                else:
-                    player.link_animation("player_none")
+        if self.player_entity_name:
+            player: Entity = self.get_by_name(self.player_entity_name)
+            if player.mouvements[0] != 0. or player.mouvements[1] != 0.:
+                player.link_animation("player_walking")
+            else:
+                player.link_animation("player_none")
 
     def get_all_entities(self) -> list[Entity]:
         """Donne la liste de toutes les entités enregistrées."""
@@ -53,14 +53,18 @@ class EntityManager:
         return self.entities[name]
 
     def pause(self):
+        for e in self.get_all_entities():
+            if e.locked:
+                self.locked_before_pause.append(e)
+            else:
+                e.lock()
         self.paused = True
-        player: Entity = self.get_by_name(self.player_entity_name)
-        if not player.locked:
-            player.lock()
 
     
     def resume(self):
+        for e in self.get_all_entities():
+            if not e in self.locked_before_pause:
+                e.unlock()
+        
         self.paused = False
-        player: Entity = self.get_by_name(self.player_entity_name)
-        if player.locked:
-            player.unlock()
+        self.locked_before_pause = []
