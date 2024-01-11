@@ -16,7 +16,8 @@ class EventHandler:
         self.engine = core
         self.key_pressed = []
         self.buttons_area = []
-        self.hovered_area = []
+        self.hovered_buttons_area = []
+        self.hovered_sliders_area = []
         self.sliders_area = []
 
     @staticmethod
@@ -43,7 +44,7 @@ class EventHandler:
                              callback: FunctionType | classmethod | staticmethod, name: str,
                              is_window_relative: int = -1,
                              hover_callback: FunctionType | classmethod | staticmethod = None):
-        """Enregistre une zone comme bouton. La fonction donnée sera donc executé lorsque la zone sur la fenêtre
+        """Enregistre une zone comme bouton. La fonction donnée sera donc executée lorsque la zone sur la fenêtre
         sera cliqué. is_window_relative doit être 0 pour que le rect soit multipliée par la largeur de la fenêtre et 1
         pour qu'elle soit multipliée par la hauteur"""
         self.buttons_area.append((rect, callback, is_window_relative, name, hover_callback))
@@ -62,10 +63,20 @@ class EventHandler:
     def register_slider_area(self, size: tuple[float | int, float | int],
                              motion_rect: tuple[float | int, float | int, float | int, float | int],
                              motion_axes: tuple[bool, bool],
-                             is_window_relative: int = -1):
+                             is_window_relative: int = -1,
+                             clicked_callback: FunctionType | classmethod | staticmethod = None,
+                             released_callback: FunctionType | classmethod | staticmethod = None,
+                             hover_callback: FunctionType | classmethod | staticmethod = None):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
-        self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0), motion_axes, motion_rect])
+        self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0),
+                                  motion_axes, motion_rect, clicked_callback, released_callback, hover_callback])
         # Le premier booléen correspond à l'état de suivi de la souris
+
+    @staticmethod
+    def get_slider_area_values(slider: list):
+        """Donne la valeur de la zone de slider donnée."""
+        return round((slider[0][0]-slider[5][0])/slider[5][2], 5), round((slider[0][1]-slider[5][1])/slider[5][3], 5)
+
 
     def update(self):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
@@ -101,21 +112,27 @@ class EventHandler:
                                 area[3] = (e.pos[0]/window_size[0] - area[0][0], e.pos[1]/window_size[1] - area[0][1])
                             else:
                                 area[3] = (e.pos[0] - area[0][0], e.pos[1] - area[0][1])
+
+                            if area[6] is not None:
+                                area[6](self.get_slider_area_values(area))
+
             elif e.type == MOUSEBUTTONUP:
                 for area in self.sliders_area:
                     area[2] = False
+                    if area[7] is not None:
+                        area[7](self.get_slider_area_values(area))
 
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
                     if area[4] is not None:
                         if self.get_click_collision(area[0], e.pos, area[2]):
-                            if area not in self.hovered_area:
+                            if area not in self.hovered_buttons_area:
                                 area[4](True)
-                                self.hovered_area.append(area)
+                                self.hovered_buttons_area.append(area)
                         else:
-                            if area in self.hovered_area:
+                            if area in self.hovered_buttons_area:
                                 area[4](False)
-                                self.hovered_area.remove(area)
+                                self.hovered_buttons_area.remove(area)
 
                 for area in self.sliders_area:
                     if area[2]:
