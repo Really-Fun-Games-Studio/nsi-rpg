@@ -66,10 +66,12 @@ class EventHandler:
                              is_window_relative: int = -1,
                              clicked_callback: FunctionType | classmethod | staticmethod = None,
                              released_callback: FunctionType | classmethod | staticmethod = None,
+                             motion_callback: FunctionType | classmethod | staticmethod = None,
                              hover_callback: FunctionType | classmethod | staticmethod = None):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
         self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0),
-                                  motion_axes, motion_rect, clicked_callback, released_callback, hover_callback])
+                                  motion_axes, motion_rect,
+                                  clicked_callback, released_callback, hover_callback, motion_callback])
         # Le premier booléen correspond à l'état de suivi de la souris
 
     @staticmethod
@@ -165,6 +167,9 @@ class EventHandler:
                             area[0][1] = area[5][1]
                         if area[0][1] > area[5][1]+area[5][3]:
                             area[0][1] = area[5][1]+area[5][3]
+
+                        if area[9] is not None:
+                            area[9](self.get_slider_area_values(area))
                     if area[8] is not None:
                         if self.get_click_collision(
                                 (area[0][0] - area[0][2] / 2, area[0][1] - area[0][3] / 2, area[0][2], area[0][3]),

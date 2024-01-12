@@ -291,23 +291,25 @@ class Renderer:
                         self.window.blit(rendered_text, (x, y))
                 elif isinstance(widget, Slider):
                     if widget.hovered:
-                        btn_image = widget.hover_image
+                        slider_image = widget.hover_image
                     else:
-                        btn_image = widget.base_image
+                        slider_image = widget.base_image
 
                     if widget.is_window_relative == 0:
-                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
-                                                                btn_image.get_height()*window_size[0]/self.window_size[0]))
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[0]/self.window_size[0]))
                     elif widget.is_window_relative == 1:
-                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[1]/self.window_size[1],
-                                                                btn_image.get_height()*window_size[1]/self.window_size[1]))
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[1]/self.window_size[1],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
                     elif widget.is_window_relative == 2:
-                        btn_image = transform.scale(btn_image, (btn_image.get_width()*window_size[0]/self.window_size[0],
-                                                                btn_image.get_height()*window_size[1]/self.window_size[1]))
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
 
-                    # On affiche l'image du boutton
-
-                    self.window.blit(btn_image, (x+widget.value*widget.width, y))
+                    self.window.blit(slider_image, (x+widget.value*widget.width-slider_image.get_width()//2,
+                                                    y-slider_image.get_height()//2))
 
 
     def render_dialogs_box(self):

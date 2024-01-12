@@ -27,26 +27,30 @@ class Label(Widget):
 class Slider(Widget):
     """Un widget pouvant être glissé pour récupérer une valeur."""
 
-    def __init__(self, x: int | float, y: int | float,
+    def __init__(self, cursor_size: tuple[int | float, int | float],
+                 area_rect: tuple[int | float, int | float],
+                 width: int | float,
                  base_image: pygame.Surface,
                  hover_image: pygame.Surface,
                  is_window_relative: int = -1,
                  area_name: str = "menu_slider"):
-        super().__init__(x, y, is_window_relative)
+        super().__init__(area_rect[0], area_rect[1], is_window_relative)
         self.base_image = base_image
         self.hover_image = hover_image
         self.area_name = area_name
         self.hovered = False
         self.follow_mouse = False
+        self.cursor_size = cursor_size
         self.value = 0.
-        self.width = 100
+        self.width = width
 
     def set_hover_state(self, state: bool):
         """Modifie la valeur du hover."""
         self.hovered = state
 
-    def set_mouse_pos(self, x: int):
-        self.value = (x-self.x)/self.width
+    def set_value(self, values: tuple[float, float]):
+        """Appelée lorsque la valeur du slider est modifiée."""
+        self.value = values[0]
 
 
 class Button(Widget):
@@ -98,18 +102,24 @@ class MenuManager:
         self.active_menu = self.menus[name]
 
         # On itère dans tous les bouttons pour leur ajouter une interaction
-        for btn in self.active_menu.widgets:
-            if isinstance(btn, Button):
-                width = btn.base_image.get_width() / self.engine.renderer.window_size[0]
-                height = btn.base_image.get_height() / self.engine.renderer.window_size[1]
-                area_x = btn.x
-                area_y = btn.y
-                if btn.centered:
+        for widget in self.active_menu.widgets:
+            if isinstance(widget, Button):
+                width = widget.base_image.get_width() / self.engine.renderer.window_size[0]
+                height = widget.base_image.get_height() / self.engine.renderer.window_size[1]
+                area_x = widget.x
+                area_y = widget.y
+                if widget.centered:
                     area_x -= width / 2
                     area_y -= height / 2
-                self.engine.event_handler.register_button_area((area_x, area_y, width, height), btn.callback,
-                                                               btn.area_name,
-                                                               btn.is_window_relative, btn.set_hover_state)
+                self.engine.event_handler.register_button_area((area_x, area_y, width, height), widget.callback,
+                                                               widget.area_name,
+                                                               widget.is_window_relative, widget.set_hover_state)
+            elif isinstance(widget, Slider):
+                self.engine.event_handler.register_slider_area(widget.cursor_size,
+                                                               (widget.x, widget.y, widget.width, 1), (True, False),
+                                                               widget.is_window_relative,
+                                                               hover_callback=widget.set_hover_state,
+                                                               motion_callback=widget.set_value)
 
     def hide(self):
         """Affiche le menu actuelement à l'écran."""
