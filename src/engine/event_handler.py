@@ -118,9 +118,10 @@ class EventHandler:
 
             elif e.type == MOUSEBUTTONUP:
                 for area in self.sliders_area:
-                    area[2] = False
-                    if area[7] is not None:
-                        area[7](self.get_slider_area_values(area))
+                    if area[2]:
+                        area[2] = False
+                        if area[7] is not None:
+                            area[7](self.get_slider_area_values(area))
 
             elif e.type == MOUSEMOTION:
                 for area in self.buttons_area:
