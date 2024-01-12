@@ -32,11 +32,13 @@ class Slider(Widget):
                  width: int | float,
                  base_image: pygame.Surface,
                  hover_image: pygame.Surface,
+                 rail_image: pygame.Surface,
                  is_window_relative: int = -1,
                  area_name: str = "menu_slider"):
         super().__init__(area_rect[0], area_rect[1], is_window_relative)
         self.base_image = base_image
         self.hover_image = hover_image
+        self.rail_image = rail_image
         self.area_name = area_name
         self.hovered = False
         self.follow_mouse = False
@@ -117,6 +119,7 @@ class MenuManager:
             elif isinstance(widget, Slider):
                 self.engine.event_handler.register_slider_area(widget.cursor_size,
                                                                (widget.x, widget.y, widget.width, 1), (True, False),
+                                                               widget.area_name,
                                                                widget.is_window_relative,
                                                                hover_callback=widget.set_hover_state,
                                                                motion_callback=widget.set_value)

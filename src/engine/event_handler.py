@@ -63,6 +63,7 @@ class EventHandler:
     def register_slider_area(self, size: tuple[float | int, float | int],
                              motion_rect: tuple[float | int, float | int, float | int, float | int],
                              motion_axes: tuple[bool, bool],
+                             name: str,
                              is_window_relative: int = -1,
                              clicked_callback: FunctionType | classmethod | staticmethod = None,
                              released_callback: FunctionType | classmethod | staticmethod = None,
@@ -71,8 +72,19 @@ class EventHandler:
         """Enregistre une zone comme une zone déplaçable à l'écran."""
         self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0),
                                   motion_axes, motion_rect,
-                                  clicked_callback, released_callback, hover_callback, motion_callback])
+                                  clicked_callback, released_callback, hover_callback, motion_callback, name])
         # Le premier booléen correspond à l'état de suivi de la souris
+
+    def remove_slider_area(self, name: str):
+        """Supprime les sliders aux noms donnés."""
+
+        # On itère dans toute la liste et on ne garde que les éléments ne portant pas le nom cherché
+        cleared_list = []
+        for area in self.sliders_area:
+            if area[10] != name:
+                cleared_list.append(area)
+
+        self.sliders_area = cleared_list
 
     @staticmethod
     def get_slider_area_values(slider: list):

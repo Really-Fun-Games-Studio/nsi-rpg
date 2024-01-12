@@ -308,9 +308,10 @@ class Renderer:
                                                        (slider_image.get_width()*window_size[0]/self.window_size[0],
                                                         slider_image.get_height()*window_size[1]/self.window_size[1]))
 
+                    self.window.blit(widget.rail_image, (x+(widget.width-widget.rail_image.get_width()) // 2,
+                                                    y - widget.rail_image.get_height() // 2))
                     self.window.blit(slider_image, (x+widget.value*widget.width-slider_image.get_width()//2,
                                                     y-slider_image.get_height()//2))
-
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
