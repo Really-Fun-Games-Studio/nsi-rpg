@@ -7,17 +7,18 @@ import src.engine.engine
 
 class Widget:
     """Classe parente des widgets de menu."""
-    def __init__(self, x, y, is_window_relative):
+    def __init__(self, x, y, is_window_relative, widget_name):
         self.x = x
         self.y = y
         self.is_window_relative = is_window_relative
+        self.widget_name = widget_name
 
 
 class Label(Widget):
     """Un widget de texte."""
     def __init__(self, x: int | float, y: int | float, text: str, size: int | float, color: tuple[int, int, int],
-                 centered: bool = False, is_window_relative: int = -1):
-        super().__init__(x, y, is_window_relative)
+                 widget_name: str, centered: bool = False, is_window_relative: int = -1):
+        super().__init__(x, y, is_window_relative, widget_name)
         self.text = text
         self.size = size
         self.centered = centered
@@ -33,13 +34,16 @@ class Slider(Widget):
                  base_image: pygame.Surface,
                  hover_image: pygame.Surface,
                  rail_image: pygame.Surface,
+                 widget_name: str,
+                 value_changed_callback: FunctionType | classmethod | staticmethod | None = None,
                  is_window_relative: int = -1,
                  area_name: str = "menu_slider"):
-        super().__init__(area_rect[0], area_rect[1], is_window_relative)
+        super().__init__(area_rect[0], area_rect[1], is_window_relative, widget_name)
         self.base_image = base_image
         self.hover_image = hover_image
         self.rail_image = rail_image
         self.area_name = area_name
+        self.value_changed_callback = value_changed_callback
         self.hovered = False
         self.follow_mouse = False
         self.cursor_size = cursor_size
@@ -52,16 +56,25 @@ class Slider(Widget):
 
     def set_value(self, values: tuple[float, float]):
         """Appelée lorsque la valeur du slider est modifiée."""
-        self.value = values[0]
+        new_value = values[0]
+
+        if new_value != self.value:
+            self.value = new_value
+            if self.value_changed_callback is not None:
+                self.value_changed_callback(self.value)
+
+    def get_value(self):
+        """Retourne la valeur entre 0.0 et 1.0 du slider."""
+        return self.value
 
 
 class Button(Widget):
     """Un widget de bouton."""
     def __init__(self, x: int | float, y: int | float, text: str, size: int | float, color: tuple[int, int, int],
                  callback: FunctionType | classmethod | staticmethod, base_image: pygame.Surface,
-                 hover_image: pygame.Surface, centered: bool = False, is_window_relative: int = -1,
+                 hover_image: pygame.Surface, widget_name: str, centered: bool = False, is_window_relative: int = -1,
                  area_name: str = "menu_button"):
-        super().__init__(x, y, is_window_relative)
+        super().__init__(x, y, is_window_relative, widget_name)
         self.text = text
         self.size = size
         self.color = color
@@ -98,6 +111,17 @@ class MenuManager:
     def register_menu(self, menu: Menu, name: str):
         """Ajoute le menu donné au manager de menu avec le nom donné."""
         self.menus[name] = menu
+
+    def get_widgets_at_name(self, menu_name: str, widget_name: str):
+        """Donne le widget au nom donné dans le menu au nom donné."""
+        menu = self.menus[menu_name]
+
+        found_sliders = []
+        for widget in menu.widgets:
+            if widget.widget_name == widget_name:
+                found_sliders.append(widget)
+
+        return found_sliders
 
     def show(self, name: str):
         """Affiche le menu au nom donné."""

@@ -47,8 +47,8 @@ class Game(Engine):
         slider_hover_image = pygame.image.load("assets/textures/GUI/slider_cursor_2.png").convert_alpha()
         slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, btn_base_image, btn_hover_image, True, 0))
-        menu.add_widget(Slider((50, 50), (100, 300), 136, slider_base_image, slider_hover_image, slider_rail_image))
+        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Slider((50, 50), (100, 300), 136, slider_base_image, slider_hover_image, slider_rail_image, "test_slider", value_changed_callback=print))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")
