@@ -100,6 +100,8 @@ class Renderer:
     def update(self, delta: float):
         """Fait le rendu du jeu."""
         self.timer -= delta
+        self.fadeout_timer -= delta
+        self.fadein_timer -= delta
 
         if self.fadeout_timer < 0:
             if self.fadeout_is_fading:
@@ -535,8 +537,8 @@ class Renderer:
                                self.tile_size, self.tile_size), width=1)
 
     def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
-        """Fait un fondu vers la couleur (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
-
+        """Fait un fondu vers la couleur au format : (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
+        self.fadein_is_fading = False
         self.fadeout_timer = fade_s
         self.fadeout_fade_in_s = fade_s
         self.fadeout_is_fading = True
@@ -545,4 +547,11 @@ class Renderer:
         self.fadeout_fade_callback = callback
 
     def fadein(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
-        return
+        """Fait un fondu depuis la couleur au format : (255, 255, 255) et depuis l'opacité spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
+        self.fadeout_is_fading = False
+        self.fadein_timer = fade_s
+        self.fadein_fade_in_s = fade_s
+        self.fadein_is_fading = True
+        self.fadein_fade_color = fade_color
+        self.fadein_fade_opacity = round(fade_opacity * 255 / 100)
+        self.fadein_fade_callback = callback
