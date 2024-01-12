@@ -38,7 +38,7 @@ class Game(Engine):
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
-        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), True, 0))
+        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), "game_title", True, 0))
 
         btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
@@ -48,7 +48,7 @@ class Game(Engine):
         slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
 
         menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, btn_base_image, btn_hover_image, "play_button", True, 0))
-        menu.add_widget(Slider((50, 50), (100, 300), 136, slider_base_image, slider_hover_image, slider_rail_image, "test_slider", value_changed_callback=print))
+        menu.add_widget(Slider((0.1, 0.1), (0.2, 0.2), 0.2255, slider_base_image, slider_hover_image, slider_rail_image, "test_slider", value_changed_callback=print, is_window_relative=0))
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")

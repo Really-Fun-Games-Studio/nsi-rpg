@@ -295,22 +295,39 @@ class Renderer:
                     else:
                         slider_image = widget.base_image
 
+                    rail_image = widget.rail_image
+
                     if widget.is_window_relative == 0:
                         slider_image = transform.scale(slider_image,
                                                        (slider_image.get_width()*window_size[0]/self.window_size[0],
                                                         slider_image.get_height()*window_size[0]/self.window_size[0]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[0] / self.window_size[
+                                                            0]))
+                        width = widget.width*window_size[0]
                     elif widget.is_window_relative == 1:
                         slider_image = transform.scale(slider_image,
                                                        (slider_image.get_width()*window_size[1]/self.window_size[1],
                                                         slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[1] / self.window_size[1],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * window_size[1]
                     elif widget.is_window_relative == 2:
                         slider_image = transform.scale(slider_image,
                                                        (slider_image.get_width()*window_size[0]/self.window_size[0],
                                                         slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * min(window_size[0], window_size[1])
 
-                    self.window.blit(widget.rail_image, (x+(widget.width-widget.rail_image.get_width()) // 2,
-                                                    y - widget.rail_image.get_height() // 2))
-                    self.window.blit(slider_image, (x+widget.value*widget.width-slider_image.get_width()//2,
+                    self.window.blit(rail_image, (x+(width-rail_image.get_width()) // 2,
+                                                    y - rail_image.get_height() // 2))
+                    self.window.blit(slider_image, (x+widget.value*width-slider_image.get_width()//2,
                                                     y-slider_image.get_height()//2))
 
     def render_dialogs_box(self):

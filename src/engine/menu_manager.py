@@ -142,7 +142,7 @@ class MenuManager:
                                                                widget.is_window_relative, widget.set_hover_state)
             elif isinstance(widget, Slider):
                 self.engine.event_handler.register_slider_area(widget.cursor_size,
-                                                               (widget.x, widget.y, widget.width, 1), (True, False),
+                                                               (widget.x, widget.y, widget.width, 0), (True, False),
                                                                widget.area_name,
                                                                widget.is_window_relative,
                                                                hover_callback=widget.set_hover_state,

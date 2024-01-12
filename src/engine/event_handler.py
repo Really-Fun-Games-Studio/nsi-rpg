@@ -89,7 +89,15 @@ class EventHandler:
     @staticmethod
     def get_slider_area_values(slider: list):
         """Donne la valeur de la zone de slider donnée."""
-        return round((slider[0][0]-slider[5][0])/slider[5][2], 5), round((slider[0][1]-slider[5][1])/slider[5][3], 5)
+        if slider[5][2]:
+            x_value = round((slider[0][0]-slider[5][0])/slider[5][2], 5)
+        else:
+            x_value = -1
+        if slider[5][3]:
+            y_value = round((slider[0][1]-slider[5][1])/slider[5][3], 5)
+        else:
+            y_value = -1
+        return x_value, y_value
 
 
     def update(self):
