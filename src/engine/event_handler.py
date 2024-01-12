@@ -165,6 +165,17 @@ class EventHandler:
                             area[0][1] = area[5][1]
                         if area[0][1] > area[5][1]+area[5][3]:
                             area[0][1] = area[5][1]+area[5][3]
+                    if area[8] is not None:
+                        if self.get_click_collision(
+                                (area[0][0] - area[0][2] / 2, area[0][1] - area[0][3] / 2, area[0][2], area[0][3]),
+                                e.pos, area[1]):
+                            if area not in self.hovered_sliders_area:
+                                area[8](True)
+                                self.hovered_sliders_area.append(area)
+                        else:
+                            if area in self.hovered_sliders_area:
+                                area[8](False)
+                                self.hovered_sliders_area.remove(area)
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:
