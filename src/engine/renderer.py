@@ -9,7 +9,7 @@ from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
-from src.engine.menu_manager import Label, Button
+from src.engine.menu_manager import Label, Button, Slider
 
 
 class Renderer:
@@ -164,7 +164,7 @@ class Renderer:
 
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
-            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}", True, (255, 0, 0)),
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}, Game Status: {'Paused' if self.engine.entity_manager.paused else 'Playing'}", True, (255, 0, 0)),
                              (0, 0))
             player = self.engine.entity_manager.get_by_name('player')
             self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",
@@ -176,9 +176,10 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
 
+            window_size = display.get_window_size()
+
             # On rend maintenant toutes les zones de détection de la fenêtre
             for area in self.engine.event_handler.buttons_area:
-                window_size = display.get_window_size()
                 if area[2] == 0:
                     draw.rect(self.window, (255, 255, 0),
                               (area[0][0] * window_size[0], area[0][1] * window_size[0],
@@ -194,6 +195,58 @@ class Renderer:
                 else:
                     draw.rect(self.window, (255, 255, 0),
                               area[0], width=1)
+
+            for area in self.engine.event_handler.sliders_area:
+                if area[1] == 0:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[0],
+                               area[0][2] * window_size[0], area[0][3] * window_size[0]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[0], area[5][1] * window_size[0],
+                               area[5][2] * window_size[0], area[5][3] * window_size[0]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0] - 2, area[0][1] * window_size[0]),
+                              (area[0][0] * window_size[0] + 2, area[0][1] * window_size[0]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] - 2),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] + 2))
+                elif area[1] == 1:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[1], (area[0][1]-area[0][3]/2) * window_size[1],
+                               area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[1], area[5][1] * window_size[1],
+                               area[5][2] * window_size[1], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1] - 2, area[0][1] * window_size[1]),
+                              (area[0][0] * window_size[1] + 2, area[0][1] * window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] - 2),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] + 2))
+                elif area[1] == 2:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[1],
+                               area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[0], area[5][1] * window_size[1],
+                               area[5][2] * window_size[0], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0] - 2, area[0][1]*window_size[1]),
+                              (area[0][0]*window_size[0] + 2, area[0][1]*window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] - 2),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] + 2))
+                else:
+                    draw.rect(self.window, (0, 255, 20),
+                              (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              area[5], width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]-2, area[0][1]),
+                              (area[0][0]+2, area[0][1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0], area[0][1]-2),
+                              (area[0][0], area[0][1]+2))
 
         # Rendu présent dans tous les types de jeu
         self.render_dialogs_box()
@@ -283,6 +336,46 @@ class Renderer:
                         self.window.blit(btn_image, (x, y))
 
                         self.window.blit(rendered_text, (x, y))
+                elif isinstance(widget, Slider):
+                    if widget.hovered:
+                        slider_image = widget.hover_image
+                    else:
+                        slider_image = widget.base_image
+
+                    rail_image = widget.rail_image
+
+                    if widget.is_window_relative == 0:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[0]/self.window_size[0]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[0] / self.window_size[
+                                                            0]))
+                        width = widget.width*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[1]/self.window_size[1],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[1] / self.window_size[1],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * window_size[1]
+                    elif widget.is_window_relative == 2:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * min(window_size[0], window_size[1])
+
+                    self.window.blit(rail_image, (x+(width-rail_image.get_width()) // 2,
+                                                    y - rail_image.get_height() // 2))
+                    self.window.blit(slider_image, (x+widget.value*width-slider_image.get_width()//2,
+                                                    y-slider_image.get_height()//2))
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
