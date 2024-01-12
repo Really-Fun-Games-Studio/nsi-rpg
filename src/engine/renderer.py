@@ -46,6 +46,7 @@ class Renderer:
         self.fadeout_fade_in_s = 0
         self.fadeout_fade_color = (255, 255, 255)
         self.fadeout_fade_opacity = 100
+        self.fadeout_pause = False
         self.fadeout_fade_callback = None
 
         # Variables du fadein
@@ -54,6 +55,7 @@ class Renderer:
         self.fadein_fade_in_s = 0
         self.fadein_fade_color = (255, 255, 255)
         self.fadein_fade_opacity = 100
+        self.fadein_pause = False
         self.fadein_fade_callback = None
 
     def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
@@ -106,12 +108,18 @@ class Renderer:
         if self.fadeout_timer < 0:
             if self.fadeout_is_fading:
                 self.fadeout_is_fading = False
+                if self.fadeout_pause:
+                    self.engine.entity_manager.resume()
+                    self.fadeout_pause = False
                 if self.fadeout_fade_callback is not None:
                     self.fadeout_fade_callback()
         
         if self.fadein_timer < 0:
             if self.fadein_is_fading:
                 self.fadein_is_fading = False
+                if self.fadein_pause:
+                    self.engine.entity_manager.resume()
+                    self.fadein_pause = False
                 if self.fadein_fade_callback is not None:
                     self.fadein_fade_callback()
 
@@ -629,7 +637,7 @@ class Renderer:
                                math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset),
                                self.tile_size, self.tile_size), width=1)
 
-    def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
+    def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, pause_world: bool = True, callback: FunctionType = None):
         """Fait un fondu vers la couleur au format : (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
         self.fadein_is_fading = False
         self.fadeout_timer = fade_s
@@ -637,9 +645,11 @@ class Renderer:
         self.fadeout_is_fading = True
         self.fadeout_fade_color = fade_color
         self.fadeout_fade_opacity = round(fade_opacity * 255 / 100)
+        self.fadeout_pause = pause_world
         self.fadeout_fade_callback = callback
+        self.engine.entity_manager.pause()
 
-    def fadein(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
+    def fadein(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, pause_world: bool = True, callback: FunctionType = None):
         """Fait un fondu depuis la couleur au format : (255, 255, 255) et depuis l'opacité spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
         self.fadeout_is_fading = False
         self.fadein_timer = fade_s
@@ -647,4 +657,6 @@ class Renderer:
         self.fadein_is_fading = True
         self.fadein_fade_color = fade_color
         self.fadein_fade_opacity = round(fade_opacity * 255 / 100)
+        self.fadein_pause = pause_world
         self.fadein_fade_callback = callback
+        self.engine.entity_manager.pause()
