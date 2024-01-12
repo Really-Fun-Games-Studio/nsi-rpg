@@ -40,12 +40,21 @@ class Renderer:
         # Particules affichées
         self.particles = []
 
-        # Varialbes du fade
+        # Varialbes du fadeout
+        self.fadeout_timer = 0 # Timer de fadeout
         self.fadeout_is_fading = False
         self.fadeout_fade_in_s = 0
         self.fadeout_fade_color = (255, 255, 255)
         self.fadeout_fade_opacity = 100
         self.fadeout_fade_callback = None
+
+        # Variables du fadein
+        self.fadein_timer = 0 # Timer de fadein
+        self.fadein_is_fading = False
+        self.fadein_fade_in_s = 0
+        self.fadein_fade_color = (255, 255, 255)
+        self.fadein_fade_opacity = 100
+        self.fadein_fade_callback = None
 
     def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
                        min_speed: float, max_speed: float, min_life_time: float, max_life_time: float,
@@ -92,12 +101,18 @@ class Renderer:
         """Fait le rendu du jeu."""
         self.timer -= delta
 
-        if self.timer < 0:
+        if self.fadeout_timer < 0:
             if self.fadeout_is_fading:
                 self.fadeout_is_fading = False
                 if self.fadeout_fade_callback is not None:
                     self.fadeout_fade_callback()
         
+        if self.fadein_timer < 0:
+            if self.fadein_is_fading:
+                self.fadein_is_fading = False
+                if self.fadein_fade_callback is not None:
+                    self.fadein_fade_callback()
+
         self.window.fill((255, 255, 255))
 
         # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
@@ -132,11 +147,16 @@ class Renderer:
         # Rend les menus
         self.render_menus()
 
-        if self.fadeout_is_fading:
+        if self.fadeout_is_fading != self.fadein_is_fading:
+            if self.fadeout_is_fading:
                 r, g, b = self.fadeout_fade_color
-                a = (1 - self.timer / self.fadeout_fade_in_s) * self.fadeout_fade_opacity
-                gui_surface.fill((r,g,b,a))
-
+                a = (1 - self.fadeout_timer / self.fadeout_fade_in_s) * self.fadeout_fade_opacity
+                gui_surface.fill((r, g, b, a))
+        
+            if self.fadein_is_fading:
+                r, g, b = self.fadein_fade_color
+                a = self.fadein_timer / self.fadein_fade_in_s * self.fadein_fade_opacity
+                gui_surface.fill((r, g, b, a))
 
         self.window.blit(gui_surface, (0, 0))
 
@@ -517,7 +537,7 @@ class Renderer:
     def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, callback: FunctionType = None):
         """Fait un fondu vers la couleur (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
 
-        self.timer = fade_s
+        self.fadeout_timer = fade_s
         self.fadeout_fade_in_s = fade_s
         self.fadeout_is_fading = True
         self.fadeout_fade_color = fade_color

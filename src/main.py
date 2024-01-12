@@ -35,7 +35,7 @@ class Game(Engine):
         self.game_state = GameState.NORMAL
         
     def play_button_callback(self):
-        self.renderer.fadeout(10, (0, 255, 0), 100, self.start_game)
+        self.renderer.fadeout(2, (0, 0, 0), 100, self.start_game)
         self.menu_manager.hide()
 
     def setup_main_menu(self):
