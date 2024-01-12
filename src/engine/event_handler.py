@@ -6,7 +6,6 @@ from pygame import event, display
 from pygame.locals import *
 
 import src.engine.engine as engine
-from src.engine.menu_manager import Slider
 
 
 class EventHandler:

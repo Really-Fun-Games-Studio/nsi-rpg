@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
-from src.engine.menu_manager import Menu, Label, Button, Slider
+from src.engine.menu_manager import Menu, Label, Button
 
 
 class Game(Engine):
