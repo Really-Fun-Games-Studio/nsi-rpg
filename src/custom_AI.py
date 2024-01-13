@@ -32,23 +32,23 @@ class WolfAI(MobAI):
 
         # On vérifie que le loup peut voir le joueur
         if player_distance <= self.ATTACK_DISTANCE:
-            # On rétablit la vitesse du loup à 1
-            self.entity.max_speed = 1.
+            # On rétablit la vitesse du loup à 60
+            self.entity.max_speed = 60.
 
             # Si le loup touche le joueur, il lui inflige des dégats
             if player.get_collisions_with_entity(self.entity):
                 player.take_damages(1)
 
             # Si le loup n'est pas déja sur le joueur, on le fait s'en raprocher
-            if player_distance > self.entity.max_speed:
+            if player_distance > 1.:
                 self.entity.move(x_distance / player_distance*self.entity.max_speed,
-                                 y_distance / player_distance*self.entity.max_speed, self.map_manager)
+                                 y_distance / player_distance*self.entity.max_speed, self.map_manager, delta)
 
         else:
             # Comportement d'attente
 
             # On diminue la vitesse
-            self.entity.max_speed = 0.5
+            self.entity.max_speed = 30.
 
             self.timer -= delta
             # Si le timer est fini et que le loup était en train d'attendre, il commence à marcher
