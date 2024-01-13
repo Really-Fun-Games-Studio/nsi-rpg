@@ -3,7 +3,7 @@ import pygame.image
 from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
-from src.engine.enums import GameState
+from src.engine.enums import GameState, EntityDeathResult
 from src.engine.menu_manager import Menu, Label, Button
 
 
@@ -85,6 +85,8 @@ class Game(Engine):
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
+        player.death_result = EntityDeathResult.RESET_LIFE
+        player.death_callback = self.create_player_entity
 
         self.entity_manager.set_player_entity("player")
 
@@ -93,7 +95,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 64.0
+        player.max_speed = 264.0
         player.x = 220.
         player.y = 767.
 

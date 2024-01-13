@@ -1,4 +1,5 @@
 from src.engine.entity import Entity
+from src.engine.enums import EntityDeathResult
 from src.engine.map_manager import MapManager
 
 
@@ -32,7 +33,13 @@ class EntityManager:
             entity = self.entities[entity_name]
             entity.update(delta)
             if entity.life_points == 0:
-                self.entities.pop(entity_name)
+                if entity.death_callback is not None:
+                    entity.death_callback()
+                if entity.death_result == EntityDeathResult.REMOVED:
+                    self.entities.pop(entity_name)
+                elif entity.death_result == EntityDeathResult.RESET_LIFE:
+                    entity.life_points = entity.max_life_points
+
 
             if entity.brain is not None and not self.paused:
                 entity.brain.update(delta)
