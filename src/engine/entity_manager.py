@@ -21,10 +21,10 @@ class EntityManager:
         """Définit l'entité donnée comme le joueur. Elle peut donc être controlée."""
         self.player_entity_name = name
 
-    def move_player_controls(self, x: float, y: float):
+    def move_player_controls(self, x: float, y: float, delta: float):
         """Bouge le joueur. X et y doivent être compris entre 0 et 1"""
         player: Entity = self.get_by_name(self.player_entity_name)
-        player.move(x, y, self.map_manager)
+        player.move(x, y, self.map_manager, delta)
 
     def update(self, delta: float):
         """Met à jour toutes les entités enregistrées."""
@@ -61,7 +61,6 @@ class EntityManager:
                 e.lock()
         self.paused = True
 
-    
     def resume(self):
         """Reprend les mouvement de toutes les entitées qui n'étaient pas lock avant l'appel de .pause()"""
         for e in self.get_all_entities():

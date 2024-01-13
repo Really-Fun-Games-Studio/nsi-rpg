@@ -98,7 +98,7 @@ class EventHandler:
         return x_value, y_value
 
 
-    def update(self):
+    def update(self, delta: float):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
 
         window_size = display.get_window_size()
@@ -203,13 +203,13 @@ class EventHandler:
 
         if self.engine.entity_manager.player_entity_name:
             if K_RIGHT in self.key_pressed:
-                self.engine.entity_manager.move_player_controls(1, 0)
+                self.engine.entity_manager.move_player_controls(1, 0, delta)
             if K_LEFT in self.key_pressed:
-                self.engine.entity_manager.move_player_controls(-1, 0)
+                self.engine.entity_manager.move_player_controls(-1, 0, delta)
             if K_UP in self.key_pressed:
-                self.engine.entity_manager.move_player_controls(0, -1)
+                self.engine.entity_manager.move_player_controls(0, -1, delta)
             if K_DOWN in self.key_pressed:
-                self.engine.entity_manager.move_player_controls(0, 1)
+                self.engine.entity_manager.move_player_controls(0, 1, delta)
 
             if K_SPACE in self.key_pressed:
                 self.engine.dialogs_manager.next_signal()
@@ -221,7 +221,7 @@ class EventHandler:
                 if K_p in self.key_pressed:
                     self.engine.renderer.emit_particles(math.floor(self.engine.entity_manager.get_by_name("player").x),
                                                         math.floor(self.engine.entity_manager.get_by_name("player").y),
-                                                        16, 16, 16, 1, 8, 0, 1, 0.2, 1., (0, 200, 200))
+                                                        16, 16, 16, 1, 8, 0, 60., 0.2, 1., (0, 200, 200))
                 if K_o in self.key_pressed:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
