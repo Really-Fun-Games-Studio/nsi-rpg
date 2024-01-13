@@ -65,8 +65,23 @@ class Entity:
 
         # Si les coordonnées ont changé, l'entité a bougé
 
-        self.mouvements[0] = (self.x - self.last_x) / self.max_speed
-        self.mouvements[1] = (self.y - self.last_y) / self.max_speed
+        x_motion = (self.x - self.last_x)
+
+        if x_motion > 0:
+            self.mouvements[0] = 1
+        elif x_motion < 0:
+            self.mouvements[0] = -1
+        else:
+            self.mouvements[0] = 0
+
+        y_motion = (self.y - self.last_y)
+
+        if y_motion > 0:
+            self.mouvements[1] = 1
+        elif y_motion < 0:
+            self.mouvements[1] = -1
+        else:
+            self.mouvements[1] = 0
 
         self.last_x = self.x
         self.last_y = self.y
