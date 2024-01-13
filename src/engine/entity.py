@@ -11,6 +11,8 @@ class Entity:
         self.x = 8
         self.y = 8
 
+        self.locked = False # Variable définissant si l'entité est bloqué ou non (.lock() et .unlock())
+
         self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
 
         # Variables utilisées pour détecter les mouvements
@@ -63,8 +65,23 @@ class Entity:
 
         # Si les coordonnées ont changé, l'entité a bougé
 
-        self.mouvements[0] = (self.x - self.last_x) / self.max_speed
-        self.mouvements[1] = (self.y - self.last_y) / self.max_speed
+        x_motion = (self.x - self.last_x)
+
+        if x_motion > 0:
+            self.mouvements[0] = 1
+        elif x_motion < 0:
+            self.mouvements[0] = -1
+        else:
+            self.mouvements[0] = 0
+
+        y_motion = (self.y - self.last_y)
+
+        if y_motion > 0:
+            self.mouvements[1] = 1
+        elif y_motion < 0:
+            self.mouvements[1] = -1
+        else:
+            self.mouvements[1] = 0
 
         self.last_x = self.x
         self.last_y = self.y
@@ -114,55 +131,67 @@ class Entity:
 
         return collision
 
-    def move(self, x: float, y: float, map_manager: MapManager):
+    def move(self, x: float, y: float, map_manager: MapManager, delta: float):
         """Fait bouger l'entité en tenant compte des collisions."""
 
-        # On vérifie le sens du mouvement pour changer self.direction
-        if x > 0:
-            self.direction = 0
-        elif x < 0:
-            self.direction = 1
-        # On ne met pas de else car si x = 0, on ne change pas de direction
-
-        # On normalise la vitesse
-        initial_speed = math.sqrt(x**2+y**2)
-
-        x = x/initial_speed*self.max_speed
-        y = y/initial_speed*self.max_speed
-
-        # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
-        if not self.get_collisions(self.x + x, self.y, map_manager):
-            self.x += x
-        else:
-            # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
-            i = 0
+        if not self.locked:  # Si l'entité n'est pas verrouillée on calcul le mouvement
+            
+            # On vérifie le sens du mouvement pour changer self.direction
             if x > 0:
-                while not self.get_collisions(self.x + i, self.y, map_manager):
-                    i += 1
-                i -= 1
+                self.direction = 0
+            elif x < 0:
+                self.direction = 1
+            # On ne met pas de else car si x = 0, on ne change pas de direction
+
+            # On normalise la vitesse
+            initial_speed = math.sqrt(x**2+y**2)
+
+            x = x*delta/initial_speed*self.max_speed
+            y = y*delta/initial_speed*self.max_speed
+
+            # On simule le mouvement. Si on ne rencontre pas de collision, on applique le mouvement
+        
+            if not self.get_collisions(self.x + x, self.y, map_manager):
+                self.x += x
             else:
-                while not self.get_collisions(self.x + i, self.y, map_manager):
+                # Si on a une collision, on avance pixel par pixel jusqu'à atteindre la collision
+                i = 0
+                if x > 0:
+                    while not self.get_collisions(self.x + i, self.y, map_manager):
+                        i += 1
                     i -= 1
-                i += 1
-
-            self.x += i
-
-        # On répète le procédé avec l'ordonnée
-        if not self.get_collisions(self.x, self.y + y, map_manager):
-            self.y += y
-        else:
-            i = 0
-            if y > 0:
-                while not self.get_collisions(self.x, self.y + i, map_manager):
+                else:
+                    while not self.get_collisions(self.x + i, self.y, map_manager):
+                        i -= 1
                     i += 1
-                i -= 1
-            else:
-                while not self.get_collisions(self.x, self.y + i, map_manager):
-                    i -= 1
-                i += 1
 
-            self.y += i
+                self.x += i
+
+            # On répète le procédé avec l'ordonnée
+            if not self.get_collisions(self.x, self.y + y, map_manager):
+                self.y += y
+            else:
+                i = 0
+                if y > 0:
+                    while not self.get_collisions(self.x, self.y + i, map_manager):
+                        i += 1
+                    i -= 1
+                else:
+                    while not self.get_collisions(self.x, self.y + i, map_manager):
+                        i -= 1
+                    i += 1
+
+                self.y += i
 
     def link_animation(self, name: str):
-        """Met à jour l'animation en cours de l'entité."""
+        """Met à jour l'animation en cours de l'entitée."""
         self.animation_name = name
+
+
+    def lock(self):
+        """Bloque tout les mouvements de l'entitée"""
+        self.locked = True
+
+    def unlock(self):
+        """Débloque tout les mouvements de l'entitée"""
+        self.locked = False

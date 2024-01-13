@@ -36,6 +36,10 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
+        self.renderer.fadein(1, (0, 0, 0), 100, True)
+
+    def play_button_callback(self):
+        self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)
         self.menu_manager.hide()
 
         self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
@@ -45,12 +49,17 @@ class Game(Engine):
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
-        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), True, 0))
+        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), "game_title", True, 0))
 
-        base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
-        hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
+        btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
+        btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, base_image, hover_image, True, 0))
+        slider_base_image = pygame.image.load("assets/textures/GUI/slider_cursor_1.png").convert_alpha()
+        slider_hover_image = pygame.image.load("assets/textures/GUI/slider_cursor_2.png").convert_alpha()
+        slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
+
+        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
+
         self.menu_manager.register_menu(menu, "main")
 
         self.menu_manager.show("main")
@@ -71,6 +80,11 @@ class Game(Engine):
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
+
+        player.set_default_life(15)
+        player.max_speed = 64.0
+
+        self.entity_manager.set_player_entity("player")
 
         player.shadow = "player_shadow"
         self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
@@ -106,7 +120,7 @@ class Game(Engine):
         mob.collision_rect = [-15, -7, 12, 7]
 
         mob.set_default_life(5)
-        mob.max_speed = 1.
+        mob.max_speed = 60.
 
         mob.x, mob.y = 1600, 16
 

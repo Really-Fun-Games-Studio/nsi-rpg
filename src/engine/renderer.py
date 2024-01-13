@@ -1,13 +1,15 @@
 import math
 import random
+from time import time_ns
 
+from types import FunctionType
 from pygame import display, image, surface, transform, draw, font
 from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
-from src.engine.menu_manager import Label, Button
+from src.engine.menu_manager import Label, Button, Slider
 
 
 class Renderer:
@@ -15,6 +17,7 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
+        self.timer = 0 # Timer local
         self.window_type = RESIZABLE
         self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (
         600, 600)
@@ -36,6 +39,24 @@ class Renderer:
 
         # Particules affichées
         self.particles = []
+
+        # Varialbes du fadeout
+        self.fadeout_timer = 0 # Timer de fadeout
+        self.fadeout_is_fading = False
+        self.fadeout_fade_in_s = 0
+        self.fadeout_fade_color = (255, 255, 255)
+        self.fadeout_fade_opacity = 100
+        self.fadeout_pause = False
+        self.fadeout_fade_callback = None
+
+        # Variables du fadein
+        self.fadein_timer = 0 # Timer de fadein
+        self.fadein_is_fading = False
+        self.fadein_fade_in_s = 0
+        self.fadein_fade_color = (255, 255, 255)
+        self.fadein_fade_opacity = 100
+        self.fadein_pause = False
+        self.fadein_fade_callback = None
 
     def emit_particles(self, x: int, y: int, w: int, h: int, count: int, min_size: int, max_size: int,
                        min_speed: float, max_speed: float, min_life_time: float, max_life_time: float,
@@ -80,17 +101,39 @@ class Renderer:
 
     def update(self, delta: float):
         """Fait le rendu du jeu."""
+        self.timer -= delta
+        self.fadeout_timer -= delta
+        self.fadein_timer -= delta
+
+        if self.fadeout_timer < 0:
+            if self.fadeout_is_fading:
+                self.fadeout_is_fading = False
+                if self.fadeout_pause:
+                    self.engine.entity_manager.resume()
+                    self.fadeout_pause = False
+                if self.fadeout_fade_callback is not None:
+                    self.fadeout_fade_callback()
+        
+        if self.fadein_timer < 0:
+            if self.fadein_is_fading:
+                self.fadein_is_fading = False
+                if self.fadein_pause:
+                    self.engine.entity_manager.resume()
+                    self.fadein_pause = False
+                if self.fadein_fade_callback is not None:
+                    self.fadein_fade_callback()
+
         self.window.fill((255, 255, 255))
+
+        # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
+        gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
+        gui_surface.fill((0, 0, 0, 0))
 
         if self.engine.game_state == GameState.NORMAL:
             # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
             rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom,
                                      display.get_window_size()[1] / self.engine.camera.zoom)
             rendered_surface = surface.Surface(rendered_surface_size)
-
-            # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
-            gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
-            gui_surface.fill((0, 0, 0, 0))
 
             self.render_layer(0, rendered_surface)
             self.render_layer(1, rendered_surface)
@@ -105,7 +148,6 @@ class Renderer:
                                                    math.ceil(rendered_surface_size[1] * self.engine.camera.zoom))),
                 (0, 0))
 
-            self.window.blit(gui_surface, (0, 0))
 
         elif self.engine.game_state == GameState.BOSS_FIGHT:
             self.window.fill((255, 230, 230))
@@ -115,9 +157,22 @@ class Renderer:
         # Rend les menus
         self.render_menus()
 
+        if self.fadeout_is_fading != self.fadein_is_fading:
+            if self.fadeout_is_fading:
+                r, g, b = self.fadeout_fade_color
+                a = (1 - self.fadeout_timer / self.fadeout_fade_in_s) * self.fadeout_fade_opacity
+                gui_surface.fill((r, g, b, a))
+        
+            if self.fadein_is_fading:
+                r, g, b = self.fadein_fade_color
+                a = self.fadein_timer / self.fadein_fade_in_s * self.fadein_fade_opacity
+                gui_surface.fill((r, g, b, a))
+
+        self.window.blit(gui_surface, (0, 0))
+
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
-            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(self.engine.clock.get_fps())}", True, (255, 0, 0)),
+            self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(1/delta if delta else 1)}, Game Status: {'Paused' if self.engine.entity_manager.paused else 'Playing'}", True, (255, 0, 0)),
                              (0, 0))
             player = self.engine.entity_manager.get_by_name('player')
             self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",
@@ -129,9 +184,10 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
 
+            window_size = display.get_window_size()
+
             # On rend maintenant toutes les zones de détection de la fenêtre
             for area in self.engine.event_handler.buttons_area:
-                window_size = display.get_window_size()
                 if area[2] == 0:
                     draw.rect(self.window, (255, 255, 0),
                               (area[0][0] * window_size[0], area[0][1] * window_size[0],
@@ -147,6 +203,58 @@ class Renderer:
                 else:
                     draw.rect(self.window, (255, 255, 0),
                               area[0], width=1)
+
+            for area in self.engine.event_handler.sliders_area:
+                if area[1] == 0:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[0],
+                               area[0][2] * window_size[0], area[0][3] * window_size[0]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[0], area[5][1] * window_size[0],
+                               area[5][2] * window_size[0], area[5][3] * window_size[0]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0] - 2, area[0][1] * window_size[0]),
+                              (area[0][0] * window_size[0] + 2, area[0][1] * window_size[0]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] - 2),
+                              (area[0][0] * window_size[0], area[0][1] * window_size[0] + 2))
+                elif area[1] == 1:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[1], (area[0][1]-area[0][3]/2) * window_size[1],
+                               area[0][2] * window_size[1], area[0][3] * window_size[1]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[1], area[5][1] * window_size[1],
+                               area[5][2] * window_size[1], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1] - 2, area[0][1] * window_size[1]),
+                              (area[0][0] * window_size[1] + 2, area[0][1] * window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] - 2),
+                              (area[0][0] * window_size[1], area[0][1] * window_size[1] + 2))
+                elif area[1] == 2:
+                    draw.rect(self.window, (0, 255, 20),
+                              ((area[0][0]-area[0][2]/2) * window_size[0], (area[0][1]-area[0][3]/2) * window_size[1],
+                               area[0][2] * window_size[0], area[0][3] * window_size[1]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              (area[5][0] * window_size[0], area[5][1] * window_size[1],
+                               area[5][2] * window_size[0], area[5][3] * window_size[1]), width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0] - 2, area[0][1]*window_size[1]),
+                              (area[0][0]*window_size[0] + 2, area[0][1]*window_size[1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] - 2),
+                              (area[0][0]*window_size[0], area[0][1]*window_size[1] + 2))
+                else:
+                    draw.rect(self.window, (0, 255, 20),
+                              (area[0][0]-area[0][2]//2, area[0][1]-area[0][3]//2, area[0][2], area[0][3]), width=1)
+                    draw.rect(self.window, (0, 255, 200),
+                              area[5], width=1)
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0]-2, area[0][1]),
+                              (area[0][0]+2, area[0][1]))
+                    draw.line(self.window, (255, 0, 0),
+                              (area[0][0], area[0][1]-2),
+                              (area[0][0], area[0][1]+2))
 
         # Rendu présent dans tous les types de jeu
         self.render_dialogs_box()
@@ -236,6 +344,46 @@ class Renderer:
                         self.window.blit(btn_image, (x, y))
 
                         self.window.blit(rendered_text, (x, y))
+                elif isinstance(widget, Slider):
+                    if widget.hovered:
+                        slider_image = widget.hover_image
+                    else:
+                        slider_image = widget.base_image
+
+                    rail_image = widget.rail_image
+
+                    if widget.is_window_relative == 0:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[0]/self.window_size[0]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[0] / self.window_size[
+                                                            0]))
+                        width = widget.width*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[1]/self.window_size[1],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[1] / self.window_size[1],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * window_size[1]
+                    elif widget.is_window_relative == 2:
+                        slider_image = transform.scale(slider_image,
+                                                       (slider_image.get_width()*window_size[0]/self.window_size[0],
+                                                        slider_image.get_height()*window_size[1]/self.window_size[1]))
+                        rail_image = transform.scale(rail_image,
+                                                       (rail_image.get_width() * window_size[0] / self.window_size[0],
+                                                        rail_image.get_height() * window_size[1] / self.window_size[
+                                                            1]))
+                        width = widget.width * min(window_size[0], window_size[1])
+
+                    self.window.blit(rail_image, (x+(width-rail_image.get_width()) // 2,
+                                                    y - rail_image.get_height() // 2))
+                    self.window.blit(slider_image, (x+widget.value*width-slider_image.get_width()//2,
+                                                    y-slider_image.get_height()//2))
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
@@ -332,8 +480,8 @@ class Renderer:
 
             draw.rect(rendered_surface, part[7], part_dest + (part[2], part[2]))
             part[5] += delta
-            part[0] += part[3]
-            part[1] += part[4]
+            part[0] += part[3]*delta
+            part[1] += part[4]*delta
             if part[5] > part[6]:
                 self.particles.remove(part)
 
@@ -488,3 +636,27 @@ class Renderer:
                               (math.floor(x * self.tile_size - self.engine.camera.x + x_middle_offset),
                                math.floor(y * self.tile_size - self.engine.camera.y + y_middle_offset),
                                self.tile_size, self.tile_size), width=1)
+
+    def fadeout(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, pause_world: bool = True, callback: FunctionType = None):
+        """Fait un fondu vers la couleur au format : (255, 255, 255) et a l'opacité max spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
+        self.fadein_is_fading = False
+        self.fadeout_timer = fade_s
+        self.fadeout_fade_in_s = fade_s
+        self.fadeout_is_fading = True
+        self.fadeout_fade_color = fade_color
+        self.fadeout_fade_opacity = round(fade_opacity * 255 / 100)
+        self.fadeout_pause = pause_world
+        self.fadeout_fade_callback = callback
+        self.engine.entity_manager.pause()
+
+    def fadein(self, fade_s: float, fade_color: tuple[int, int, int] = (0, 0, 0), fade_opacity: int = 100, pause_world: bool = True, callback: FunctionType = None):
+        """Fait un fondu depuis la couleur au format : (255, 255, 255) et depuis l'opacité spécifié, et dans le temps spécifié, appelle la fonction callback une fois le fadout terminé"""
+        self.fadeout_is_fading = False
+        self.fadein_timer = fade_s
+        self.fadein_fade_in_s = fade_s
+        self.fadein_is_fading = True
+        self.fadein_fade_color = fade_color
+        self.fadein_fade_opacity = round(fade_opacity * 255 / 100)
+        self.fadein_pause = pause_world
+        self.fadein_fade_callback = callback
+        self.engine.entity_manager.pause()
