@@ -60,7 +60,7 @@ class Engine:
         self.camera.update()
         self.entity_manager.update(delta)
         self.renderer.update(delta)
-        self.event_handler.update()
+        self.event_handler.update(delta)
         self.event_sheduler.update()
         self.dialogs_manager.update(delta)
         self.sound_manager.update(delta)

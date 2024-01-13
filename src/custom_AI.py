@@ -66,4 +66,4 @@ class WolfAI(MobAI):
 
             # On fait avancer le loup quand il le doit
             if self.comportment == 1:
-                self.entity.move(self.walk_x, self.walk_y, self.map_manager)
+                self.entity.move(self.walk_x, self.walk_y, self.map_manager, delta)

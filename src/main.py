@@ -72,7 +72,7 @@ class Game(Engine):
         player.collision_rect = [-6, -7, 6, 16]
 
         player.set_default_life(15)
-        player.max_speed = 1.1
+        player.max_speed = 64.0
 
         self.entity_manager.set_player_entity("player")
 
@@ -95,7 +95,7 @@ class Game(Engine):
         mob.collision_rect = [-15, -7, 12, 7]
 
         mob.set_default_life(5)
-        mob.max_speed = 1.
+        mob.max_speed = 60.
 
         mob.x, mob.y = 1600, 16
 
