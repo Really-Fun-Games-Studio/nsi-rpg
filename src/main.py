@@ -60,6 +60,15 @@ class Game(Engine):
 
         self.menu_manager.show("main")
 
+        self.create_boss_temple_area()
+
+    def create_boss_temple_area(self):
+        """Enregistre les zones d'entrées de boss fight."""
+        self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: print("temple 1"), ["player"], True)
+        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: print("temple 2"), ["player"], True)
+        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: print("temple 3"), ["player"], True)
+        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: print("temple 4"), ["player"], True)
+
     def create_player_entity(self):
         """Crée une entité joueur."""
 
@@ -84,8 +93,8 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 64.0
-        player.x = 220.
+        player.max_speed = 640.0
+        player.x = 6220.
         player.y = 767.
 
         # On place la caméra au niveau du joueur
