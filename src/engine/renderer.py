@@ -480,8 +480,8 @@ class Renderer:
 
             draw.rect(rendered_surface, part[7], part_dest + (part[2], part[2]))
             part[5] += delta
-            part[0] += part[3]
-            part[1] += part[4]
+            part[0] += part[3]*delta
+            part[1] += part[4]*delta
             if part[5] > part[6]:
                 self.particles.remove(part)
 

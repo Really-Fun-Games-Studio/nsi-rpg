@@ -221,7 +221,7 @@ class EventHandler:
                 if K_p in self.key_pressed:
                     self.engine.renderer.emit_particles(math.floor(self.engine.entity_manager.get_by_name("player").x),
                                                         math.floor(self.engine.entity_manager.get_by_name("player").y),
-                                                        16, 16, 16, 1, 8, 0, 1, 0.2, 1., (0, 200, 200))
+                                                        16, 16, 16, 1, 8, 0, 60., 0.2, 1., (0, 200, 200))
                 if K_o in self.key_pressed:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
