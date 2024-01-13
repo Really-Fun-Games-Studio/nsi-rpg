@@ -19,7 +19,7 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = False
+        self.DEBUG_MODE = True
 
         self.game_state = GameState.MAIN_MENU
 
@@ -81,9 +81,6 @@ class Game(Engine):
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
 
-        player.set_default_life(15)
-        player.max_speed = 64.0
-
         self.entity_manager.set_player_entity("player")
 
         player.shadow = "player_shadow"
@@ -91,7 +88,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 1.5
+        player.max_speed = 64.0
         player.x = 220.
         player.y = 767.
 

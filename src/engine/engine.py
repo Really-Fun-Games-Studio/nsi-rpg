@@ -52,6 +52,8 @@ class Engine:
 
             new_time = time.time_ns()/10E8
             delta = new_time-last_time
+            if delta == 0.:
+                delta = 1/512  # Sécurité pour éviter les divisions par 0 si le delta baisse trop
             last_time = new_time
 
     def update(self, delta: float):
