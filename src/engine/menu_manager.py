@@ -149,7 +149,7 @@ class MenuManager:
                                                                motion_callback=widget.set_value)
 
     def hide(self):
-        """Affiche le menu actuelement à l'écran."""
+        """Cache le menu actuelement à l'écran."""
         # On itère dans tous les bouttons pour retirer l'interaction
         for widget in self.active_menu.widgets:
             if isinstance(widget, Button):

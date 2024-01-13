@@ -33,6 +33,10 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
+        self.renderer.fadein(1, (0, 0, 0), 100, True)
+
+    def play_button_callback(self):
+        self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)
         self.menu_manager.hide()
 
     def setup_main_menu(self):
@@ -47,7 +51,7 @@ class Game(Engine):
         slider_hover_image = pygame.image.load("assets/textures/GUI/slider_cursor_2.png").convert_alpha()
         slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.start_game, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
         self.menu_manager.register_menu(menu, "main")
 
