@@ -93,8 +93,8 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 640.0
-        player.x = 6220.
+        player.max_speed = 64.0
+        player.x = 220.
         player.y = 767.
 
         # On place la caméra au niveau du joueur
