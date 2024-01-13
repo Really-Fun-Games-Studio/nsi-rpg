@@ -57,7 +57,7 @@ class Engine:
     def update(self, delta: float):
         """Fonction qui regroupe toutes les updates des composants. Elle permet de mettre à jour le jeu quand on
         l'appelle."""
-        self.camera.update()
+        self.camera.update(delta)
         self.entity_manager.update(delta)
         self.renderer.update(delta)
         self.event_handler.update(delta)

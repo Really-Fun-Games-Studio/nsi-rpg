@@ -15,11 +15,11 @@ class Camera:
         self.target_y = self.y
         self.target_zoom = self.zoom
 
-        self.smoothness = 20.
+        self.smoothness = 0.5
 
         self.followed_entity: Entity | None = None
 
-    def update(self):
+    def update(self, delta: float):
         """Met à jour la caméra. Permet, par exemple, de faire le scrolling."""
 
         # Si on suit une entité, on met à jour les coordonnées de suivi
@@ -29,9 +29,9 @@ class Camera:
             self.target_y = (self.followed_entity.y + self.followed_entity.mouvements[1] *
                              self.player_moving_offset / self.zoom)
 
-        self.x += (self.target_x - self.x) / self.smoothness
-        self.y += (self.target_y - self.y) / self.smoothness
-        self.zoom += (self.target_zoom - self.zoom) / self.smoothness
+        self.x += (self.target_x - self.x)*delta / self.smoothness
+        self.y += (self.target_y - self.y)*delta / self.smoothness
+        self.zoom += (self.target_zoom - self.zoom)*delta / self.smoothness
 
     def follow_entity(self, entity: Entity | None):
         """Active le suivit de l'entité donnée. Mettre `None` pour retirer le suivit."""
