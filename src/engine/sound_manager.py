@@ -20,7 +20,7 @@ class SoundManager:
         self.music_current_index = 0
         self.music_shuffle_playlist = True
         self.music_next_request = False
-        self.music_set_volume(music_master_volume)
+        self.music_set_volume(100)
 
         self.music_before_pause_pos = 0
         self.music_before_pause_song = ""
@@ -51,14 +51,15 @@ class SoundManager:
             self.sound_hears_y = self.sound_hears_anchor.y
 
         for key in self.sound_global_currently_playing.keys(): # Son globaux
-            sound_container = self.sound_global_currently_playing[key]
+            sound_container: list[mixer.Sound, float, float] = self.sound_global_currently_playing[key]
+
             if sound_container[2] > self.time:
                 self.sound_global_currently_playing.pop(key)
             else:
                 sound_container[0].set_volume(round(sound_global_master_volume / 100 * sound_container[1] / 100, 3))
 
         for key in self.sound_currently_playing.keys(): # Son locaux
-            sound_container = self.sound_currently_playing[key]
+            sound_container: list[mixer.Sound, float, list[float, float], float] = self.sound_currently_playing[key]
             if sound_container[3] > self.time: # Timeout des sons
                 self.sound_currently_playing.pop(key)
 
@@ -110,7 +111,7 @@ class SoundManager:
 
     def music_set_volume(self, new_volume: float):
         """Définit le nouveau volume de la musique"""
-        mixer.music.set_volume((round(self.music_master_volume / 100 * new_volume / 100, 3)))
+        mixer.music.set_volume(round(self.music_master_volume / 100 * new_volume / 100, 3))
     
     def music_pause(self, fade_s: float, restart_tolerance: float = 33):
         """Met en pause la musique, la musique reprendra à la fin de la musique moin la tolérance (en pourcentage)"""
