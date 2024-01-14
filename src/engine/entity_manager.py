@@ -8,6 +8,8 @@ class EntityManager:
         self.entities: dict[str:Entity] = {}
         self.player_entity_name = ""
         self.map_manager = map_manager
+        self.locked_before_pause: list[Entity] = []
+        self.paused = False
 
     def register_entity(self, name: str) -> Entity:
         """Crée une entité et l'enregistre dans un dictionnaire."""
@@ -19,10 +21,10 @@ class EntityManager:
         """Définit l'entité donnée comme le joueur. Elle peut donc être controlée."""
         self.player_entity_name = name
 
-    def move_player_controls(self, x: float, y: float):
+    def move_player_controls(self, x: float, y: float, delta: float):
         """Bouge le joueur. X et y doivent être compris entre 0 et 1"""
         player: Entity = self.get_by_name(self.player_entity_name)
-        player.move(x, y, self.map_manager)
+        player.move(x, y, self.map_manager, delta)
 
     def update(self, delta: float):
         """Met à jour toutes les entités enregistrées."""
@@ -32,7 +34,7 @@ class EntityManager:
             if entity.life_points == 0:
                 self.entities.pop(entity_name)
 
-            if entity.brain is not None:
+            if entity.brain is not None and not self.paused:
                 entity.brain.update(delta)
 
         if self.player_entity_name:
@@ -49,3 +51,21 @@ class EntityManager:
     def get_by_name(self, name: str) -> Entity:
         """Donne l'entité avec le nom donné."""
         return self.entities[name]
+
+    def pause(self):
+        """Met en pause tout les mouvements de toutes les entitées"""
+        for e in self.get_all_entities():
+            if e.locked:
+                self.locked_before_pause.append(e)
+            else:
+                e.lock()
+        self.paused = True
+
+    def resume(self):
+        """Reprend les mouvement de toutes les entitées qui n'étaient pas lock avant l'appel de .pause()"""
+        for e in self.get_all_entities():
+            if not e in self.locked_before_pause:
+                e.unlock()
+        
+        self.paused = False
+        self.locked_before_pause = []

@@ -1,3 +1,5 @@
+import time
+
 from src.engine.boss_fight_manager import BossFightManager
 from src.engine.camera import Camera
 from src.engine.dialogs_manager import DialogsManager
@@ -25,8 +27,6 @@ class Engine:
         # Etat courant du jeu
         self.game_state = GameState.NORMAL
 
-        self.clock = pygame.time.Clock()
-
         self.running = False
 
         # Composants du moteur de jeu
@@ -38,7 +38,7 @@ class Engine:
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
-        self.dialogs_manager = DialogsManager(self.event_handler)
+        self.dialogs_manager = DialogsManager(self)
         self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 
                                   self.settings_manager.get_sound_global_master_volume(),
@@ -49,20 +49,26 @@ class Engine:
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
         Attend jusqu'à la fin du jeu."""
         self.running = True
-        while self.running:
-            self.update()
-            self.clock.tick(60.)
 
-    def update(self):
+        delta = 1.  # Le delta est le temps depuis la dernière image
+        last_time = time.time_ns()/10E8
+        while self.running:
+            self.update(delta)
+
+            new_time = time.time_ns()/10E8
+            delta = new_time-last_time
+            last_time = new_time
+
+    def update(self, delta: float):
         """Fonction qui regroupe toutes les updates des composants. Elle permet de mettre à jour le jeu quand on
         l'appelle."""
-        self.camera.update(self.settings_manager.get_zoom())
-        self.entity_manager.update(0.016666666)
-        self.renderer.update(0.016666666)
-        self.event_handler.update()
+        self.camera.update(delta, self.settings_manager.get_zoom())
+        self.entity_manager.update(delta)
+        self.renderer.update(delta)
+        self.event_handler.update(delta)
         self.event_sheduler.update()
-        self.dialogs_manager.update(0.016666666)
-        self.sound_manager.update(1/60, self.settings_manager.get_music_master_volume(), 
+        self.dialogs_manager.update(delta)
+        self.sound_manager.update(delta, self.settings_manager.get_music_master_volume(), 
                                   self.settings_manager.get_sound_global_master_volume(),
                                   self.settings_manager.get_sound_master_volume())
 
