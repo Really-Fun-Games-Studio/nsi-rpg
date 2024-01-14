@@ -14,20 +14,24 @@ class BossFightManager:
         self.fights = {}
         self.current_fight_id = -1
 
+        self.player_points = -1
+        self.boss_points = -1
+
     def update(self):
         """Met à jour le combat de boss."""
         if self.engine.game_state == GameState.BOSS_FIGHT:
             pass
 
-    def register_fight_data(self, fight_id: int, boss_name: str, boss_life: int, boss_damage_count: int):
+    def register_fight_data(self, fight_id: int, boss_name: str, total_concurrent_points: int, boss_damage_count: int):
         """Enregistre les données permettant de mettre en place le combat."""
-        self.fights[fight_id] = [boss_name, boss_life, boss_damage_count]
+        self.fights[fight_id] = [boss_name, total_concurrent_points, boss_damage_count]
 
     def enter_boss_fight(self, fight_id: int):
         """Entre dans le combat de boss donné."""
         self.current_fight_id = fight_id
         self.engine.sound_manager.music_pause(3)
         self.engine.renderer.fadeout(3, (0, 0, 0), 100, True, self.setup_fight)
+
 
     def setup_fight(self):
         """Met en place le combat."""
@@ -43,4 +47,8 @@ class BossFightManager:
         self.engine.sound_manager.music_set_volume(volume)
 
         self.engine.entity_manager.pause()
+
+        self.player_points = self.fights[self.current_fight_id]
+        self.boss_points = self.fights[self.current_fight_id]
+
         self.engine.game_state = GameState.BOSS_FIGHT

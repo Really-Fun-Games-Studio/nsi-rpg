@@ -16,7 +16,7 @@ class Game(Engine):
         self.dialogs_manager.load_dialogs("assets/dialogs.json")
 
         self.create_player_entity()
-        self.load_boss_fight_assets()
+        self.setup_boss_fight()
         self.spawn_mobs()
 
         self.DEBUG_MODE = True
@@ -35,8 +35,9 @@ class Game(Engine):
         self.setup_main_menu()
 
     def start_game(self):
-        self.game_state = GameState.NORMAL
-        self.renderer.fadein(1, (0, 0, 0), 100, True)
+        #self.game_state = GameState.NORMAL
+        self.boss_fight_manager.enter_boss_fight(1)
+        #self.renderer.fadein(1, (0, 0, 0), 100, True)
 
     def play_button_callback(self):
         self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)
@@ -66,9 +67,12 @@ class Game(Engine):
         """Enregistre les zones d'entrées de boss fight."""
         self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: self.boss_fight_manager.enter_boss_fight(1),
                                           ["player"], True)
-        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: print("temple 2"), ["player"], True)
-        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: print("temple 3"), ["player"], True)
-        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: print("temple 4"), ["player"], True)
+        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: self.boss_fight_manager.enter_boss_fight(2),
+                                          ["player"], True)
+        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: self.boss_fight_manager.enter_boss_fight(3),
+                                          ["player"], True)
+        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: self.boss_fight_manager.enter_boss_fight(4),
+                                          ["player"], True)
 
     def create_player_entity(self):
         """Crée une entité joueur."""
@@ -129,7 +133,7 @@ class Game(Engine):
 
         mob.x, mob.y = 1600, 16
 
-    def load_boss_fight_assets(self):
+    def setup_boss_fight(self):
         """Charge les animations de combat des combats de boss."""
         player_none = Anim(1)
         player_none.load_animation_from_directory("assets/textures/boss_fight/player_big/none")
@@ -139,6 +143,12 @@ class Game(Engine):
         self.renderer.register_boss_fight_boss_animation(boss_none, "none")
 
         self.renderer.boss_fight_GUI_container = pygame.image.load("assets/textures/boss_fight/fight_actions_GUI.png").convert_alpha()
+
+        # On crée les boss
+        self.boss_fight_manager.register_fight_data(1, "Greg", 15, 1)
+        self.boss_fight_manager.register_fight_data(2, "Mark", 18, 2)
+        self.boss_fight_manager.register_fight_data(3, "Steve", 20, 3)
+        self.boss_fight_manager.register_fight_data(4, "The ultra-supra boss", 25, 4)
 
 
 game = Game()
