@@ -29,7 +29,7 @@ class Game(Engine):
 
         self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
 
-        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\boss_fight_1.mp3")
         self.sound_manager.music_start_playlist()
 
         self.setup_main_menu()
@@ -42,8 +42,8 @@ class Game(Engine):
         self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)
         self.menu_manager.hide()
 
-        self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
-        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Bruit de foret pour yannis.mp3")
+        self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\boss_fight_1.mp3")
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\forest_sound.mp3")
         self.sound_manager.music_next()
 
     def setup_main_menu(self):
