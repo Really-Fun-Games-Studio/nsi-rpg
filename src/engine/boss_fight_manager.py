@@ -48,7 +48,7 @@ class BossFightManager:
 
         self.engine.entity_manager.pause()
 
-        self.player_points = self.fights[self.current_fight_id]
-        self.boss_points = self.fights[self.current_fight_id]
+        self.player_points = self.fights[self.current_fight_id][1]
+        self.boss_points = self.fights[self.current_fight_id][1]
 
         self.engine.game_state = GameState.BOSS_FIGHT
