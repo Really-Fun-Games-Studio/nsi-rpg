@@ -489,9 +489,10 @@ class Renderer:
         """Rend les sprites du joueur et du boss lors d'un combat de boss."""
 
         # On rend le fond qui correspond au points des 2 concurents
-        total_point = self.engine.boss_fight_manager.player_points + self.engine.boss_fight_manager.boss_points
+        # La zone est commentée car encore développement
+        """total_point = self.engine.boss_fight_manager.player_points + self.engine.boss_fight_manager.boss_points
         draw.rect(self.window, (75, 50, 255), (0, 0, math.ceil(display.get_window_size()[0]*(self.engine.boss_fight_manager.player_points/total_point)), display.get_window_size()[1]))
-
+        """
 
         # On récupère l'image de l'animation du boss
         boss_animation: Anim = self.boss_fight_boss_animations[self.engine.boss_fight_manager.current_boss_animation]
