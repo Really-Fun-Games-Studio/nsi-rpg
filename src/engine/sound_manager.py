@@ -27,7 +27,7 @@ class SoundManager:
         self.music_is_paused = False
         self.music_pos_delay = 0
 
-        self.sound_currently_playing: dict[float: list[mixer.Sound, float, list[float, float], float]] = {} # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]}
+        self.sound_currently_playing: list[float: list[mixer.Sound, float, Entity | list[float, float], float]] = [] # Format [unique_id : [Sound, max_volume, anchor, stop_at]]
 
         self.sound_loaded: dict[str: mixer.Sound] = {}# Format : {name: mixer.Sound}
         self.sound_global_currently_playing: dict[float: list[mixer.Sound, float, float]] = {} # Format {unique_id: [Sound, volume, stop_at]}
@@ -53,22 +53,27 @@ class SoundManager:
         for key in self.sound_global_currently_playing.keys(): # Son globaux
             sound_container: list[mixer.Sound, float, float] = self.sound_global_currently_playing[key]
 
-            if sound_container[2] > self.time:
+            if sound_container[2] < self.time:
                 self.sound_global_currently_playing.pop(key)
             else:
                 sound_container[0].set_volume(round(sound_global_master_volume / 100 * sound_container[1] / 100, 3))
 
-        for key in self.sound_currently_playing.keys(): # Son locaux
-            sound_container: list[mixer.Sound, float, list[float, float], float] = self.sound_currently_playing[key]
-            if sound_container[3] > self.time: # Timeout des sons
-                self.sound_currently_playing.pop(key)
+        for i, container in enumerate(self.sound_currently_playing): # Son locaux
+            sound_container: list[mixer.Sound, float, Entity, float] = container[1]
+            
+            if sound_container[3] < self.time: # Timeout des sons
+                self.sound_currently_playing.pop(i)
+                print("Popped at", self.time)
 
             else: # Gère le volume en fonction de la position
                 sound = sound_container[0]
                 max_volume = sound_container[1]
-                pos_x, pos_y = sound_container[2]
-                sound.set_volume(max(0, int((round(sound_master_volume / 100 * max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(sound_master_volume / 100 * max_volume / 100, 3)))
+                anchor: Entity = sound_container[2]
+                pos_x = anchor.x
+                pos_y = anchor.y
+                print("New volume is :", max(0, int((max_volume / 100) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (max_volume / 100))
 
+                sound.set_volume(max(0, int((round(max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(max_volume / 100, 3)))
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
             try:
                 if not mixer.music.get_busy() or self.music_next_request:
@@ -175,12 +180,13 @@ class SoundManager:
     def sound_load(self, file_path: str, name: str):
         self.sound_loaded[name] = mixer.Sound(file_path)
     
-    def sound_play(self, name: str, max_volume: float, pos_x: float, pos_y: float):
-        sound = self.sound_loaded[name]
+    def sound_play(self, name: str, max_volume: float, anchor: Entity):
+        sound: mixer.Sound = self.sound_loaded[name]
         stop_at = stop_at = self.time + sound.get_length()
         unique_id = self.create_unique_id()
 
-        self.sound_currently_playing[unique_id] = [sound, max_volume, [pos_x, pos_y], stop_at] # Format {unique_id : [Sound, max_volume, [pos_x, pos_y], stop_at]
+        self.sound_currently_playing.append([unique_id, [sound, max_volume, anchor, stop_at]]) # Format [unique_id : [Sound, max_volume, [anchor], stop_at]]
+        sound.play(10)
         return unique_id
     
     def sound_stop(self, name: str, unique_id: float = None, all: bool = False):

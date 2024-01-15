@@ -5,7 +5,7 @@ from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
 from src.engine.menu_manager import Menu, Label, Button
-
+import time
 
 class Game(Engine):
     def __init__(self):
@@ -93,7 +93,7 @@ class Game(Engine):
 
         player.shadow = "player_shadow"
         self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
-
+        self.sound_manager.sound_link_hears(player)
         self.camera.follow_entity(player)
 
     def spawn_mobs(self):
@@ -112,7 +112,13 @@ class Game(Engine):
         mob.set_default_life(5)
         mob.max_speed = 60.
 
-        mob.x, mob.y = 1600, 16
+        mob.x, mob.y = 100, 16
+        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl1")
+        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl2")
+        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl3")
+        self.sound_manager.sound_play("wolf_growl1", 60, mob)
+
+
 
     def load_boss_fight_assets(self):
         """Charge les animations de combat des combats de boss."""
