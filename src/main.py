@@ -35,9 +35,8 @@ class Game(Engine):
         self.setup_main_menu()
 
     def start_game(self):
-        #self.game_state = GameState.NORMAL
-        self.boss_fight_manager.enter_boss_fight(1)
-        #self.renderer.fadein(1, (0, 0, 0), 100, True)
+        self.game_state = GameState.NORMAL
+        self.renderer.fadein(1, (0, 0, 0), 100, True)
 
     def play_button_callback(self):
         self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)

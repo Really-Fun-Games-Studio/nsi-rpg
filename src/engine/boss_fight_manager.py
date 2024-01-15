@@ -56,17 +56,18 @@ class BossFightManager:
         # Partie à retirer plus tard V
         match self.current_fight_id:
             case 1:
-                self.engine.dialogs_manager.start_dialog("temple_1", self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
+                self.engine.dialogs_manager.start_dialog("temple_1", lambda: self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
             case 2:
-                self.engine.dialogs_manager.start_dialog("temple_2", self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
+                self.engine.dialogs_manager.start_dialog("temple_2", lambda: self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
             case 3:
-                self.engine.dialogs_manager.start_dialog("temple_3", self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
+                self.engine.dialogs_manager.start_dialog("temple_3", lambda: self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(None)))
             case 4:
-                self.engine.dialogs_manager.start_dialog("temple_4", self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(lambda : self.final_temple_end)))
+                self.engine.dialogs_manager.start_dialog("temple_4", lambda: self.engine.renderer.fadeout(2, (0, 0, 0), callback=lambda : self.finish_fight(self.final_temple_end)))
 
     def finish_fight(self, callback):
         """Finie le combat."""
         # Change la musique
+        self.engine.sound_manager.music_pause(0)
         self.engine.sound_manager.music_remove_from_playlist(".\\assets\\OST\\boss_fight_1.mp3")
         self.engine.sound_manager.music_add_to_playlist(".\\assets\\OST\\forest_sound.mp3")
         self.engine.sound_manager.music_start_playlist()
@@ -76,7 +77,7 @@ class BossFightManager:
         self.engine.sound_manager.music_next()
         self.engine.sound_manager.music_set_volume(volume)
 
-        self.engine.entity_manager.pause()
+        self.engine.entity_manager.resume()
 
         self.engine.game_state = GameState.NORMAL
 
