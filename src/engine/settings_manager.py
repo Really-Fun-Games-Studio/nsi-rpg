@@ -1,6 +1,6 @@
 class SettingsManager:
     def __init__(self, default_master_volume: float, default_zoom: float) -> None:
-        self.refresh_rate = 200
+        self.refresh_rate = 30
         self.latency_precision = 100 # Nombre de valeurs de latence stocké (Pour faire la moyenne)
         self.master_volume = default_master_volume
         self.sound_master_volume = 100

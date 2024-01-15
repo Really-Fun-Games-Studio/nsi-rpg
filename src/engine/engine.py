@@ -53,18 +53,11 @@ class Engine:
         Attend jusqu'à la fin du jeu."""
         self.running = True
 
-        self.start_time = time.time()
-        self.frames = 0
 
         # Initialisation ddes valeurs de delta et de last_time
         delta = 1.  # Le delta est le temps depuis la dernière image
         last_time = time.time()
-
-        latency = 0
-
         
-        
-
         while self.running:
             refresh_rate = self.settings_manager.get_refresh_rate()
             if refresh_rate == -1: # Pas de limite, vers l'infini et l'au-delà !!!
@@ -84,9 +77,17 @@ class Engine:
 
 
                 self.update(delta)
+                
+                new_refresh_rate = self.settings_manager.get_refresh_rate()
+                if refresh_rate != new_refresh_rate:
+                    refresh_rate = new_refresh_rate
+                    self.global_latency = 0
+                    self.last_latency = []
 
+                latency = 0
                 latency = delta - 1/refresh_rate
-                if not latency > self.global_latency * 100 or self.global_latency == 0 or self.settings_manager.get_refresh_rate() != refresh_rate: # Impossible que le jeu prenne autant de retard, on skip cette latence dans le calcul, l'utilisateur a surement cliquer hors de la fenêtre
+                
+                if not latency > self.global_latency * 100 or self.global_latency == 0: # Impossible que le jeu prenne autant de retard, on skip cette latence dans le calcul, l'utilisateur a surement cliquer hors de la fenêtre
                     if len(self.last_latency) < self.latency_precision:
                         self.last_latency.append(latency)
                     else:
@@ -100,10 +101,6 @@ class Engine:
                     self.global_latency = n/len(self.last_latency)
 
     def update(self, delta: float):
-        self.frames += 1
-        if time.time() > 50 + self.start_time:
-            print(self.frames/50)
-            exit()
         """Fonction qui regroupe toutes les updates des composants. Elle permet de mettre à jour le jeu quand on
         l'appelle."""
         self.camera.update(delta, self.settings_manager.get_zoom())
