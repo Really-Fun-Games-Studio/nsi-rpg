@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState, EntityDeathResult
-from src.engine.menu_manager import Menu, Label, Button
+from src.engine.menu_manager import Menu, Label, Button, Image
 
 
 class Game(Engine):
@@ -19,7 +19,7 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.MAIN_MENU
 
@@ -49,12 +49,12 @@ class Game(Engine):
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
-        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), "game_title", True, 0))
+        menu.add_widget(Image(0, 0, 1, "C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\textures\\Title_Screen.png", "title_screen_image", False, 2))
 
         btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Button(0.5, 0.4, "play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
         self.menu_manager.register_menu(menu, "main")
 

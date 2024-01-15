@@ -89,6 +89,14 @@ class Button(Widget):
         """Modifie la valeur du hover."""
         self.hovered = state
 
+class Image(Widget):
+    """Un widget d'image."""
+    def __init__(self, x: int | float, y: int | float, size: int | float, image_path: str, widget_name: str, 
+                 centered: bool = False, is_window_relative: int = -1):
+        super().__init__(x, y, is_window_relative, widget_name)
+        self.size = size
+        self.image = pygame.image.load(image_path)
+        self.centered = centered
 
 class Menu:
     """Un menu contenant des widgets."""
