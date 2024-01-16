@@ -417,6 +417,36 @@ class Renderer:
                     else:
                         self.window.blit(image, (x, y))
 
+                elif isinstance(widget, Image):
+                    
+                    if widget.is_window_relative == 0:
+                        size = widget.size*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        size = widget.size*window_size[1]
+                    elif widget.is_window_relative == 2:
+                        size = widget.size*min(window_size[0], window_size[1])
+                    else:
+                        size = widget.size
+
+                    image = widget.image
+
+                    if widget.is_window_relative == 0:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[0]/self.window_size[0]))
+                    elif widget.is_window_relative == 1:
+                        image = transform.scale(image, (image.get_width()*window_size[1]/self.window_size[1],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+                    elif widget.is_window_relative == 2:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+
+                    # On affiche l'image
+                    if widget.centered:
+                        self.window.blit(image, (x-image.get_width()//2,
+                                                     y-image.get_height()//2))
+                    else:
+                        self.window.blit(image, (x, y))
+
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
 

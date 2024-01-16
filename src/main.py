@@ -3,8 +3,9 @@ import pygame.image
 from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
-from src.engine.enums import GameState
+from src.engine.enums import GameState, EntityDeathResult
 from src.engine.menu_manager import Menu, Label, Button, Image
+from pygame.locals import FULLSCREEN, RESIZABLE
 import time
 
 class Game(Engine):
@@ -19,7 +20,7 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.MAIN_MENU
 
@@ -36,6 +37,7 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
+        self.renderer.set_display(FULLSCREEN)
         self.renderer.fadein(1, (0, 0, 0), 100, True)
 
     def play_button_callback(self):
@@ -64,6 +66,9 @@ class Game(Engine):
 
         self.menu_manager.show("main")
     
+        self.create_boss_temple_area()
+
+
     def setup_settings_menu(self):
         """Crée les éléments du menu de paramètre"""
         menu = Menu()
@@ -72,8 +77,18 @@ class Game(Engine):
         #base_image = pygame.image.load("assets\\textures\\GUI\\setting_menu.png")
         #hover_image = pygame.image.load("assets\\textures\\GUI\\setting_menu_hovered.png")
 
+        
+    def create_boss_temple_area(self):
+        """Enregistre les zones d'entrées de boss fight."""
+        self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: print("temple 1"), ["player"], True)
+        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: print("temple 2"), ["player"], True)
+        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: print("temple 3"), ["player"], True)
+        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: print("temple 4"), ["player"], True)
+
     def create_player_entity(self):
         """Crée une entité joueur."""
+
+        # On crée les animations
         anim = Anim(0.5)
         anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
@@ -82,18 +97,33 @@ class Game(Engine):
         anim.load_animation_from_directory("assets/textures/entities/player/walking")
         self.renderer.register_animation(anim, "player_walking")
 
+        # On crée l'entité
         player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
-
-        player.set_default_life(15)
-        player.max_speed = 64.0
+        player.death_result = EntityDeathResult.RESET_LIFE
+        player.death_callback = self.create_player_entity
 
         self.entity_manager.set_player_entity("player")
 
         player.shadow = "player_shadow"
         self.renderer.register_shadow("assets/textures/entities/player/shadow.png", "player_shadow")
-        self.sound_manager.sound_link_hears(player)
+
+        # On définit ses attributs
+        player.set_default_life(15)
+        player.max_speed = 64.0
+        player.x = 220.
+        player.y = 767.
+
+        # On place la caméra au niveau du joueur
+        self.camera.x = player.x
+        self.camera.y = player.y
+        self.camera.target_x = player.x
+        self.camera.target_y = player.y
+
+        # On enregistre l'entité
+        self.entity_manager.set_player_entity("player")
+
         self.camera.follow_entity(player)
 
     def spawn_mobs(self):

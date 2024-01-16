@@ -1,5 +1,6 @@
 import math
 
+from src.engine.enums import EntityDeathResult
 from src.engine.map_manager import MapManager
 from src.engine.mobs_AI import MobAI
 
@@ -41,6 +42,9 @@ class Entity:
         self.animation_name = None
 
         self.shadow = None
+
+        self.death_callback = None
+        self.death_result = EntityDeathResult.REMOVED
 
     def set_default_life(self, life: int):
         """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""

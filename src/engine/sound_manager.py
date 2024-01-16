@@ -156,7 +156,7 @@ class SoundManager:
     def music_remove_from_playlist(self, song_path: str = None, index: int = None):
         if song_path:
             index = self.music_playlist.index(song_path)
-        if index:
+        if index != None:
             self.music_playlist.pop(index)
 
     def music_start_playlist(self):
@@ -168,8 +168,10 @@ class SoundManager:
     def music_playlist_set_shuffle(self, shuffle: bool):
         self.music_shuffle_playlist = shuffle
 
-    def music_next(self):
+    def music_next(self, resume: bool = True):
         self.music_next_request = True
+        if resume:
+            self.music_is_paused = False
 
     def sound_link_hears(self, entity: Entity):
         self.sound_hears_anchor = entity
