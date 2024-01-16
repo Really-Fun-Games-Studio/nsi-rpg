@@ -439,18 +439,18 @@ class Renderer:
 
     def render_debug_area(self, rendered_surface: surface.Surface):
         """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
+        if self.engine.game_state:
+            # On calcule le décalage pour centrer la caméra
+            x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+            y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
-        # On calcule le décalage pour centrer la caméra
-        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
-
-        # On itère et on rend toutes les zones de détection
-        for area in self.engine.event_sheduler.area_callbacks:
-            area_rect = area[0]
-            draw.rect(rendered_surface, (200, 100, 0),
-                      (math.floor(x_middle_offset + area_rect[0] - self.engine.camera.x),
-                       math.floor(y_middle_offset + area_rect[1] - self.engine.camera.y),
-                       math.floor(area_rect[2]), math.floor(area_rect[3])), width=1)
+            # On itère et on rend toutes les zones de détection
+            for area in self.engine.event_sheduler.area_callbacks:
+                area_rect = area[0]
+                draw.rect(rendered_surface, (200, 100, 0),
+                          (math.floor(x_middle_offset + area_rect[0] - self.engine.camera.x),
+                           math.floor(y_middle_offset + area_rect[1] - self.engine.camera.y),
+                           math.floor(area_rect[2]), math.floor(area_rect[3])), width=1)
 
     def register_shadow(self, file_path: str, name: str):
         """Enregistre une image d'ombre utilisée pour le rendu des entités."""
