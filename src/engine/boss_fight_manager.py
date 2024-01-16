@@ -1,4 +1,8 @@
+import random
+
+from src.custom_AI import RickAI
 from src.engine import engine
+from src.engine.animation import Anim
 from src.engine.enums import GameState
 
 
@@ -86,3 +90,16 @@ class BossFightManager:
 
     def final_temple_end(self):
         self.engine.dialogs_manager.start_dialog("out_temple_4")
+        self.engine.event_sheduler.register_area((591, 358, 98, 46), lambda _: self.engine.dialogs_manager.start_dialog("before_door_open", self.end_game), ["player"], True)
+
+    def end_game(self, *_):
+        for i in range(10):
+            anim = Anim(0.1)
+            anim.load_animation_from_directory("assets/textures/entities/rick")
+            entity = self.engine.entity_manager.register_entity(f"rick_{i}")
+            self.engine.renderer.register_animation(anim, f"rick_anim_{i}")
+            entity.link_animation(f"rick_anim_{i}")
+            entity.max_speed = 64.0
+            entity.x = 640.+random.randint(-40, 40)
+            entity.y = 358.+random.randint(-40, 40)
+            entity.set_ai(RickAI, self.engine)

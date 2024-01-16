@@ -23,11 +23,7 @@ class Game(Engine):
 
         self.game_state = GameState.MAIN_MENU
 
-        self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test"), ["player"], False, True)
-
         self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
-
-        self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
 
         self.sound_manager.music_add_to_playlist(".\\assets\\OST\\boss_fight_1.mp3")
         self.sound_manager.music_start_playlist()
