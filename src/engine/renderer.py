@@ -439,7 +439,7 @@ class Renderer:
 
     def render_debug_area(self, rendered_surface: surface.Surface):
         """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
-        if self.engine.game_state:
+        if self.engine.DEBUG_MODE:
             # On calcule le décalage pour centrer la caméra
             x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
             y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
