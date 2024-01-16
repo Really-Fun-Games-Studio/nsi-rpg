@@ -19,7 +19,7 @@ class Game(Engine):
         self.setup_boss_fight()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.MAIN_MENU
 
@@ -95,7 +95,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 640.0
+        player.max_speed = 64.0
         player.x = 220.
         player.y = 767.
 
