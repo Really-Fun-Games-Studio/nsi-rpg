@@ -17,6 +17,7 @@ class EventHandler:
         self.hovered_buttons_area = []
         self.hovered_sliders_area = []
         self.sliders_area = []
+        self.key_cooldown: dict[int: float] = {}
 
     @staticmethod
     def get_click_collision(rect: tuple[float | int, float | int, float | int, float | int], point: tuple[int, int],
@@ -214,6 +215,13 @@ class EventHandler:
             if K_SPACE in self.key_pressed:
                 self.engine.dialogs_manager.next_signal()
                 self.key_pressed.remove(K_SPACE)
+            
+            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0:
+                if not self.engine.settings_manager.menu_is_displaying:
+                    self.engine.settings_manager.show_menu()
+                else:
+                    self.engine.settings_manager.hide_menu()
+                self.cooldown(K_ESCAPE, 0.2)
 
             if self.engine.DEBUG_MODE:
                 if K_l in self.key_pressed:
@@ -231,3 +239,9 @@ class EventHandler:
                     self.engine.settings_manager.zoom *= 1.01
                 if K_c in self.key_pressed:
                     self.engine.settings_manager.zoom *= 0.99
+        
+        for key in self.key_cooldown.keys():
+            self.key_cooldown[key] -= delta
+
+    def cooldown(self, key: int, cooldown: float):
+        self.key_cooldown[key] = cooldown
