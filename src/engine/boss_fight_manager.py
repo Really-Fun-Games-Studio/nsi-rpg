@@ -103,3 +103,14 @@ class BossFightManager:
             entity.x = 640.+random.randint(-40, 40)
             entity.y = 358.+random.randint(-40, 40)
             entity.set_ai(RickAI, self.engine)
+
+            # Change la musique
+            self.engine.sound_manager.music_pause(0)
+            self.engine.sound_manager.music_remove_from_playlist(".\\assets\\OST\\forest_sound.mp3")
+            self.engine.sound_manager.music_add_to_playlist(".\\assets\\OST\\rickrick.mp3")
+            self.engine.sound_manager.music_start_playlist()
+            volume = self.engine.sound_manager.music_get_volume()
+            self.engine.sound_manager.music_set_volume(0)
+            self.engine.sound_manager.music_resume(0)
+            self.engine.sound_manager.music_next()
+            self.engine.sound_manager.music_set_volume(volume/3)
