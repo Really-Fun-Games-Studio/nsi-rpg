@@ -37,7 +37,6 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
-        self.settings_manager.show_menu()
         self.renderer.set_display(FULLSCREEN)
         self.renderer.fadein(1, (0, 0, 0), 100, True)
 

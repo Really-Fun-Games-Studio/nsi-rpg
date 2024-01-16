@@ -1,14 +1,16 @@
 from src.engine import engine
-from src.engine.menu_manager import Menu, Slider, Label
+from src.engine.menu_manager import Menu, Slider, Label, Image
 import pygame
 
 class SettingsManager:
     def __init__(self, engine: 'engine.Engine', default_master_volume: float, default_zoom: float) -> None:
+
         self.engine = engine
+        self.menu_is_displaying = False
+
         self.refresh_rate_list = [-1, 10, 30, 60]
         self.refresh_rate = -1
 
-        self.setup_menu()
 
         self.latency_precision = 100 # Nombre de valeurs de latence stocké (Pour faire la moyenne)
         self.master_volume = default_master_volume
@@ -17,6 +19,8 @@ class SettingsManager:
         self.sound_global_master_volume = 100
 
         self.zoom = default_zoom
+
+        self.setup_menu()
     
     def get_refresh_rate(self):
         return self.refresh_rate
@@ -47,6 +51,8 @@ class SettingsManager:
     def setup_menu(self):
         """Crée les éléments du menu de paramètre"""
         menu = Menu()
+        menu.add_widget(Image(0, 0, 1, ".\\assets\\textures\\Settings_menu.png", "settings_menu_image", False, 2))
+
         menu.add_widget(Label(0, 0.2, "Paramètres", 0.05, (192,192,192), True, 0))
 
         base_image = pygame.image.load("assets\\textures\\GUI\\slider_cursor_1.png")
@@ -61,11 +67,17 @@ class SettingsManager:
 
     def show_menu(self):
         self.engine.entity_manager.pause(True)
+        self.engine.renderer.fadeout(0.5, (0, 0, 0), 60, callback=self.__show_menu_callback)
+        
+    
+    def __show_menu_callback(self):
         self.engine.menu_manager.show("settings")
+        self.menu_is_displaying = True
     
     def hide_menu(self):
+        self.engine.renderer.fadein(0.5, (0, 0, 0), 60, callback=self.engine.entity_manager.resume)
         self.engine.menu_manager.hide()
-        self.engine.entity_manager.resume()
+        self.menu_is_displaying = False
 
     def get_zoom(self):
         return self.zoom

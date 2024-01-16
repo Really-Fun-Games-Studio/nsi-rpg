@@ -201,5 +201,5 @@ class Entity:
 
     def unlock(self):
         """Débloque tout les mouvements de l'entitée"""
-        self.locked_animation = True
+        self.locked_animation = False
         self.locked = False
