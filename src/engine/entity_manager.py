@@ -35,8 +35,10 @@ class EntityManager:
             if entity.life_points == 0:
                 if entity.death_callback is not None:
                     entity.death_callback()
+
                 if entity.death_result == EntityDeathResult.REMOVED:
                     self.entities.pop(entity_name)
+
                 elif entity.death_result == EntityDeathResult.RESET_LIFE:
                     entity.life_points = entity.max_life_points
 
@@ -46,6 +48,7 @@ class EntityManager:
 
         if self.player_entity_name:
             player: Entity = self.get_by_name(self.player_entity_name)
+            
             if player.mouvements[0] != 0. or player.mouvements[1] != 0.:
                 player.link_animation("player_walking")
             else:

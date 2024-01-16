@@ -4,7 +4,6 @@ from src.engine.enums import EntityDeathResult
 from src.engine.map_manager import MapManager
 from src.engine.mobs_AI import MobAI
 
-
 class Entity:
     """Classe permettant de gérer les entités. Créée automatiquement par `EntityManager.register_entity()`"""
 
@@ -61,6 +60,7 @@ class Entity:
     def update(self, delta: float):
         """Met à jour l'entité."""
         self.time += delta
+
 
         # Diminue la valeur du cooldown de dégât
         self.damage_cooldown -= delta

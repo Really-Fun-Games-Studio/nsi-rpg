@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState, EntityDeathResult
-from src.engine.menu_manager import Menu, Label, Button, Image
+from src.engine.menu_manager import Menu, Label, Button, Image, Slider
 from pygame.locals import FULLSCREEN, RESIZABLE
 import time
 
@@ -37,6 +37,7 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
+        self.settings_manager.show_menu()
         self.renderer.set_display(FULLSCREEN)
         self.renderer.fadein(1, (0, 0, 0), 100, True)
 
@@ -69,15 +70,6 @@ class Game(Engine):
         self.create_boss_temple_area()
 
 
-    def setup_settings_menu(self):
-        """Crée les éléments du menu de paramètre"""
-        menu = Menu()
-        menu.add_widget(Label(0, 0.3, "Paramètres", 0.05, (192,192,192), True, 0))
-
-        #base_image = pygame.image.load("assets\\textures\\GUI\\setting_menu.png")
-        #hover_image = pygame.image.load("assets\\textures\\GUI\\setting_menu_hovered.png")
-
-        
     def create_boss_temple_area(self):
         """Enregistre les zones d'entrées de boss fight."""
         self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: print("temple 1"), ["player"], True)
@@ -88,17 +80,18 @@ class Game(Engine):
     def create_player_entity(self):
         """Crée une entité joueur."""
 
+        # On crée l'entité
+        player = self.entity_manager.register_entity("player")
+        
         # On crée les animations
-        anim = Anim(0.5)
+        anim = Anim(0.5, player)
         anim.load_animation_from_directory("assets/textures/entities/player/none")
         self.renderer.register_animation(anim, "player_none")
 
-        anim = Anim(0.1)
+        anim = Anim(0.1, player)
         anim.load_animation_from_directory("assets/textures/entities/player/walking")
         self.renderer.register_animation(anim, "player_walking")
 
-        # On crée l'entité
-        player = self.entity_manager.register_entity("player")
         player.link_animation("player_none")
         player.collision_rect = [-6, -7, 6, 16]
         player.death_result = EntityDeathResult.RESET_LIFE
@@ -129,11 +122,13 @@ class Game(Engine):
     def spawn_mobs(self):
         """Fait apparaitre les mobs de la map."""
 
-        anim = Anim(0.5)
+        mob = self.entity_manager.register_entity("wolf1")
+
+        anim = Anim(0.5, mob)
         anim.load_animation_from_directory("assets/textures/entities/wolf/none")
         self.renderer.register_animation(anim, "wolf_none")
 
-        mob = self.entity_manager.register_entity("wolf1")
+        
         mob.set_ai(WolfAI, self)
 
         mob.link_animation("wolf_none")
