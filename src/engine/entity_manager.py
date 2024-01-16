@@ -62,13 +62,13 @@ class EntityManager:
         """Donne l'entité avec le nom donné."""
         return self.entities[name]
 
-    def pause(self):
+    def pause(self, lock_animation: bool = False):
         """Met en pause tout les mouvements de toutes les entitées"""
         for e in self.get_all_entities():
             if e.locked:
                 self.locked_before_pause.append(e)
             else:
-                e.lock()
+                e.lock(lock_animation)
         self.paused = True
 
     def resume(self):

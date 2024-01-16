@@ -38,8 +38,9 @@ class SoundManager:
 
     def update(self, delta: float, music_master_volume: float, sound_global_master_volume: float, sound_master_volume: float):
         self.__tick += delta
-        self.tick = int(self.__tick / delta)
-        self.time = self.tick * delta
+        if delta != 0:
+            self.tick = int(self.__tick / delta)
+            self.time = self.tick * delta
 
         self.music_master_volume = music_master_volume
         self.sound_global_master_volume = sound_global_master_volume

@@ -75,6 +75,7 @@ class Button(Widget):
                  hover_image: pygame.Surface, widget_name: str, centered: bool = False, is_window_relative: int = -1,
                  area_name: str = "menu_button"):
         super().__init__(x, y, is_window_relative, widget_name)
+        
         self.text = text
         self.size = size
         self.color = color

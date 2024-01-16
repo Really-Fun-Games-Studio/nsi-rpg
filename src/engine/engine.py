@@ -30,7 +30,8 @@ class Engine:
         self.running = False
 
         # Composants du moteur de jeu
-        self.settings_manager = SettingsManager(60, 1.75) # DOIT ABSOLUMENT ETRE EN PREMIER (Sinon les autres composants qui nécessite les settings crash)
+        self.menu_manager = MenuManager(self)
+        self.settings_manager = SettingsManager(self, 60, 1.75) # DOIT ABSOLUMENT ETRE EN PREMIER ET APRES MENU_MANAGER (Sinon les autres composants qui nécessite les settings crash)
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
@@ -39,10 +40,10 @@ class Engine:
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self)
-        self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 
                                   self.settings_manager.get_sound_global_master_volume(),
                                   self.settings_manager.get_sound_master_volume())
+
         
         self.global_latency = 0
         self.last_latency = []

@@ -12,6 +12,7 @@ class Entity:
         self.y = 8
 
         self.locked = False # Variable définissant si l'entité est bloqué ou non (.lock() et .unlock())
+        self.locked_animation = False
 
         self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
 
@@ -192,10 +193,13 @@ class Entity:
         self.animation_name = name
 
 
-    def lock(self):
+    def lock(self, lock_animation: bool = False):
         """Bloque tout les mouvements de l'entitée"""
+        if lock_animation:
+            self.locked_animation = True
         self.locked = True
 
     def unlock(self):
         """Débloque tout les mouvements de l'entitée"""
+        self.locked_animation = True
         self.locked = False
