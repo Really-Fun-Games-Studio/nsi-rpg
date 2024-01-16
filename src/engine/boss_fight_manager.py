@@ -106,7 +106,6 @@ class BossFightManager:
 
             # Change la musique
             self.engine.sound_manager.music_pause(0)
-            self.engine.sound_manager.music_remove_from_playlist(".\\assets\\OST\\forest_sound.mp3")
             self.engine.sound_manager.music_add_to_playlist(".\\assets\\OST\\rickrick.mp3")
             self.engine.sound_manager.music_start_playlist()
             volume = self.engine.sound_manager.music_get_volume()
