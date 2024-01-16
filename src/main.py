@@ -4,7 +4,7 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState
-from src.engine.menu_manager import Menu, Label, Button
+from src.engine.menu_manager import Menu, Label, Button, Image
 import time
 
 class Game(Engine):
@@ -49,7 +49,7 @@ class Game(Engine):
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
-        menu.add_widget(Label(0.5, 0.1, "The Forest's Secret", 0.1, (0, 0, 0), "game_title", True, 0))
+        menu.add_widget(Image(0, 0, 1, ".\\assets\\textures\\Title_Screen.png", "title_screen_image", False, 2))
 
         btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
@@ -58,7 +58,7 @@ class Game(Engine):
         slider_hover_image = pygame.image.load("assets/textures/GUI/slider_cursor_2.png").convert_alpha()
         slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
 
-        menu.add_widget(Button(0.5, 0.3, "Play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Button(0.5, 0.4, "Play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
         self.menu_manager.register_menu(menu, "main")
 
@@ -112,11 +112,7 @@ class Game(Engine):
         mob.set_default_life(5)
         mob.max_speed = 60.
 
-        mob.x, mob.y = 100, 16
-        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl1")
-        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl2")
-        self.sound_manager.sound_load("C:\\Users\\kerri\\Downloads\\Code\\nsi-rpg\\assets\\sounds\\wolf\\growl1.ogg", "wolf_growl3")
-        self.sound_manager.sound_play("wolf_growl1", 60, mob)
+        mob.x, mob.y = 1600, 16
 
 
 
