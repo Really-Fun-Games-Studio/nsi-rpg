@@ -1,8 +1,8 @@
 {
-  "temple_1": ["Mmmhhh...", "Le premier templier ne semble pas être là ...", "Il doit être partit en vacance...", "Les templiers ne sont jamais là quand on veut leur parler ...", "Oh !", "Il a laissé la première clé sur la table !", "Bon et bien le combat était facile ..."],
-  "temple_2": ["Quoi !?", "Encore ?!", "Mais que font-ils ?", "Les deux premiers templiers ont disparue !...", "Mais ?!", "Sa clé est encore sur la table !", "Bon et bien j'aurrais ouvert la porte avant la fin de la journée alors ..."],
-  "temple_3": ["Euuh...", "Il y a quelque chose qui ne va pas...", "Mais que font ils ?", "Et bien évidament, il a aussi laissé la clé sur la table ...", "Comme par hazard !..."],
-  "temple_4": ["Bon et bien cela n'a pas de sens...", "Je n'ai jamais vue ça ...", "Les templiers les plus puissant du monde qu'on me disait...", "Mon oeil oui ..."],
-  "out_temple_4": ["Bon, je dois maintenant retrouver la porte ..."],
-  "before_door_open": ["Je vais être la première personne à découvrir ce qui se cache vraiment derrière cette porte !", "Oh mais...", "Qu'est ce que c'est ?"]
+  "temple_1": ["Mmmhhh...", "Le premier templier ne semble pas être là.", "Il doit certainement être partit en vacances...", "Les templiers ne sont jamais là quand on veut leur parler !", "Oh !", "Il a laissé un fragment de clé sur la table !", "Bon et bien ce n’était pas si difficile que ça."],
+  "temple_2": ["Il y a quelqu'un ?", "...", "Personne...", "Mais où sont-ils ?", "Les templiers sont introuvables !", "Mais ?!", "Son fragment de clé est encore sur la table !", "C’est une situation bien étrange...", "Mais a ce rythme-là j'aurais ouvert cette mystérieuse porte avant la fin de la journée."],
+  "temple_3": ["Toujours personne en vue...", "Quelque chose ne va pas...", "Mais que font-ils ?", "Et bien évidement, il a aussi laissé le fragment de sa clé sur la table !"],
+  "temple_4": ["Encore disparu !?", "Le panneau disait pourtant que je les trouverais dans ces temples...", "Les templiers les plus puissant du monde qu'on me disait...", "Les rois du cache-cache oui !", "Mais ?!", "Ce fragment !", "C'est le dernier fragment de la clé !"],
+  "out_temple_4": ["Quelque chose ne vraiment pas...", "Je dois vite retourner ouvrir cette porte et découvrir ce qui se passe ici"],
+  "before_door_open": ["Enfin !", "Nous y voilà !", "Je dois vraiment découvrir ce qu’il se passe ici !", "Oh mais...", "Qu'est-ce que c'est ?"]
 }
