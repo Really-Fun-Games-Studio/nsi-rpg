@@ -17,20 +17,16 @@ class Game(Engine):
         self.dialogs_manager.load_dialogs("assets/dialogs.json")
 
         self.create_player_entity()
-        self.load_boss_fight_assets()
+        self.setup_boss_fight()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = True
+        self.DEBUG_MODE = False
 
         self.game_state = GameState.MAIN_MENU
 
-        self.event_sheduler.register_area((64, 64, 32, 32), lambda _: self.dialogs_manager.start_dialog("test"), ["player"], False, True)
-
         self.renderer.dialogs_box = pygame.image.load("assets/textures/GUI/dialogs_box.png").convert_alpha()
 
-        self.event_handler.register_button_area((0, 0, 0.1, 0.1), lambda : print("salut"), 0)
-
-        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\boss_fight_1.mp3")
         self.sound_manager.music_start_playlist()
 
         self.setup_main_menu()
@@ -45,8 +41,8 @@ class Game(Engine):
         self.renderer.fadeout(1, (0, 0, 0), 100, True, self.start_game)
         self.menu_manager.hide()
 
-        self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\Main Title (Y'as pas de boss la donc jpp le mettre pour un fight).mp3")
-        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\Bruit de foret pour yannis.mp3")
+        self.sound_manager.music_remove_from_playlist(".\\assets\\OST\\boss_fight_1.mp3")
+        self.sound_manager.music_add_to_playlist(".\\assets\\OST\\forest_sound.mp3")
         self.sound_manager.music_next()
 
     def setup_main_menu(self):
@@ -72,10 +68,14 @@ class Game(Engine):
 
     def create_boss_temple_area(self):
         """Enregistre les zones d'entrées de boss fight."""
-        self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: print("temple 1"), ["player"], True)
-        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: print("temple 2"), ["player"], True)
-        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: print("temple 3"), ["player"], True)
-        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: print("temple 4"), ["player"], True)
+        self.event_sheduler.register_area((3104, 608, 48, 16), lambda _: self.boss_fight_manager.enter_boss_fight(1),
+                                          ["player"], True)
+        self.event_sheduler.register_area((4544, 592, 48, 16), lambda _: self.boss_fight_manager.enter_boss_fight(2),
+                                          ["player"], True)
+        self.event_sheduler.register_area((5664, 688, 32, 16), lambda _: self.boss_fight_manager.enter_boss_fight(3),
+                                          ["player"], True)
+        self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: self.boss_fight_manager.enter_boss_fight(4),
+                                          ["player"], True)
 
     def create_player_entity(self):
         """Crée une entité joueur."""
@@ -104,7 +104,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 64.0
+        player.max_speed = 64.0 # Default = 64.0
         player.x = 220.
         player.y = 767.
 
@@ -139,9 +139,7 @@ class Game(Engine):
 
         mob.x, mob.y = 1600, 16
 
-
-
-    def load_boss_fight_assets(self):
+    def setup_boss_fight(self):
         """Charge les animations de combat des combats de boss."""
         player_none = Anim(1)
         player_none.load_animation_from_directory("assets/textures/boss_fight/player_big/none")
@@ -151,6 +149,12 @@ class Game(Engine):
         self.renderer.register_boss_fight_boss_animation(boss_none, "none")
 
         self.renderer.boss_fight_GUI_container = pygame.image.load("assets/textures/boss_fight/fight_actions_GUI.png").convert_alpha()
+
+        # On crée les boss
+        self.boss_fight_manager.register_fight_data(1, "Greg", 15, 1)
+        self.boss_fight_manager.register_fight_data(2, "Mark", 18, 2)
+        self.boss_fight_manager.register_fight_data(3, "Steve", 20, 3)
+        self.boss_fight_manager.register_fight_data(4, "The ultra-supra boss", 25, 4)
 
 
 game = Game()

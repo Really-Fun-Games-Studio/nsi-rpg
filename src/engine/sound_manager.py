@@ -76,11 +76,10 @@ class SoundManager:
 
                 sound.set_volume(max(0, int((round(max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(max_volume / 100, 3)))
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
-            try:
-                if not mixer.music.get_busy() or self.music_next_request:
-                    if self.music_next_request:
-                        self.music_next_request = False
-                        mixer.music.fadeout(1)
+            if mixer.get_init() and (not mixer.music.get_busy() or self.music_next_request):
+                if self.music_next_request:
+                    self.music_next_request = False
+                    mixer.music.fadeout(1)
 
                     if len(self.music_playlist) == 0:
                         pass

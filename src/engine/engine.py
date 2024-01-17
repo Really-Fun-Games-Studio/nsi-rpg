@@ -37,7 +37,6 @@ class Engine:
         self.map_manager = MapManager()
         self.camera = Camera(self.DEBUG_MODE, self.settings_manager.get_zoom())
         self.entity_manager = EntityManager(self.map_manager)
-        self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self)
         self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 

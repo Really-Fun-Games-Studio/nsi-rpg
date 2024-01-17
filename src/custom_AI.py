@@ -67,3 +67,60 @@ class WolfAI(MobAI):
             # On fait avancer le loup quand il le doit
             if self.comportment == 1:
                 self.entity.move(self.walk_x, self.walk_y, self.map_manager, delta)
+
+class RickAI(MobAI):
+    def __init__(self, entity: 'Entity', entity_manager: 'EntityManager', map_manager: 'MapManager'):
+        super().__init__(entity, entity_manager, map_manager)
+
+        self.ATTACK_DISTANCE = 1600
+        self.timer = 0
+        self.walk_x = 0
+        self.walk_y = 0
+        self.comportment = 0  # 0 : waiting, 1: walking
+
+    def update(self, delta: float):
+        """Fonction executée à chaque tick pour chaque rick et qui gère l'IA."""
+
+        # On récupère l'entité joueur
+        player: Entity = self.entity_manager.get_by_name(self.entity_manager.player_entity_name)
+
+        # On calcule la distance en x et en y entre le loup et le joueur
+        x_distance = (player.x - self.entity.x)
+        y_distance = (player.y - self.entity.y)
+
+        # On calcule la distance
+        player_distance = math.sqrt(x_distance ** 2 + y_distance ** 2)
+
+        # On vérifie que le loup peut voir le joueur
+        if player_distance <= self.ATTACK_DISTANCE:
+            # On rétablit la vitesse du rick à 60
+            self.entity.max_speed = 60.
+
+            # Si le loup n'est pas déja sur le joueur, on le fait s'en raprocher
+            if player_distance > 60.:
+                self.entity.move(x_distance / player_distance*self.entity.max_speed,
+                                 y_distance / player_distance*self.entity.max_speed, self.map_manager, delta)
+
+        else:
+            # Comportement d'attente
+
+            # On diminue la vitesse
+            self.entity.max_speed = 30.
+
+            self.timer -= delta
+            # Si le timer est fini et que le rick était en train d'attendre, il commence à marcher
+            if self.timer <= 0 and self.comportment == 0:
+                self.comportment = 1
+                self.timer = random.random() * 5.
+
+                # On choisit la direction
+                self.walk_x = (random.random()-0.5)*2
+                self.walk_y = (random.random()-0.5)*2
+            # Si le timer est fini et que le rick était de marcher, il commence à attendre
+            elif self.timer <= 0 and self.comportment == 1:
+                self.comportment = 0
+                self.timer = random.random() * 3
+
+            # On fait avancer le loup quand il le doit
+            if self.comportment == 1:
+                self.entity.move(self.walk_x, self.walk_y, self.map_manager, delta)
