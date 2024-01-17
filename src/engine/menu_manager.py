@@ -37,7 +37,8 @@ class Slider(Widget):
                  widget_name: str,
                  value_changed_callback: FunctionType | classmethod | staticmethod | None = None,
                  is_window_relative: int = -1,
-                 area_name: str = "menu_slider"):
+                 area_name: str = "menu_slider", 
+                 default_value: float = 0.):
         super().__init__(area_rect[0], area_rect[1], is_window_relative, widget_name)
         self.base_image = base_image
         self.hover_image = hover_image
@@ -47,7 +48,7 @@ class Slider(Widget):
         self.hovered = False
         self.follow_mouse = False
         self.cursor_size = cursor_size
-        self.value = 0.
+        self.value = default_value
         self.width = width
 
     def set_hover_state(self, state: bool):
