@@ -95,7 +95,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 64.0
+        player.max_speed = 64.0 # Default = 64.0
         player.x = 220.
         player.y = 767.
 
