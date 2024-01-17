@@ -67,9 +67,10 @@ class EventHandler:
                              clicked_callback: FunctionType | classmethod | staticmethod = None,
                              released_callback: FunctionType | classmethod | staticmethod = None,
                              motion_callback: FunctionType | classmethod | staticmethod = None,
-                             hover_callback: FunctionType | classmethod | staticmethod = None):
+                             hover_callback: FunctionType | classmethod | staticmethod = None,
+                             default_values: tuple[int, int] = (0., 0.)):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
-        self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0),
+        self.sliders_area.append([[motion_rect[0]+default_values[0]*motion_rect[2], motion_rect[1]+default_values[1]*motion_rect[3], *size], is_window_relative, False, default_values,
                                   motion_axes, motion_rect,
                                   clicked_callback, released_callback, hover_callback, motion_callback, name])
         # Le premier booléen correspond à l'état de suivi de la souris

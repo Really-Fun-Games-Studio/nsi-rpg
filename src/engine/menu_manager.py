@@ -156,7 +156,8 @@ class MenuManager:
                                                                widget.area_name,
                                                                widget.is_window_relative,
                                                                hover_callback=widget.set_hover_state,
-                                                               motion_callback=widget.set_value)
+                                                               motion_callback=widget.set_value,
+                                                               default_values=(widget.value, 0.))
 
     def hide(self):
         """Cache le menu actuelement à l'écran."""
