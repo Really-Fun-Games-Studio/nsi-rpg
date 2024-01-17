@@ -48,13 +48,17 @@ class Game(Engine):
     def setup_main_menu(self):
         """Crée les éléments du menu principal."""
         menu = Menu()
-        menu.add_widget(Image(0, 0, 1, ".\\assets\\textures\\Title_Screen.png", "title_screen_image", False, 2))
+        menu.add_widget(Image(0, 0, 1, ".\\assets\\textures\\title_screen\\Title Screen.png", "title_screen_image", False, 2))
+        menu.add_widget(Image(0.09, 0.05, 1, ".\\assets\\textures\\title_screen\\Word The.png", "title_screen_word_the", False, 2))
+        menu.add_widget(Image(0.3, 0.1, 1, ".\\assets\\textures\\title_screen\\Word Forest.png", "title_screen_word_forest", False, 2))
+        menu.add_widget(Image(0.54, 0.06, 1, ".\\assets\\textures\\title_screen\\Word 's.png", "title_screen_word_'s'", False, 2))
+        menu.add_widget(Image(0.62, 0.05, 1, ".\\assets\\textures\\title_screen\\Word Secret.png", "title_screen_word_secret", False, 2))
 
         btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
 
-        menu.add_widget(Button(0.5, 0.4, "Play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Button(0.5, 0.4, "Play", 0.03, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
         self.menu_manager.register_menu(menu, "main")
 

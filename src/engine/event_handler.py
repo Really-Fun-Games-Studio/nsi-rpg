@@ -217,7 +217,7 @@ class EventHandler:
                 self.engine.dialogs_manager.next_signal()
                 self.key_pressed.remove(K_SPACE)
             
-            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0 and self.engine.game_state == GameState.NORMAL:
+            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0 and self.engine.game_state == GameState.NORMAL and not (self.engine.renderer.fadein_is_fading or self.engine.renderer.fadeout_is_fading):
                 if not self.engine.settings_manager.menu_is_displaying:
                     self.engine.settings_manager.show_menu()
                 else:

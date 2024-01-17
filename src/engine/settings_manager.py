@@ -14,7 +14,7 @@ class SettingsManager:
         self.menu_fade_time = 0.3
 
         self.screen_max_resolution = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-        self.screen_resolution = (600, 600)
+        self.screen_resolution = (1280, 720)
         self.screen_mode = RESIZABLE
         self.screen_resolution_list = [(854, 480), (1280, 720), (1366, 768), (1920, 1080), (2560, 1440), (3840, 2160), (7680, 4320), self.screen_max_resolution] # 16:9
 
