@@ -20,7 +20,7 @@ class Game(Engine):
         self.load_boss_fight_assets()
         self.spawn_mobs()
 
-        self.DEBUG_MODE = False
+        self.DEBUG_MODE = True
 
         self.game_state = GameState.MAIN_MENU
 

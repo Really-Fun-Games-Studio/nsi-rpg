@@ -81,6 +81,7 @@ class Engine:
                 
                 new_refresh_rate = self.settings_manager.get_refresh_rate()
                 if refresh_rate != new_refresh_rate:
+                    print(f"New refresh rate ! Before : {refresh_rate} New : {new_refresh_rate}")
                     refresh_rate = new_refresh_rate
                     self.global_latency = 0
                     self.last_latency = []
