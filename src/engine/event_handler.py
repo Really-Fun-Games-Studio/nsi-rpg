@@ -5,7 +5,7 @@ from pygame import event, display
 from pygame.locals import *
 
 import src.engine.engine as engine
-
+from src.engine.enums import GameState
 
 class EventHandler:
     """Classe utilisée pour traiter les pygame.event.get() et gérer les interactions avec le reste du programme."""
@@ -216,12 +216,22 @@ class EventHandler:
                 self.engine.dialogs_manager.next_signal()
                 self.key_pressed.remove(K_SPACE)
             
-            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0:
+            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0 and self.engine.game_state == GameState.NORMAL:
                 if not self.engine.settings_manager.menu_is_displaying:
                     self.engine.settings_manager.show_menu()
                 else:
                     self.engine.settings_manager.hide_menu()
-                self.cooldown(K_ESCAPE, 0.2)
+                self.cooldown(K_ESCAPE, self.engine.settings_manager.menu_fade_time)
+            
+            if K_F11 in self.key_pressed and self.key_cooldown.get(K_F11, 0) <= 0:
+                screen_mode = self.engine.settings_manager.get_screen_mode()
+                if screen_mode == FULLSCREEN:
+                    self.engine.settings_manager.set_screen_mode(RESIZABLE)
+
+                elif screen_mode == RESIZABLE:
+                    self.engine.settings_manager.set_screen_mode(FULLSCREEN)
+
+                self.cooldown(K_F11, 0.2)
 
             if self.engine.DEBUG_MODE:
                 if K_l in self.key_pressed:
@@ -241,7 +251,8 @@ class EventHandler:
                     self.engine.settings_manager.zoom *= 0.99
         
         for key in self.key_cooldown.keys():
-            self.key_cooldown[key] -= delta
+            if key not in self.key_pressed:
+                self.key_cooldown[key] -= delta
 
     def cooldown(self, key: int, cooldown: float):
         self.key_cooldown[key] = cooldown
