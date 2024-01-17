@@ -17,11 +17,9 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.fullscreen_size = display.Info().current_w, display.Info().current_h
         self.timer = 0 # Timer local
-        self.window_type = RESIZABLE
-        self.window_size = self.fullscreen_size if self.window_type == FULLSCREEN else (
-        600, 600)
+        self.window_type = self.engine.settings_manager.get_screen_mode()
+        self.window_size = self.engine.settings_manager.get_screen_resolution()
         self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
         self.tile_size = 0
@@ -169,7 +167,11 @@ class Renderer:
                 a = self.fadein_timer / self.fadein_fade_in_s * self.fadein_fade_opacity
                 gui_surface.fill((r, g, b, a))
 
+        if self.engine.settings_manager.menu_is_displaying:
+            gui_surface.fill((0, 0, 0, self.engine.settings_manager.get_menu_background_opacity()))
+
         self.window.blit(gui_surface, (0, 0))
+
 
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
@@ -451,7 +453,7 @@ class Renderer:
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
 
         # Rend le conteneur des dialogues
-        if self.engine.dialogs_manager.reading_dialog:
+        if self.engine.dialogs_manager.reading_dialog and not self.engine.settings_manager.menu_is_displaying:
             resized_box = transform.scale(self.dialogs_box,
                                           (display.get_window_size()[0],
                                            self.dialogs_box.get_height() / self.dialogs_box.get_width() *
@@ -725,7 +727,6 @@ class Renderer:
     
     def set_display(self, window_type: FULLSCREEN | RESIZABLE, size: tuple[int, int] = None):
         self.window_type = window_type
-        self.window_size = self.fullscreen_size if self.window_type == FULLSCREEN else (
-        size[0], size[1])
+        self.window_size = size
         self.window = display.set_mode(self.window_size, self.window_type)
         display.flip()
