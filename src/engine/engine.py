@@ -34,9 +34,9 @@ class Engine:
         self.map_manager = MapManager()
         self.camera = Camera()
         self.entity_manager = EntityManager(self.map_manager)
-        self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self)
+        self.boss_fight_manager = BossFightManager(self)
         self.menu_manager = MenuManager(self)
         self.sound_manager = SoundManager(60)
 
