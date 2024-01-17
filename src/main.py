@@ -37,7 +37,8 @@ class Game(Engine):
 
     def start_game(self):
         self.game_state = GameState.NORMAL
-        self.renderer.set_display(FULLSCREEN)
+        self.settings_manager.set_screen_resolution(max_res=True)
+        self.settings_manager.set_screen_mode(FULLSCREEN)
         self.renderer.fadein(1, (0, 0, 0), 100, True)
 
     def play_button_callback(self):
