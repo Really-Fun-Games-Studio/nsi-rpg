@@ -53,9 +53,6 @@ class Game(Engine):
         btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
         btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
 
-        slider_base_image = pygame.image.load("assets/textures/GUI/slider_cursor_1.png").convert_alpha()
-        slider_hover_image = pygame.image.load("assets/textures/GUI/slider_cursor_2.png").convert_alpha()
-        slider_rail_image = pygame.image.load("assets/textures/GUI/slider_rail_1.png").convert_alpha()
 
         menu.add_widget(Button(0.5, 0.4, "Play", 0.08, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
@@ -104,7 +101,7 @@ class Game(Engine):
 
         # On définit ses attributs
         player.set_default_life(15)
-        player.max_speed = 64.0 # Default = 64.0
+        player.max_speed = 500. # Default = 64.0
         player.x = 220.
         player.y = 767.
 

@@ -75,6 +75,7 @@ class SoundManager:
                 print("New volume is :", max(0, int((max_volume / 100) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (max_volume / 100))
 
                 sound.set_volume(max(0, int((round(max_volume / 100, 3)) - sqrt((pos_x - self.sound_hears_x) ** 2 + (pos_y - self.sound_hears_y) ** 2))) / (round(max_volume / 100, 3)))
+
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
             if mixer.get_init() and (not mixer.music.get_busy() or self.music_next_request):
                 if self.music_next_request:
@@ -100,6 +101,7 @@ class SoundManager:
 
                             elif len(self.music_playlist) - 1 <= just_played_index: # Dernier son de la playlist / la playlist a rétréci entre temps
                                 self.music_current_index = 0
+                                print("Triggered")
                                 self.__music_play(self.music_playlist[0]) # Recommence depuis le début de la playlist
 
                             else:
@@ -111,8 +113,6 @@ class SoundManager:
                             self.music_current_index = new_index
                             self.__music_play(self.music_playlist[new_index])
 
-            except error:
-                pass
 
 
     def music_get_volume(self):

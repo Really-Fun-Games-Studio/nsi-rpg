@@ -101,7 +101,7 @@ class BossFightManager:
 
         if callback is not None:
             callback()
-            
+
         if self.keys == 4:
             self.final_temple_end()
 

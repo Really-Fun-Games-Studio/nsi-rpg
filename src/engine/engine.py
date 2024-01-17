@@ -37,6 +37,7 @@ class Engine:
         self.map_manager = MapManager()
         self.camera = Camera(self.DEBUG_MODE, self.settings_manager.get_zoom())
         self.entity_manager = EntityManager(self.map_manager)
+        self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self)
         self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 
@@ -80,7 +81,6 @@ class Engine:
                 
                 new_refresh_rate = self.settings_manager.get_refresh_rate()
                 if refresh_rate != new_refresh_rate:
-                    print(f"New refresh rate ! Before : {refresh_rate} New : {new_refresh_rate}")
                     refresh_rate = new_refresh_rate
                     self.global_latency = 0
                     self.last_latency = []
