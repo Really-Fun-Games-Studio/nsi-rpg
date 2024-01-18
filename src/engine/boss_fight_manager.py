@@ -48,6 +48,7 @@ class BossFightManager:
 
     def player_at_door(self):
         if self.keys != 4:
+            self.engine.dialogs_manager.start_dialog("at_door_not_4_keys")
             return
 
     def setup_fight(self):

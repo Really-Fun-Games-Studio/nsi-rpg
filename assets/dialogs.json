@@ -1,4 +1,5 @@
 {
+  "at_door_not_4_keys": ["Oh !", "Voici enfin la porte dont on m'a tant parlé !", "J'ai marché longtemps avant de la trouver !", "La légende raconte qu'un grand secret se cache derrière mais personne n'a jamais réussit à l'ouvrir...", "Pour y arriver, il faut récupérer 4 fragments de clés détenus par 4 templiers.", "Il paraît qu'ils vivent dans des temples non loin d'ici."],
   "temple_1": ["Mmmhhh...", "Le premier templier ne semble pas être là.", "Il doit certainement être partit en vacances...", "Les templiers ne sont jamais là quand on veut leur parler !", "Oh !", "Il a laissé un fragment de clé sur la table !", "Bon et bien ce n’était pas si difficile que ça."],
   "temple_2": ["Il y a quelqu'un ?", "...", "Personne...", "Mais où sont-ils ?", "Les templiers sont introuvables !", "Mais ?!", "Son fragment de clé est encore sur la table !", "C’est une situation bien étrange...", "Mais a ce rythme-là j'aurais ouvert cette mystérieuse porte avant la fin de la journée."],
   "temple_3": ["Toujours personne en vue...", "Quelque chose ne va pas...", "Mais que font-ils ?", "Et bien évidement, il a aussi laissé le fragment de sa clé sur la table !"],
