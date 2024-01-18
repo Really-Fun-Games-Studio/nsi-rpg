@@ -55,7 +55,7 @@ class SettingsManager:
 
 
         menu.add_widget(Slider((0.03, 0.03), (0.45, 0.4), 0.1, base_image, hover_image, rail_image, "menu_fps_rail",
-                               self.set_refresh_rate, 0, "menu_fps_slider_area"))
+                               self.set_menu_refresh_rate, 0, "menu_fps_slider_area"))
         
         menu.add_widget(Label(0.5, 0.35, self.get_refresh_rate_text(), 0.02, (0, 0, 0), "menu_fps_text", True, 0))
         self.engine.menu_manager.register_menu(menu, "settings_menu")
@@ -69,6 +69,10 @@ class SettingsManager:
                                self.menu_set_screen_resolution, 0, "menu_screen_res_rail_area"))
         
         menu.add_widget(Label(0.5, 0.05, f"Resolution : {self.screen_max_resolution[0]}p x {self.screen_max_resolution[1]}p", 0.02, (0, 0, 0), "menu_screen_res_text", True, 0))
+
+        # menu.add_widget(Slider((0.03, 0.03), (0.45, 0.4), 0.1, base_image, hover_image, rail_image, "menu_zoom_rail",
+        #                        self.menu_set_zoom, 0, "menu_zoom_slider_area"))
+        # menu.add_widget(Label(0.5, 0.7, self.get_zoom_text(), 0.02, (0, 0, 0)))
 
 
     def __show_menu_callback(self):
@@ -106,7 +110,7 @@ class SettingsManager:
         
         return f"FPS : {refresh_rate}"
     
-    def set_refresh_rate(self, value: float):
+    def set_menu_refresh_rate(self, value: float):
         if len(self.refresh_rate_list) == 0:
             self.refresh_rate_new_value = -1
         else:
