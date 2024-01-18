@@ -31,6 +31,8 @@ class SettingsManager:
         self.sound_global_master_volume = 100
 
         self.zoom = default_zoom
+        self.base_zoom = default_zoom
+        self.zoom_new_value = None
 
         self.setup_menu()
     
@@ -58,7 +60,7 @@ class SettingsManager:
                                self.set_menu_refresh_rate, 0, "menu_fps_slider_area"))
         
         menu.add_widget(Label(0.5, 0.35, self.get_refresh_rate_text(), 0.02, (0, 0, 0), "menu_fps_text", True, 0))
-        self.engine.menu_manager.register_menu(menu, "settings_menu")
+        
 
 
         base_image2 = pygame.image.load("assets\\textures\\GUI\\slider_cursor_1.png")
@@ -70,9 +72,12 @@ class SettingsManager:
         
         menu.add_widget(Label(0.5, 0.05, f"Resolution : {self.screen_max_resolution[0]}p x {self.screen_max_resolution[1]}p", 0.02, (0, 0, 0), "menu_screen_res_text", True, 0))
 
-        # menu.add_widget(Slider((0.03, 0.03), (0.45, 0.4), 0.1, base_image, hover_image, rail_image, "menu_zoom_rail",
-        #                        self.menu_set_zoom, 0, "menu_zoom_slider_area"))
-        # menu.add_widget(Label(0.5, 0.7, self.get_zoom_text(), 0.02, (0, 0, 0)))
+        menu.add_widget(Slider((0.03, 0.03), (0.45, 0.4), 0.1, base_image, hover_image, rail_image, "menu_zoom_rail",
+                               self.menu_set_zoom, 0, "menu_zoom_slider_area"))
+        menu.add_widget(Label(0.5, 0.7, self.get_zoom_text(), 0.02, (0, 0, 0), "menu_zoom_text", True, 0))
+
+
+        self.engine.menu_manager.register_menu(menu, "settings_menu")
 
 
     def __show_menu_callback(self):
@@ -95,6 +100,10 @@ class SettingsManager:
         if self.screen_resolution_new_value is not None:
             self.set_screen_resolution(self.screen_resolution_new_value)
             self.screen_resolution_new_value = None
+        
+        if self.zoom_new_value is not None:
+            self.zoom = self.zoom_new_value
+            self.zoom_new_value = None
 
     def get_refresh_rate(self):
         if self.menu_is_displaying:
@@ -175,9 +184,13 @@ class SettingsManager:
         print("Thanks for playing !")
         self.engine.running = False
 
-
+    def menu_set_zoom(self, value):
+        self.zoom_new_value = self.base_zoom * (value + 0.5)
 
     def get_zoom(self):
+        if self.menu_is_displaying:
+            if self.zoom_new_value is not None:
+                return self.zoom_new_value
         return self.zoom
     
     def get_music_master_volume(self):
