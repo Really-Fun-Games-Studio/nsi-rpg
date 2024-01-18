@@ -28,7 +28,7 @@ class SoundManager:
         self.time = self.tick * delta
 
         if self.music_play_playlist and not self.music_is_paused: # Musique de fond
-            if not mixer.music.get_busy() or self.music_next_request:
+            if mixer.get_init() and (not mixer.music.get_busy() or self.music_next_request):
                 if self.music_next_request:
                     self.music_next_request = False
                     mixer.music.fadeout(1)
