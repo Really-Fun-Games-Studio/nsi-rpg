@@ -4,9 +4,8 @@ from src.custom_AI import WolfAI
 from src.engine.animation import Anim
 from src.engine.engine import Engine
 from src.engine.enums import GameState, EntityDeathResult
-from src.engine.menu_manager import Menu, Label, Button, Image, Slider
+from src.engine.menu_manager import Menu, Label, Button, Slider, Image
 from pygame.locals import FULLSCREEN, RESIZABLE
-import time
 
 class Game(Engine):
     def __init__(self):
@@ -54,11 +53,11 @@ class Game(Engine):
         menu.add_widget(Image(0.54, 0.06, 1, ".\\assets\\textures\\title_screen\\Word 's.png", "title_screen_word_'s'", False, 2))
         menu.add_widget(Image(0.62, 0.05, 1, ".\\assets\\textures\\title_screen\\Word Secret.png", "title_screen_word_secret", False, 2))
 
-        btn_base_image = pygame.image.load("assets/textures/GUI/button_1.png").convert_alpha()
-        btn_hover_image = pygame.image.load("assets/textures/GUI/button_2.png").convert_alpha()
+        btn_base_image = pygame.image.load("assets/textures/Button Play.png").convert_alpha()
+        btn_hover_image = pygame.image.load("assets/textures/Button Play Hovered.png").convert_alpha()
 
 
-        menu.add_widget(Button(0.5, 0.4, "Play", 0.03, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
+        menu.add_widget(Button(0.5, 0.4, "", 0.03, (0, 0, 0), self.play_button_callback, btn_base_image, btn_hover_image, "play_button", True, 0))
 
         self.menu_manager.register_menu(menu, "main")
 
@@ -77,7 +76,9 @@ class Game(Engine):
                                           ["player"], True)
         self.event_sheduler.register_area((6720, 720, 16, 32), lambda _: self.boss_fight_manager.enter_boss_fight(4),
                                           ["player"], True)
-
+        self.event_sheduler.register_area((591, 358, 98, 46), lambda _: self.boss_fight_manager.player_at_door(),
+                                          ["player"], False, True)
+        
     def create_player_entity(self):
         """Crée une entité joueur."""
 

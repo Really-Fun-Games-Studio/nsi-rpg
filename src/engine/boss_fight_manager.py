@@ -46,6 +46,9 @@ class BossFightManager:
         self.engine.sound_manager.music_pause(3)
         self.engine.renderer.fadeout(3, (0, 0, 0), 100, True, self.setup_fight)
 
+    def player_at_door(self):
+        if self.keys != 4:
+            return
 
     def setup_fight(self):
         """Met en place le combat."""
