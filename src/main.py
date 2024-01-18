@@ -10,6 +10,9 @@ from pygame.locals import FULLSCREEN, RESIZABLE
 class Game(Engine):
     def __init__(self):
         super().__init__()
+        pygame.display.set_caption("The Forest's Secret")
+        icon = pygame.image.load("assets\\textures\\icon.png")
+        pygame.display.set_icon(icon)
         self.map_manager.load_new("maps/map5.tmj")
 
         self.renderer.load_tile_set("assets/textures/tileset.png", 16)

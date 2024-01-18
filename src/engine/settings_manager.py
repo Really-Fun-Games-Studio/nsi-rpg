@@ -72,7 +72,7 @@ class SettingsManager:
         
         menu.add_widget(Label(0.5, 0.05, f"Resolution : {self.screen_max_resolution[0]}p x {self.screen_max_resolution[1]}p", 0.02, (0, 0, 0), "menu_screen_res_text", True, 0))
 
-        menu.add_widget(Slider((0.03, 0.03), (0.45, 0.4), 0.1, base_image, hover_image, rail_image, "menu_zoom_rail",
+        menu.add_widget(Slider((0.03, 0.03), (0.45, 0.6), 0.1, base_image, hover_image, rail_image, "menu_zoom_rail",
                                self.menu_set_zoom, 0, "menu_zoom_slider_area"))
         menu.add_widget(Label(0.5, 0.7, self.get_zoom_text(), 0.02, (0, 0, 0), "menu_zoom_text", True, 0))
 
@@ -186,12 +186,19 @@ class SettingsManager:
 
     def menu_set_zoom(self, value):
         self.zoom_new_value = self.base_zoom * (value + 0.5)
+        self.engine.menu_manager.get_widgets_at_name("settings_menu", "menu_zoom_text")[0].text = self.get_zoom_text()
 
     def get_zoom(self):
         if self.menu_is_displaying:
             if self.zoom_new_value is not None:
                 return self.zoom_new_value
         return self.zoom
+
+    def get_zoom_text(self):
+        if self.menu_is_displaying:
+            if self.zoom_new_value:
+                return f"Zoom : {self.zoom_new_value}x"
+        return f"Zoom : {self.zoom}x"
     
     def get_music_master_volume(self):
         return round(self.master_volume / 100 * self.music_master_volume, 3)
