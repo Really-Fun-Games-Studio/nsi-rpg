@@ -160,7 +160,3 @@ class Game(Engine):
         self.boss_fight_manager.register_fight_data(2, "Mark", 18, 2)
         self.boss_fight_manager.register_fight_data(3, "Steve", 20, 3)
         self.boss_fight_manager.register_fight_data(4, "The ultra-supra boss", 25, 4)
-
-
-game = Game()
-game.loop()
