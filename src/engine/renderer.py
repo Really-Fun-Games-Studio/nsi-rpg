@@ -1,6 +1,5 @@
 import math
 import random
-from time import time_ns
 
 from types import FunctionType
 from pygame import display, image, surface, transform, draw, font
@@ -17,7 +16,7 @@ class Renderer:
 
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
-        self.timer = 0 # Timer local
+        self.timer = 0  # Timer local
         self.window_type = self.engine.settings_manager.get_screen_mode()
         self.window_size = self.engine.settings_manager.get_screen_resolution()
         self.window = display.set_mode(self.window_size, self.window_type)
@@ -33,14 +32,17 @@ class Renderer:
         # Boite de dialogue
         self.dialogs_box = None
 
+        # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
+        self.gui_surface = surface.Surface(self.window_size, SRCALPHA)
+
         # Ombres d'entités
         self.shadows = {}
 
         # Particules affichées
         self.particles = []
 
-        # Varialbes du fadeout
-        self.fadeout_timer = 0 # Timer de fadeout
+        # Variables du fadeout
+        self.fadeout_timer = 0  # Timer de fadeout
         self.fadeout_is_fading = False
         self.fadeout_fade_in_s = 0
         self.fadeout_fade_color = (255, 255, 255)
@@ -49,7 +51,7 @@ class Renderer:
         self.fadeout_fade_callback = None
 
         # Variables du fadein
-        self.fadein_timer = 0 # Timer de fadein
+        self.fadein_timer = 0  # Timer de fadein
         self.fadein_is_fading = False
         self.fadein_fade_in_s = 0
         self.fadein_fade_color = (255, 255, 255)
@@ -122,21 +124,17 @@ class Renderer:
                 if self.fadein_fade_callback is not None:
                     self.fadein_fade_callback()
 
-        self.window.fill((255, 255, 255))
-
-        # On crée une surface qui sera ajoutée à la fenêtre apres rendered_surface pour pouvoir mettre des GUI
-        gui_surface = surface.Surface(display.get_window_size(), SRCALPHA)
-        gui_surface.fill((0, 0, 0, 0))
+        self.gui_surface.fill((0, 0, 0, 0))
 
         if self.engine.game_state == GameState.NORMAL:
             # On crée une surface temporaire qui nous permettra de faire le rendu à l'échelle 1:1
-            rendered_surface_size = (display.get_window_size()[0] / self.engine.camera.zoom,
-                                     display.get_window_size()[1] / self.engine.camera.zoom)
+            rendered_surface_size = (self.window_size[0] / self.engine.camera.zoom,
+                                     self.window_size[1] / self.engine.camera.zoom)
             rendered_surface = surface.Surface(rendered_surface_size)
 
             self.render_layer(0, rendered_surface)
             self.render_layer(1, rendered_surface)
-            self.render_entities(rendered_surface, gui_surface, delta)
+            self.render_entities(rendered_surface, self.gui_surface, delta)
             self.render_particles(rendered_surface, delta)
             self.render_layer(2, rendered_surface)
             self.render_debug_area(rendered_surface)
@@ -160,17 +158,17 @@ class Renderer:
             if self.fadeout_is_fading:
                 r, g, b = self.fadeout_fade_color
                 a = (1 - self.fadeout_timer / self.fadeout_fade_in_s) * self.fadeout_fade_opacity
-                gui_surface.fill((r, g, b, a))
+                self.gui_surface.fill((r, g, b, a))
         
             if self.fadein_is_fading:
                 r, g, b = self.fadein_fade_color
                 a = self.fadein_timer / self.fadein_fade_in_s * self.fadein_fade_opacity
-                gui_surface.fill((r, g, b, a))
+                self.gui_surface.fill((r, g, b, a))
 
         if self.engine.settings_manager.menu_is_displaying:
-            gui_surface.fill((0, 0, 0, self.engine.settings_manager.get_menu_background_opacity()))
+            self.gui_surface.fill((0, 0, 0, self.engine.settings_manager.get_menu_background_opacity()))
 
-        self.window.blit(gui_surface, (0, 0))
+        self.window.blit(self.gui_surface, (0, 0))
 
 
         # Conteur de FPS en mode DEBUG
@@ -187,7 +185,7 @@ class Renderer:
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
 
-            window_size = display.get_window_size()
+            window_size = self.window_size
 
             # On rend maintenant toutes les zones de détection de la fenêtre
             for area in self.engine.event_handler.buttons_area:
@@ -263,11 +261,11 @@ class Renderer:
         self.render_dialogs_box()
 
         # Apres avoir tout rendu, on met à jour l'écran
-        display.update()
+        display.flip()
 
     def render_menus(self):
         """Rend le menu enregistré comme visible."""
-        window_size = display.get_window_size()
+        window_size = self.window_size
 
         # Si un menu est affiché, on itère dans tous ses widgets
         if self.engine.menu_manager.active_menu is not None:
@@ -455,10 +453,10 @@ class Renderer:
         # Rend le conteneur des dialogues
         if self.engine.dialogs_manager.reading_dialog and not self.engine.settings_manager.menu_is_displaying:
             resized_box = transform.scale(self.dialogs_box,
-                                          (display.get_window_size()[0],
+                                          (self.window_size[0],
                                            self.dialogs_box.get_height() / self.dialogs_box.get_width() *
-                                           display.get_window_size()[0]))
-            self.window.blit(resized_box, (0, display.get_window_size()[1] - resized_box.get_height()))
+                                           self.window_size[0]))
+            self.window.blit(resized_box, (0, self.window_size[1] - resized_box.get_height()))
 
             # Rend le texte
 
@@ -466,11 +464,11 @@ class Renderer:
             sentence = self.engine.dialogs_manager.get_current_dialog_sentence()
 
             # On crée la font qui permettra de faire le rendu du texte après
-            text_font = font.SysFont("Arial", display.get_window_size()[0]//30)
+            text_font = font.SysFont("Arial", self.window_size[0]//30)
 
             # On calcule la taille du décalage puis on calcule la largeur maximale que peut faire une ligne
-            x_border = display.get_window_size()[0]/30
-            max_width = display.get_window_size()[0]-2*x_border
+            x_border = self.window_size[0]/30
+            max_width = self.window_size[0]-2*x_border
 
             # On passe le texte dans un algorithme qui coupe le texte entre les espaces pour empecher de dépacer la
             # taille maximale de la ligne
@@ -497,16 +495,16 @@ class Renderer:
                 rendered_text = text_font.render(text, True, (0, 0, 0))
                 self.window.blit(rendered_text,
                                  (x_border,
-                                  display.get_window_size()[1] - resized_box.get_height() +
-                                  display.get_window_size()[0]/30 +
-                                  (text_font.get_height()+display.get_window_size()[0]/200)*i[0]))
+                                  self.window_size[1] - resized_box.get_height() +
+                                  self.window_size[0]/30 +
+                                  (text_font.get_height()+self.window_size[0]/200)*i[0]))
 
     def render_debug_area(self, rendered_surface: surface.Surface):
         """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
         if self.engine.DEBUG_MODE:
             # On calcule le décalage pour centrer la caméra
-            x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-            y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+            x_middle_offset = self.window_size[0] / 2 / self.engine.camera.zoom
+            y_middle_offset = self.window_size[1] / 2 / self.engine.camera.zoom
 
             # On itère et on rend toutes les zones de détection
             for area in self.engine.event_sheduler.area_callbacks:
@@ -535,8 +533,8 @@ class Renderer:
 
     def render_particles(self, rendered_surface: surface.Surface, delta: float):
         """Update et rend les particules."""
-        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+        x_middle_offset = self.window_size[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = self.window_size[1] / 2 / self.engine.camera.zoom
 
         for part in self.particles.copy():
             part_dest = (math.floor(part[0] - self.engine.camera.x + x_middle_offset),
@@ -555,7 +553,7 @@ class Renderer:
         # On rend le fond qui correspond au points des 2 concurents
         # La zone est commentée car encore développement
         """total_point = self.engine.boss_fight_manager.player_points + self.engine.boss_fight_manager.boss_points
-        draw.rect(self.window, (75, 50, 255), (0, 0, math.ceil(display.get_window_size()[0]*(self.engine.boss_fight_manager.player_points/total_point)), display.get_window_size()[1]))
+        draw.rect(self.window, (75, 50, 255), (0, 0, math.ceil(self.window_size[0]*(self.engine.boss_fight_manager.player_points/total_point)), self.window_size[1]))
         """
 
         # On récupère l'image de l'animation du boss
@@ -563,37 +561,37 @@ class Renderer:
         frame = boss_animation.get_frame(delta)
 
         # On redimensionne l'image
-        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+        frame = transform.scale(frame, (self.window_size[0] / 5, self.window_size[0] / 5))
 
         # On colle le boss à droite de la fenêtre
-        self.window.blit(frame, (display.get_window_size()[0] - frame.get_width() - display.get_window_size()[0] / 20,
-                                 display.get_window_size()[1] / 4 - frame.get_height() / 2))
+        self.window.blit(frame, (self.window_size[0] - frame.get_width() - self.window_size[0] / 20,
+                                 self.window_size[1] / 4 - frame.get_height() / 2))
 
         # On récupère l'image de l'animation du joueur
         player_animation = self.boss_fight_player_animations[self.engine.boss_fight_manager.current_player_animation]
         frame = player_animation.get_frame(delta)
 
         # On redimensionne l'image
-        frame = transform.scale(frame, (display.get_window_size()[0] / 5, display.get_window_size()[0] / 5))
+        frame = transform.scale(frame, (self.window_size[0] / 5, self.window_size[0] / 5))
 
         # On colle le joueur à gauche de la fenêtre
         self.window.blit(frame,
-                         (display.get_window_size()[0] / 20, display.get_window_size()[1] / 4 - frame.get_height() / 2))
+                         (self.window_size[0] / 20, self.window_size[1] / 4 - frame.get_height() / 2))
 
     def render_boss_fight_gui(self):
         """Rend la barre d'action en bas de l'écran pendant le combat de boss."""
 
         resized_container = transform.scale(self.boss_fight_GUI_container,
-                                            (display.get_window_size()[0],
+                                            (self.window_size[0],
                                              self.boss_fight_GUI_container.get_height() / self.boss_fight_GUI_container.get_width() *
-                                             display.get_window_size()[0]))
-        self.window.blit(resized_container, (0, display.get_window_size()[1] - resized_container.get_height()))
+                                             self.window_size[0]))
+        self.window.blit(resized_container, (0, self.window_size[1] - resized_container.get_height()))
 
     def render_entities(self, rendered_surface: surface.Surface, gui_surface: surface.Surface, delta: float):
         """Rend toutes les entités."""
         # On calcule le décalage pour centrer la caméra
-        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+        x_middle_offset = self.window_size[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = self.window_size[1] / 2 / self.engine.camera.zoom
 
         for entity in self.engine.entity_manager.get_all_entities():
             # On récupère la frame courante de l'animation
@@ -668,12 +666,12 @@ class Renderer:
     def render_layer(self, layer_id: int, rendered_surface: surface.Surface):
         """Rend la map."""
         # On calcule le nombre de tiles à mettre sur notre écran en prenant en compte le zoom
-        x_map_range = int(display.get_window_size()[0] / self.tile_size / self.engine.camera.zoom) + 2
-        y_map_range = int(display.get_window_size()[1] / self.tile_size / self.engine.camera.zoom) + 2
+        x_map_range = int(self.window_size[0] / self.tile_size / self.engine.camera.zoom) + 2
+        y_map_range = int(self.window_size[1] / self.tile_size / self.engine.camera.zoom) + 2
 
         # On calcule le décalage pour centrer la caméra
-        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
+        x_middle_offset = self.window_size[0] / 2 / self.engine.camera.zoom
+        y_middle_offset = self.window_size[1] / 2 / self.engine.camera.zoom
 
         # On calcule le décalage du début de rendu des tiles
         x_map_offset = math.floor((self.engine.camera.x - x_middle_offset) / self.tile_size)
@@ -736,3 +734,6 @@ class Renderer:
         self.window_size = size
         self.window = display.set_mode(self.window_size, self.window_type)
         display.flip()
+        self.window_size = display.get_window_size()
+        # update des surfaces de rendu :
+        self.gui_surface = surface.Surface(self.window_size, SRCALPHA)

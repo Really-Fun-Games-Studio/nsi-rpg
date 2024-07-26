@@ -55,13 +55,13 @@ class Engine:
         self.running = True
 
 
-        # Initialisation ddes valeurs de delta et de last_time
+        # Initialisation des valeurs de delta et de last_time
         delta = 1.  # Le delta est le temps depuis la dernière image
         last_time = time.time()
         
         while self.running:
             refresh_rate = self.settings_manager.get_refresh_rate()
-            if refresh_rate == -1: # Pas de limite, vers l'infini et l'au-delà !!!
+            if refresh_rate == -1:  # Pas de limite, vers l'infini et l'au-delà !!!
 
                 self.update(delta)
                 new_time = time.time()
@@ -75,7 +75,6 @@ class Engine:
                 new_time = time.time()
                 delta = new_time-last_time
                 last_time = new_time
-
 
                 self.update(delta)
                 
