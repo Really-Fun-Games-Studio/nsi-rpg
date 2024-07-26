@@ -7,6 +7,7 @@ from pygame.locals import *
 import src.engine.engine as engine
 from src.engine.enums import GameState
 
+
 class EventHandler:
     """Classe utilisée pour traiter les pygame.event.get() et gérer les interactions avec le reste du programme."""
 
@@ -99,7 +100,6 @@ class EventHandler:
             y_value = -1
         return x_value, y_value
 
-
     def update(self, delta: float):
         """Vérifie s'il y a de nouvelles interactions et les traites."""
 
@@ -114,13 +114,14 @@ class EventHandler:
             elif e.type == KEYUP:
                 if e.key in self.key_pressed:
                     self.key_pressed.remove(e.key)
+            elif e.type == WINDOWRESIZED:
+                self.engine.renderer.update_window_size()
             elif e.type == MOUSEBUTTONDOWN:
                 # Vérifie si une des zones enregistrées comme bouton n'a pas été cliqué
                 if e.button == 1:
                     for area in self.buttons_area:
                         if self.get_click_collision(area[0], e.pos, area[2]):
                             area[1]()
-
 
                     for area in self.sliders_area:
                         if self.get_click_collision(

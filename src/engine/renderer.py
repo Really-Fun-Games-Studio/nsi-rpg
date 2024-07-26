@@ -734,6 +734,9 @@ class Renderer:
         self.window_size = size
         self.window = display.set_mode(self.window_size, self.window_type)
         display.flip()
+        self.update_window_size()
+
+    def update_window_size(self):
         self.window_size = display.get_window_size()
         # update des surfaces de rendu :
         self.gui_surface = surface.Surface(self.window_size, SRCALPHA)
