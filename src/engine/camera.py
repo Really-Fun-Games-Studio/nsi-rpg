@@ -25,7 +25,7 @@ class Camera:
         """Met à jour la caméra. Permet, par exemple, de faire le scrolling."""
 
         if not self.DEBUG_MODE:
-            self.zoom = zoom
+            self.target_zoom = zoom
 
         # Si on suit une entité, on met à jour les coordonnées de suivi
         if self.followed_entity is not None:
