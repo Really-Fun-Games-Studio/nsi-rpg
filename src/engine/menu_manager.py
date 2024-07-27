@@ -97,7 +97,7 @@ class Image(Widget):
                  centered: bool = False, is_window_relative: int = -1):
         super().__init__(x, y, is_window_relative, widget_name)
         self.size = size
-        self.image = pygame.image.load(image_path)
+        self.image = pygame.image.load(image_path).convert_alpha()
         self.centered = centered
 
 class Menu:
