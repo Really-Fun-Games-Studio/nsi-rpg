@@ -11,6 +11,7 @@ from src.engine.menu_manager import MenuManager
 from src.engine.renderer import Renderer
 from src.engine.enums import GameState
 from src.engine.sound_manager import SoundManager
+from src.engine.settings_manager import SettingsManager
 import pygame
 
 
@@ -29,41 +30,89 @@ class Engine:
         self.running = False
 
         # Composants du moteur de jeu
+        self.menu_manager = MenuManager(self)
+        self.settings_manager = SettingsManager(self, 60, 1.75) # DOIT ABSOLUMENT ETRE EN PREMIER ET APRES MENU_MANAGER (Sinon les autres composants qui nécessite les settings crash)
         self.renderer = Renderer(self)
         self.event_handler = EventHandler(self)
         self.map_manager = MapManager()
-        self.camera = Camera()
+        self.camera = Camera(self.DEBUG_MODE, self.settings_manager.get_zoom())
         self.entity_manager = EntityManager(self.map_manager)
         self.boss_fight_manager = BossFightManager(self)
         self.event_sheduler = EventSheduler(self)
         self.dialogs_manager = DialogsManager(self)
-        self.menu_manager = MenuManager(self)
-        self.sound_manager = SoundManager(60)
+        self.sound_manager = SoundManager(self.settings_manager.get_music_master_volume(), 
+                                  self.settings_manager.get_sound_global_master_volume(),
+                                  self.settings_manager.get_sound_master_volume())
+
+        
+        self.global_latency = 0
+        self.last_latency = []
+        self.latency_precision = self.settings_manager.latency_precision
 
     def loop(self):
         """Fonction à lancer au début du programme et qui va lancer les updates dans une boucle.
         Attend jusqu'à la fin du jeu."""
         self.running = True
 
-        delta = 1.  # Le delta est le temps depuis la dernière image
-        last_time = time.time_ns()/10E8
-        while self.running:
-            self.update(delta)
 
-            new_time = time.time_ns()/10E8
-            delta = new_time-last_time
-            last_time = new_time
+        # Initialisation ddes valeurs de delta et de last_time
+        delta = 1.  # Le delta est le temps depuis la dernière image
+        last_time = time.time()
+        
+        while self.running:
+            refresh_rate = self.settings_manager.get_refresh_rate()
+            if refresh_rate == -1: # Pas de limite, vers l'infini et l'au-delà !!!
+
+                self.update(delta)
+                new_time = time.time()
+                delta = new_time - last_time
+                last_time = new_time
+
+            else:
+                while time.time() < last_time + 1 / refresh_rate - self.global_latency:
+                    pass
+
+                new_time = time.time()
+                delta = new_time-last_time
+                last_time = new_time
+
+
+                self.update(delta)
+                
+                new_refresh_rate = self.settings_manager.get_refresh_rate()
+                if refresh_rate != new_refresh_rate:
+                    refresh_rate = new_refresh_rate
+                    self.global_latency = 0
+                    self.last_latency = []
+
+                latency = 0
+                latency = delta - 1/refresh_rate
+                
+                if not latency > self.global_latency * 100 or self.global_latency == 0: # Impossible que le jeu prenne autant de retard, on skip cette latence dans le calcul, l'utilisateur a surement cliquer hors de la fenêtre
+                    if len(self.last_latency) < self.latency_precision:
+                        self.last_latency.append(latency)
+                    else:
+                        self.last_latency.pop(0)
+                        self.last_latency.append(latency)
+
+                    n = 0
+                    for i in self.last_latency:
+                        n += i
+
+                    self.global_latency = n/len(self.last_latency)
 
     def update(self, delta: float):
         """Fonction qui regroupe toutes les updates des composants. Elle permet de mettre à jour le jeu quand on
         l'appelle."""
-        self.camera.update(delta)
+        self.camera.update(delta, self.settings_manager.get_zoom())
         self.entity_manager.update(delta)
         self.renderer.update(delta)
         self.event_handler.update(delta)
         self.event_sheduler.update()
         self.dialogs_manager.update(delta)
-        self.sound_manager.update(delta)
+        self.sound_manager.update(delta, self.settings_manager.get_music_master_volume(), 
+                                  self.settings_manager.get_sound_global_master_volume(),
+                                  self.settings_manager.get_sound_master_volume())
 
     def stop(self):
         """Arrête le programme."""

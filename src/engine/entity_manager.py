@@ -1,4 +1,5 @@
 from src.engine.entity import Entity
+from src.engine.enums import EntityDeathResult
 from src.engine.map_manager import MapManager
 
 
@@ -29,16 +30,25 @@ class EntityManager:
     def update(self, delta: float):
         """Met à jour toutes les entités enregistrées."""
         for entity_name in list(self.entities.keys()):
-            entity = self.entities[entity_name]
+            entity: Entity = self.entities[entity_name]
             entity.update(delta)
             if entity.life_points == 0:
-                self.entities.pop(entity_name)
+                if entity.death_callback is not None:
+                    entity.death_callback()
+
+                if entity.death_result == EntityDeathResult.REMOVED:
+                    self.entities.pop(entity_name)
+
+                elif entity.death_result == EntityDeathResult.RESET_LIFE:
+                    entity.life_points = entity.max_life_points
+
 
             if entity.brain is not None and not self.paused:
                 entity.brain.update(delta)
 
         if self.player_entity_name:
             player: Entity = self.get_by_name(self.player_entity_name)
+            
             if player.mouvements[0] != 0. or player.mouvements[1] != 0.:
                 player.link_animation("player_walking")
             else:
@@ -52,13 +62,13 @@ class EntityManager:
         """Donne l'entité avec le nom donné."""
         return self.entities[name]
 
-    def pause(self):
+    def pause(self, lock_animation: bool = False):
         """Met en pause tout les mouvements de toutes les entitées"""
         for e in self.get_all_entities():
             if e.locked:
                 self.locked_before_pause.append(e)
             else:
-                e.lock()
+                e.lock(lock_animation)
         self.paused = True
 
     def resume(self):

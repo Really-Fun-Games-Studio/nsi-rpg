@@ -2,10 +2,12 @@ from src.engine.entity import Entity
 
 
 class Camera:
-    def __init__(self):
+    def __init__(self, DEBUG_MODE: bool, zoom: float):
+        self.DEBUG_MODE = DEBUG_MODE
+        
         self.x = 0
         self.y = 0
-        self.zoom = 1.75
+        self.zoom = zoom
 
         # Décalage lors du mouvement du joueur
         self.player_moving_offset = 100
@@ -19,8 +21,11 @@ class Camera:
 
         self.followed_entity: Entity | None = None
 
-    def update(self, delta: float):
+    def update(self, delta: float, zoom: float):
         """Met à jour la caméra. Permet, par exemple, de faire le scrolling."""
+
+        if not self.DEBUG_MODE:
+            self.zoom = zoom
 
         # Si on suit une entité, on met à jour les coordonnées de suivi
         if self.followed_entity is not None:

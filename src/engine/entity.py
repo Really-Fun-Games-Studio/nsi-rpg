@@ -1,8 +1,8 @@
 import math
 
+from src.engine.enums import EntityDeathResult
 from src.engine.map_manager import MapManager
 from src.engine.mobs_AI import MobAI
-
 
 class Entity:
     """Classe permettant de gérer les entités. Créée automatiquement par `EntityManager.register_entity()`"""
@@ -12,6 +12,7 @@ class Entity:
         self.y = 8
 
         self.locked = False # Variable définissant si l'entité est bloqué ou non (.lock() et .unlock())
+        self.locked_animation = False
 
         self.direction = 0  # 0 : tourné vers la droite (ou sens par défaut), 1 : tourné vers la gauche (ou retourné)
 
@@ -42,6 +43,9 @@ class Entity:
 
         self.shadow = None
 
+        self.death_callback = None
+        self.death_result = EntityDeathResult.REMOVED
+
     def set_default_life(self, life: int):
         """Définit le nombre de PV de l'entité. Mettre -1 pour rendre l'entité immortelle."""
         self.life_points = life
@@ -57,6 +61,7 @@ class Entity:
     def update(self, delta: float):
         """Met à jour l'entité."""
         self.time += delta
+
 
         # Diminue la valeur du cooldown de dégât
         self.damage_cooldown -= delta
@@ -188,10 +193,13 @@ class Entity:
         self.animation_name = name
 
 
-    def lock(self):
+    def lock(self, lock_animation: bool = False):
         """Bloque tout les mouvements de l'entitée"""
+        if lock_animation:
+            self.locked_animation = True
         self.locked = True
 
     def unlock(self):
         """Débloque tout les mouvements de l'entitée"""
+        self.locked_animation = False
         self.locked = False

@@ -9,7 +9,7 @@ from pygame.locals import RESIZABLE, SRCALPHA, FULLSCREEN
 import src.engine.engine as engine
 from src.engine.animation import Anim
 from src.engine.enums import GameState
-from src.engine.menu_manager import Label, Button, Slider
+from src.engine.menu_manager import Label, Button, Slider, Image
 
 
 class Renderer:
@@ -18,9 +18,8 @@ class Renderer:
     def __init__(self, core: 'engine.Engine'):
         self.engine = core
         self.timer = 0 # Timer local
-        self.window_type = RESIZABLE
-        self.window_size = (display.Info().current_w, display.Info().current_h) if self.window_type == FULLSCREEN else (
-        600, 600)
+        self.window_type = self.engine.settings_manager.get_screen_mode()
+        self.window_size = self.engine.settings_manager.get_screen_resolution()
         self.window = display.set_mode(self.window_size, self.window_type)
         self.tiles = []
         self.tile_size = 0
@@ -168,18 +167,22 @@ class Renderer:
                 a = self.fadein_timer / self.fadein_fade_in_s * self.fadein_fade_opacity
                 gui_surface.fill((r, g, b, a))
 
+        if self.engine.settings_manager.menu_is_displaying:
+            gui_surface.fill((0, 0, 0, self.engine.settings_manager.get_menu_background_opacity()))
+
         self.window.blit(gui_surface, (0, 0))
+
 
         # Conteur de FPS en mode DEBUG
         if self.engine.DEBUG_MODE:
             self.window.blit(font.SysFont("Arial", 20).render(f"FPS: {round(1/delta if delta else 1)}, Game Status: {'Paused' if self.engine.entity_manager.paused else 'Playing'}", True, (255, 0, 0)),
                              (0, 0))
             player = self.engine.entity_manager.get_by_name('player')
-            self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2)} Y:{round(player.y, 2)}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"X: {round(player.x, 2):.2f} Y:{round(player.y, 2):.2f}",
                                                               True, (255, 0, 0)), (0, 30))
-            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.camera.zoom, 2)}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"Zoom: {round(self.engine.settings_manager.get_zoom(), 2)}",
                                                               True, (255, 0, 0)), (0, 60))
-            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos()}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}",
+            self.window.blit(font.SysFont("Arial", 20).render(f"Volume: {self.engine.sound_manager.music_get_volume()}, Pos: {self.engine.sound_manager.music_get_current_song_pos():.3f}s, Index: {self.engine.sound_manager.music_current_index}, Paused: {self.engine.sound_manager.music_is_paused}",
                                                               True, (255, 0, 0)), (0, 90))
             self.window.blit(font.SysFont("Arial", 20).render(f"Track: {self.engine.sound_manager.music_current_song}",
                                                               True, (255, 0, 0)), (0, 120))
@@ -344,6 +347,7 @@ class Renderer:
                         self.window.blit(btn_image, (x, y))
 
                         self.window.blit(rendered_text, (x, y))
+
                 elif isinstance(widget, Slider):
                     if widget.hovered:
                         slider_image = widget.hover_image
@@ -384,12 +388,72 @@ class Renderer:
                                                     y - rail_image.get_height() // 2))
                     self.window.blit(slider_image, (x+widget.value*width-slider_image.get_width()//2,
                                                     y-slider_image.get_height()//2))
+                    
+                elif isinstance(widget, Image):
+                    
+                    if widget.is_window_relative == 0:
+                        size = widget.size*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        size = widget.size*window_size[1]
+                    elif widget.is_window_relative == 2:
+                        size = widget.size*min(window_size[0], window_size[1])
+                    else:
+                        size = widget.size
+
+                    image = widget.image
+
+                    if widget.is_window_relative == 0:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[0]/self.window_size[0]))
+                    elif widget.is_window_relative == 1:
+                        image = transform.scale(image, (image.get_width()*window_size[1]/self.window_size[1],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+                    elif widget.is_window_relative == 2:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+
+                    # On affiche l'image
+                    if widget.centered:
+                        self.window.blit(image, (x-image.get_width()//2,
+                                                     y-image.get_height()//2))
+                    else:
+                        self.window.blit(image, (x, y))
+
+                elif isinstance(widget, Image):
+                    
+                    if widget.is_window_relative == 0:
+                        size = widget.size*window_size[0]
+                    elif widget.is_window_relative == 1:
+                        size = widget.size*window_size[1]
+                    elif widget.is_window_relative == 2:
+                        size = widget.size*min(window_size[0], window_size[1])
+                    else:
+                        size = widget.size
+
+                    image = widget.image
+
+                    if widget.is_window_relative == 0:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[0]/self.window_size[0]))
+                    elif widget.is_window_relative == 1:
+                        image = transform.scale(image, (image.get_width()*window_size[1]/self.window_size[1],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+                    elif widget.is_window_relative == 2:
+                        image = transform.scale(image, (image.get_width()*window_size[0]/self.window_size[0],
+                                                                image.get_height()*window_size[1]/self.window_size[1]))
+
+                    # On affiche l'image
+                    if widget.centered:
+                        self.window.blit(image, (x-image.get_width()//2,
+                                                     y-image.get_height()//2))
+                    else:
+                        self.window.blit(image, (x, y))
 
     def render_dialogs_box(self):
         """Rend la boite de dialogue lorsqu'un dialogue est lancé."""
 
         # Rend le conteneur des dialogues
-        if self.engine.dialogs_manager.reading_dialog:
+        if self.engine.dialogs_manager.reading_dialog and not self.engine.settings_manager.menu_is_displaying:
             resized_box = transform.scale(self.dialogs_box,
                                           (display.get_window_size()[0],
                                            self.dialogs_box.get_height() / self.dialogs_box.get_width() *
@@ -439,18 +503,18 @@ class Renderer:
 
     def render_debug_area(self, rendered_surface: surface.Surface):
         """Rend les zones de collisions et de détections quand le mode DEBUG est activé."""
+        if self.engine.DEBUG_MODE:
+            # On calcule le décalage pour centrer la caméra
+            x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
+            y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
 
-        # On calcule le décalage pour centrer la caméra
-        x_middle_offset = display.get_window_size()[0] / 2 / self.engine.camera.zoom
-        y_middle_offset = display.get_window_size()[1] / 2 / self.engine.camera.zoom
-
-        # On itère et on rend toutes les zones de détection
-        for area in self.engine.event_sheduler.area_callbacks:
-            area_rect = area[0]
-            draw.rect(rendered_surface, (200, 100, 0),
-                      (math.floor(x_middle_offset + area_rect[0] - self.engine.camera.x),
-                       math.floor(y_middle_offset + area_rect[1] - self.engine.camera.y),
-                       math.floor(area_rect[2]), math.floor(area_rect[3])), width=1)
+            # On itère et on rend toutes les zones de détection
+            for area in self.engine.event_sheduler.area_callbacks:
+                area_rect = area[0]
+                draw.rect(rendered_surface, (200, 100, 0),
+                          (math.floor(x_middle_offset + area_rect[0] - self.engine.camera.x),
+                           math.floor(y_middle_offset + area_rect[1] - self.engine.camera.y),
+                           math.floor(area_rect[2]), math.floor(area_rect[3])), width=1)
 
     def register_shadow(self, file_path: str, name: str):
         """Enregistre une image d'ombre utilisée pour le rendu des entités."""
@@ -487,6 +551,12 @@ class Renderer:
 
     def render_boss_fight_scene(self, delta: float):
         """Rend les sprites du joueur et du boss lors d'un combat de boss."""
+
+        # On rend le fond qui correspond au points des 2 concurents
+        # La zone est commentée car encore développement
+        """total_point = self.engine.boss_fight_manager.player_points + self.engine.boss_fight_manager.boss_points
+        draw.rect(self.window, (75, 50, 255), (0, 0, math.ceil(display.get_window_size()[0]*(self.engine.boss_fight_manager.player_points/total_point)), display.get_window_size()[1]))
+        """
 
         # On récupère l'image de l'animation du boss
         boss_animation: Anim = self.boss_fight_boss_animations[self.engine.boss_fight_manager.current_boss_animation]
@@ -660,3 +730,9 @@ class Renderer:
         self.fadein_pause = pause_world
         self.fadein_fade_callback = callback
         self.engine.entity_manager.pause()
+    
+    def set_display(self, window_type: FULLSCREEN | RESIZABLE, size: tuple[int, int] = None):
+        self.window_type = window_type
+        self.window_size = size
+        self.window = display.set_mode(self.window_size, self.window_type)
+        display.flip()

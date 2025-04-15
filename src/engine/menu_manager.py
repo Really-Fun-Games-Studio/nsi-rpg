@@ -37,7 +37,8 @@ class Slider(Widget):
                  widget_name: str,
                  value_changed_callback: FunctionType | classmethod | staticmethod | None = None,
                  is_window_relative: int = -1,
-                 area_name: str = "menu_slider"):
+                 area_name: str = "menu_slider", 
+                 default_value: float = 0.):
         super().__init__(area_rect[0], area_rect[1], is_window_relative, widget_name)
         self.base_image = base_image
         self.hover_image = hover_image
@@ -47,7 +48,7 @@ class Slider(Widget):
         self.hovered = False
         self.follow_mouse = False
         self.cursor_size = cursor_size
-        self.value = 0.
+        self.value = default_value
         self.width = width
 
     def set_hover_state(self, state: bool):
@@ -75,6 +76,7 @@ class Button(Widget):
                  hover_image: pygame.Surface, widget_name: str, centered: bool = False, is_window_relative: int = -1,
                  area_name: str = "menu_button"):
         super().__init__(x, y, is_window_relative, widget_name)
+        
         self.text = text
         self.size = size
         self.color = color
@@ -88,7 +90,15 @@ class Button(Widget):
     def set_hover_state(self, state: bool):
         """Modifie la valeur du hover."""
         self.hovered = state
-
+        
+class Image(Widget):
+    """Un widget d'image."""
+    def __init__(self, x: int | float, y: int | float, size: int | float, image_path: str, widget_name: str, 
+                 centered: bool = False, is_window_relative: int = -1):
+        super().__init__(x, y, is_window_relative, widget_name)
+        self.size = size
+        self.image = pygame.image.load(image_path)
+        self.centered = centered
 
 class Menu:
     """Un menu contenant des widgets."""
@@ -146,7 +156,8 @@ class MenuManager:
                                                                widget.area_name,
                                                                widget.is_window_relative,
                                                                hover_callback=widget.set_hover_state,
-                                                               motion_callback=widget.set_value)
+                                                               motion_callback=widget.set_value,
+                                                               default_values=(widget.value, 0.))
 
     def hide(self):
         """Cache le menu actuelement à l'écran."""

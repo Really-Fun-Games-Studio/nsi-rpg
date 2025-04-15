@@ -5,7 +5,7 @@ from pygame import event, display
 from pygame.locals import *
 
 import src.engine.engine as engine
-
+from src.engine.enums import GameState
 
 class EventHandler:
     """Classe utilisée pour traiter les pygame.event.get() et gérer les interactions avec le reste du programme."""
@@ -17,6 +17,7 @@ class EventHandler:
         self.hovered_buttons_area = []
         self.hovered_sliders_area = []
         self.sliders_area = []
+        self.key_cooldown: dict[int: float] = {}
 
     @staticmethod
     def get_click_collision(rect: tuple[float | int, float | int, float | int, float | int], point: tuple[int, int],
@@ -66,9 +67,10 @@ class EventHandler:
                              clicked_callback: FunctionType | classmethod | staticmethod = None,
                              released_callback: FunctionType | classmethod | staticmethod = None,
                              motion_callback: FunctionType | classmethod | staticmethod = None,
-                             hover_callback: FunctionType | classmethod | staticmethod = None):
+                             hover_callback: FunctionType | classmethod | staticmethod = None,
+                             default_values: tuple[int, int] = (0., 0.)):
         """Enregistre une zone comme une zone déplaçable à l'écran."""
-        self.sliders_area.append([[motion_rect[0], motion_rect[1], *size], is_window_relative, False, (0, 0),
+        self.sliders_area.append([[motion_rect[0]+default_values[0]*motion_rect[2], motion_rect[1]+default_values[1]*motion_rect[3], *size], is_window_relative, False, default_values,
                                   motion_axes, motion_rect,
                                   clicked_callback, released_callback, hover_callback, motion_callback, name])
         # Le premier booléen correspond à l'état de suivi de la souris
@@ -214,6 +216,23 @@ class EventHandler:
             if K_SPACE in self.key_pressed:
                 self.engine.dialogs_manager.next_signal()
                 self.key_pressed.remove(K_SPACE)
+            
+            if K_ESCAPE in self.key_pressed and self.key_cooldown.get(K_ESCAPE, 0) <= 0 and self.engine.game_state == GameState.NORMAL and not (self.engine.renderer.fadein_is_fading or self.engine.renderer.fadeout_is_fading):
+                if not self.engine.settings_manager.menu_is_displaying:
+                    self.engine.settings_manager.show_menu()
+                else:
+                    self.engine.settings_manager.hide_menu()
+                self.cooldown(K_ESCAPE, self.engine.settings_manager.menu_fade_time)
+            
+            if K_F11 in self.key_pressed and self.key_cooldown.get(K_F11, 0) <= 0:
+                screen_mode = self.engine.settings_manager.get_screen_mode()
+                if screen_mode == FULLSCREEN:
+                    self.engine.settings_manager.set_screen_mode(RESIZABLE)
+
+                elif screen_mode == RESIZABLE:
+                    self.engine.settings_manager.set_screen_mode(FULLSCREEN)
+
+                self.cooldown(K_F11, 0.2)
 
             if self.engine.DEBUG_MODE:
                 if K_l in self.key_pressed:
@@ -225,9 +244,16 @@ class EventHandler:
                 if K_o in self.key_pressed:
                     print(f"Player pos: X = {self.engine.entity_manager.get_by_name('player').x} "
                           f"Y = {self.engine.entity_manager.get_by_name('player').y}")
+                    self.key_pressed.remove(K_o)
 
                 if K_x in self.key_pressed:
-                    self.engine.camera.target_zoom *= 1.01
+                    self.engine.settings_manager.zoom *= 1.01
                 if K_c in self.key_pressed:
-                    self.engine.camera.target_zoom *= 0.99
+                    self.engine.settings_manager.zoom *= 0.99
+        
+        for key in self.key_cooldown.keys():
+            if key not in self.key_pressed:
+                self.key_cooldown[key] -= delta
 
+    def cooldown(self, key: int, cooldown: float):
+        self.key_cooldown[key] = cooldown

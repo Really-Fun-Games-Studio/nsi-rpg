@@ -25,7 +25,7 @@ class DialogsManager:
         if self.reading_dialog:
             if self.writing_dialog:
                 self.current_dialogue_letter_id = len(self.current_dialogs[self.current_dialog_id])
-            else:
+            elif not self.engine.settings_manager.menu_is_displaying:
                 self.next_dialog()
 
     def next_dialog(self):
@@ -47,7 +47,7 @@ class DialogsManager:
         """Lance le dialogue au nom donné."""
 
         # Si un dialogue n'est pas déja lancé, on lance le dialogue au nom donné
-        if not self.reading_dialog:
+        if not self.reading_dialog and not self.engine.settings_manager.menu_is_displaying:
             self.engine.entity_manager.pause()
 
             self.engine.event_handler.register_button_area((0, 0, 1, 1), self.next_signal, "next_dialog", 2)

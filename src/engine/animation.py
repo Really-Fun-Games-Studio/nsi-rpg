@@ -3,11 +3,12 @@
 import os
 
 import pygame
-
+from src.engine import entity
 
 class Anim:
     """Une animation contenant les images pygame et le temps entre chaque frames."""
-    def __init__(self, change_frame_time: float):
+    def __init__(self, change_frame_time: float, entity: 'entity.Entity' = None):
+        self.linked_entity = entity
         self.frames = []
         self.change_frame_time = change_frame_time  # Delay entre chaque frames
         self.current_frame = 0
@@ -30,6 +31,10 @@ class Anim:
 
     def update_current_frame(self, delta: float):
         """Met à jour le delay de l'image courante avec le delta time."""
+        if self.linked_entity is not None:
+            if self.linked_entity.locked_animation:
+                return
+            
         self.time += delta
 
         # Si le delay entre deux images est écoulé, on incrémente le numéro de l'image et on remet le temps à 0
